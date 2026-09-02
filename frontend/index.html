@@ -178,7 +178,7 @@
                         <i data-lucide="file-text" class="w-4 h-4 text-zinc-400"></i> Extrato & Recibos
                     </button>
                     <button onclick="navigateTo('cartoes')" id="nav-cartoes" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400"></i> Cartões
+                        <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400"></i> Central de Cartões
                     </button>
                     <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
                         <i data-lucide="qr-code" class="w-4 h-4 text-zinc-400"></i> Área Pix
@@ -238,7 +238,6 @@
                         <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Swagger
                     </a>
 
-                    <!-- TopBar Profile Pill Clickable (Opens BB iOS Profile Modal) -->
                     <button onclick="openProfileModal()" class="flex items-center gap-2.5 pl-3 border-l border-zinc-800 hover:opacity-80 transition cursor-pointer text-left group">
                         <div class="w-8 h-8 rounded-full bg-amber-400/10 group-hover:bg-amber-400/20 border border-amber-400/30 flex items-center justify-center font-bold text-amber-400 text-xs shadow-sm" id="topUserAvatar">JP</div>
                         <div class="hidden xl:block">
@@ -309,7 +308,7 @@
                                 </div>
                             </div>
                             <button onclick="navigateTo('cartoes')" class="mt-4 w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
-                                Gerenciar Cartões →
+                                Central de Cartões →
                             </button>
                         </div>
                     </div>
@@ -396,92 +395,248 @@
                     </div>
                 </section>
 
-                <!-- 3. VIEW: CARTÕES -->
+                <!-- 3. VIEW: CENTRAL DE CARTÕES (PADRÃO BB iOS + CARBON LUXURY) -->
                 <section id="view-cartoes" class="view-panel hidden space-y-6">
+                    
+                    <!-- Top Section: Limite Único + Meus Cartões -->
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <div class="lg:col-span-6 space-y-4">
-                            <div id="interactiveCard" class="card-theme-carbon rounded-3xl p-7 shadow-2xl relative flex flex-col justify-between h-64 transition-all duration-500 overflow-hidden">
-                                <div class="absolute -right-12 -top-12 w-44 h-44 bg-white/5 rounded-full blur-3xl"></div>
+                        
+                        <!-- Limite Único Card (Exact BB iOS Reference) -->
+                        <div class="lg:col-span-5 carbon-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-black text-white">Limite único</h2>
+                                <button onclick="showToastNotification('Gestão de limites de crédito aberta.', 'info')" class="text-xs font-bold text-blue-400 hover:text-blue-300 transition">
+                                    Gerenciar limites
+                                </button>
+                            </div>
 
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 rounded-lg bg-zinc-900/80 border border-amber-500/50 flex items-center justify-center">
-                                            <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
-                                        </div>
-                                        <span class="text-base font-extrabold tracking-wider text-white">Bank<span class="text-amber-400">Core</span></span>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-zinc-400">
-                                        <i data-lucide="wifi" class="w-4 h-4 rotate-90"></i>
-                                        <span class="text-xs uppercase font-extrabold tracking-widest text-zinc-300" id="cardBadgeTitle">Carbon Black</span>
-                                    </div>
+                            <!-- Values Display -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div class="text-lg sm:text-xl font-black text-white font-mono" id="cardLimitUsed">R$ 8.371,00</div>
+                                    <div class="text-[11px] text-zinc-400 font-medium">Utilizado</div>
                                 </div>
-
-                                <div class="flex items-center gap-4 my-2">
-                                    <div class="w-12 h-9 rounded-lg bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-200 border border-amber-600/40 shadow-inner flex items-center justify-center">
-                                        <div class="w-7 h-6 border border-amber-800/40 rounded-sm grid grid-cols-2 gap-0.5 opacity-60">
-                                            <div class="border-b border-amber-800/40"></div>
-                                            <div class="border-b border-amber-800/40"></div>
-                                        </div>
-                                    </div>
-                                    <span class="text-sm font-mono text-zinc-300 tracking-widest">•••• •••• •••• 4289</span>
-                                </div>
-
-                                <div class="flex items-end justify-between">
-                                    <div>
-                                        <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Titular</div>
-                                        <div class="text-sm font-extrabold text-white uppercase tracking-wide font-mono" id="cardHolderFull">JOAO PAULO SOUZA</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Validade</div>
-                                        <div class="text-xs font-mono text-zinc-300 font-bold">12/29</div>
-                                    </div>
+                                <div class="text-right">
+                                    <div class="text-lg sm:text-xl font-black text-blue-400 font-mono" id="cardLimitAvailable">R$ 12.260,00</div>
+                                    <div class="text-[11px] text-zinc-400 font-medium">Disponível</div>
                                 </div>
                             </div>
 
-                            <div class="carbon-card rounded-2xl p-4 flex items-center justify-between">
-                                <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Cor do Cartão:</span>
-                                <div class="flex items-center gap-3">
-                                    <button onclick="setCardTheme('carbon', 'Carbon Black')" class="w-7 h-7 rounded-full bg-zinc-900 border-2 border-amber-400 shadow-sm"></button>
-                                    <button onclick="setCardTheme('gold', 'Gold Edition')" class="w-7 h-7 rounded-full bg-amber-600 border-2 border-zinc-700"></button>
-                                    <button onclick="setCardTheme('silver', 'Titanium Silver')" class="w-7 h-7 rounded-full bg-slate-400 border-2 border-zinc-700"></button>
-                                    <button onclick="setCardTheme('blue', 'Acqua Blue')" class="w-7 h-7 rounded-full bg-sky-600 border-2 border-zinc-700"></button>
-                                    <button onclick="setCardTheme('rose', 'Rose Gold')" class="w-7 h-7 rounded-full bg-rose-600 border-2 border-zinc-700"></button>
+                            <!-- Progress Bar (BB Style) -->
+                            <div>
+                                <div class="w-full bg-zinc-800 h-3 rounded-full overflow-hidden border border-zinc-700/60 p-0.5">
+                                    <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[40%] rounded-full shadow-sm"></div>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-zinc-500 font-mono mt-1.5">
+                                    <span>Limite Total: <strong>R$ 20.631,00</strong></span>
+                                    <span>Renovação: <strong>10/Set</strong></span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-6 carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
-                            <h3 class="text-lg font-black text-white">Gestão do Cartão Carbon</h3>
-                            <div>
-                                <div class="flex items-center justify-between text-xs font-bold mb-2">
-                                    <span class="text-zinc-400">Limite de Crédito Disponível</span>
-                                    <span class="text-amber-400 font-mono text-sm">R$ 25.000,00</span>
-                                </div>
-                                <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden border border-zinc-800">
-                                    <div class="bg-gradient-to-r from-amber-400 to-amber-500 h-full w-[85%] rounded-full"></div>
-                                </div>
-                                <div class="flex justify-between text-[10px] text-zinc-500 mt-1">
-                                    <span>Fatura Atual: R$ 3.750,00</span>
-                                    <span>Limite Total: R$ 25.000,00</span>
-                                </div>
+                        <!-- Meus Cartões Card (BB iOS Card & Invoice Box) -->
+                        <div class="lg:col-span-7 carbon-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-black text-white">Meus cartões</h2>
+                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Cartão Principal</span>
                             </div>
 
-                            <div class="space-y-3 pt-2">
-                                <div class="p-3.5 rounded-xl carbon-card-subtle flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <i data-lucide="lock" class="w-4 h-4 text-zinc-400"></i>
-                                        <div>
-                                            <div class="text-xs font-bold text-white">Bloqueio Temporário</div>
-                                            <div class="text-[10px] text-zinc-500">Bloquear compras online e presenciais</div>
-                                        </div>
+                            <div class="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <div class="text-sm font-extrabold text-blue-400">Final 4289 • Carbon Black</div>
+                                    <div class="text-2xl font-black text-white font-mono mt-1" id="cardInvoiceValue">R$ 2.296,07</div>
+                                    <div class="text-xs text-zinc-400 font-medium mt-0.5">Fatura vence em <strong class="text-zinc-200">10 de setembro</strong></div>
+                                </div>
+
+                                <!-- Mini Card Illustration -->
+                                <div class="w-44 h-24 rounded-xl card-theme-carbon p-3 flex flex-col justify-between border border-zinc-700/80 shadow-xl flex-shrink-0">
+                                    <div class="flex justify-between items-center text-[10px] font-bold text-white">
+                                        <span>Bank<span class="text-amber-400">Core</span></span>
+                                        <span class="text-[8px] font-mono text-amber-400 uppercase">VORTEX</span>
                                     </div>
-                                    <input type="checkbox" class="w-4 h-4 accent-amber-400 cursor-pointer">
+                                    <div class="text-[9px] font-mono text-zinc-400">•••• •••• •••• 4289</div>
+                                    <div class="flex justify-between items-center text-[8px] font-mono text-zinc-400">
+                                        <span>JOAO PAULO</span>
+                                        <span class="text-white font-bold">VISA</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <button onclick="showToastNotification('Dados do cartão virtual visualizados com criptografia.', 'success')" class="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white border border-zinc-700 transition flex items-center justify-center gap-2">
-                                <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i> Visualizar CVV e Senha
-                            </button>
+                            <div class="flex items-center justify-between pt-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                    <span class="w-2 h-2 rounded-full bg-zinc-700"></span>
+                                </div>
+                                <button onclick="openInvoiceModal()" class="text-sm font-extrabold text-blue-400 hover:text-blue-300 transition flex items-center gap-1">
+                                    <span>Ver faturas</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid of 8 Circular Quick Actions (BB iOS Style) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+                        <button onclick="openInvoiceModal()" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
+                                <i data-lucide="receipt" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight">Pagar fatura</span>
+                        </button>
+
+                        <button onclick="showToastNotification('Adicionado com sucesso ao Apple Wallet!', 'success')" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
+                                <i data-lucide="wallet" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight">Carteiras digitais</span>
+                        </button>
+
+                        <button onclick="generateVirtualCard()" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
+                                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight">Cartões virtuais</span>
+                        </button>
+
+                        <button onclick="showToastNotification('Upgrade para Vortex Black Infinite liberado.', 'success')" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight">Upgrade de cartão</span>
+                        </button>
+
+                        <button onclick="showToastNotification('Central de Adicionais aberta.', 'info')" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
+                                <i data-lucide="user-plus" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight">Central de Adicionais</span>
+                        </button>
+
+                        <button onclick="toggleCardBlock()" id="btnCardBlock" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition" id="iconCardBlock">
+                                <i data-lucide="lock" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight" id="textCardBlock">Bloquear cartão</span>
+                        </button>
+
+                        <button onclick="showToastNotification('Simulador de parcelamento de compras aberto.', 'info')" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
+                                <i data-lucide="calculator" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight">Parcelar compra</span>
+                        </button>
+
+                        <button onclick="showToastNotification('Mais opções de compras internacionais e segurança.', 'info')" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
+                            <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-300 group-hover:text-white leading-tight">Ver mais</span>
+                        </button>
+                    </div>
+
+                    <!-- Section: Últimos Lançamentos (Exact BB iOS Items) -->
+                    <div class="carbon-card rounded-3xl p-6 sm:p-8 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                            <h2 class="text-xl font-black text-white">Últimos lançamentos</h2>
+                            <span class="text-xs font-bold text-zinc-400">Fatura Atual • Setembro</span>
+                        </div>
+
+                        <!-- Purchases List -->
+                        <div class="divide-y divide-zinc-800/70">
+                            
+                            <!-- Item 1 -->
+                            <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
+                                <div>
+                                    <div class="text-sm font-extrabold text-white">Pg *qb Quero</div>
+                                    <div class="text-xs text-zinc-400">Ourocard-e 5745</div>
+                                    <div class="text-[11px] text-zinc-500 font-mono">Dom, 30/Ago às 20:59</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono">R$ 224,90</div>
+                                    <div class="text-xs text-blue-400 font-medium">em 6x</div>
+                                    <div class="text-[10px] text-zinc-500">no crédito</div>
+                                </div>
+                            </div>
+
+                            <!-- Item 2 -->
+                            <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
+                                <div>
+                                    <div class="text-sm font-extrabold text-white">Zp *olx Sergi</div>
+                                    <div class="text-xs text-zinc-400">Ourocard-e 6884</div>
+                                    <div class="text-[11px] text-zinc-500 font-mono">Dom, 30/Ago às 17:52</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono">R$ 2.785,99</div>
+                                    <div class="text-xs text-blue-400 font-medium">em 10x</div>
+                                    <div class="text-[10px] text-zinc-500">no crédito</div>
+                                </div>
+                            </div>
+
+                            <!-- Item 3 -->
+                            <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
+                                <div>
+                                    <div class="text-sm font-extrabold text-white">Zp *olx Sergio H</div>
+                                    <div class="text-xs text-zinc-400">Ourocard-e 6884</div>
+                                    <div class="text-[11px] text-zinc-500 font-mono">Dom, 30/Ago às 16:39</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono">R$ 2.785,99</div>
+                                    <div class="text-xs text-blue-400 font-medium">em 10x</div>
+                                    <div class="text-[10px] text-zinc-500">no crédito</div>
+                                </div>
+                            </div>
+
+                            <!-- Item 4 -->
+                            <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
+                                <div>
+                                    <div class="text-sm font-extrabold text-white">Mp*aliexpress</div>
+                                    <div class="text-xs text-zinc-400">Ourocard-e 6884</div>
+                                    <div class="text-[11px] text-zinc-500 font-mono">Sex, 28/Ago às 22:52</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono">R$ 1.302,18</div>
+                                    <div class="text-[10px] text-zinc-500">no crédito</div>
+                                </div>
+                            </div>
+
+                            <!-- Item 5 -->
+                            <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
+                                <div>
+                                    <div class="text-sm font-extrabold text-white">Aliexpress</div>
+                                    <div class="text-xs text-zinc-400">Ourocard-e 6884</div>
+                                    <div class="text-[11px] text-zinc-500 font-mono">Sex, 28/Ago às 22:16</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono">R$ 121,20</div>
+                                    <div class="text-[10px] text-zinc-500">no crédito</div>
+                                </div>
+                            </div>
+
+                            <!-- Item 6 -->
+                            <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
+                                <div>
+                                    <div class="text-sm font-extrabold text-white">Apple.com/bill</div>
+                                    <div class="text-xs text-zinc-400">Ourocard-e 0357</div>
+                                    <div class="text-[11px] text-zinc-500 font-mono">Sex, 28/Ago às 02:10</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono">R$ 38,00</div>
+                                    <div class="text-[10px] text-zinc-500">no crédito</div>
+                                </div>
+                            </div>
+
+                            <!-- Item 7 -->
+                            <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
+                                <div>
+                                    <div class="text-sm font-extrabold text-white">Apple.com/bill</div>
+                                    <div class="text-xs text-zinc-400">Ourocard-e 0357</div>
+                                    <div class="text-[11px] text-zinc-500 font-mono">Qua, 26/Ago às 09:31</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono">R$ 5,90</div>
+                                    <div class="text-[10px] text-zinc-500">no crédito</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -728,11 +883,105 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: MEU PERFIL & CONFIGURAÇÕES (PADRÃO BB iOS) ================= -->
+    <!-- ================= MODAL: FATURA DO CARTÃO EM PDF ================= -->
+    <div id="invoiceModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+        <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
+            
+            <div id="invoicePrintableArea" class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 space-y-5 text-white">
+                
+                <!-- Invoice Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
+                            <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-extrabold text-white leading-tight">Bank<span class="text-amber-400">Core</span> Card</div>
+                            <div class="text-[9px] text-zinc-400 uppercase font-mono">Vortex Software • Carbon Black</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            Fatura Fechada
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Invoice Summary -->
+                <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total da Fatura</div>
+                        <div class="text-2xl font-black text-amber-400 font-mono">R$ 2.296,07</div>
+                        <div class="text-[11px] text-zinc-400 mt-0.5">Vencimento: <strong class="text-white">10/09/2026</strong></div>
+                    </div>
+                    <div class="text-right text-xs text-zinc-400">
+                        <div>Melhor dia de compra: <strong>03</strong></div>
+                        <div>Limite Utilizado: <strong>R$ 8.371,00</strong></div>
+                    </div>
+                </div>
+
+                <!-- Purchases Breakdown -->
+                <div>
+                    <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Detalhamento dos Lançamentos</div>
+                    <div class="divide-y divide-zinc-800/60 text-xs">
+                        <div class="py-2 flex justify-between">
+                            <div>
+                                <div class="font-bold text-white">Pg *qb Quero</div>
+                                <div class="text-[10px] text-zinc-500">30/Ago • 6x de R$ 37,48</div>
+                            </div>
+                            <div class="font-bold text-white font-mono">R$ 224,90</div>
+                        </div>
+                        <div class="py-2 flex justify-between">
+                            <div>
+                                <div class="font-bold text-white">Mp*aliexpress</div>
+                                <div class="text-[10px] text-zinc-500">28/Ago • À vista</div>
+                            </div>
+                            <div class="font-bold text-white font-mono">R$ 1.302,18</div>
+                        </div>
+                        <div class="py-2 flex justify-between">
+                            <div>
+                                <div class="font-bold text-white">Aliexpress</div>
+                                <div class="text-[10px] text-zinc-500">28/Ago • À vista</div>
+                            </div>
+                            <div class="font-bold text-white font-mono">R$ 121,20</div>
+                        </div>
+                        <div class="py-2 flex justify-between">
+                            <div>
+                                <div class="font-bold text-white">Apple.com/bill</div>
+                                <div class="text-[10px] text-zinc-500">28/Ago • Assinatura iCloud</div>
+                            </div>
+                            <div class="font-bold text-white font-mono">R$ 38,00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barcode & Payment Info -->
+                <div class="pt-3 border-t border-zinc-800 space-y-1.5">
+                    <div class="text-[9px] uppercase font-bold text-zinc-500">Linha Digitável para Pagamento</div>
+                    <div class="text-[10px] font-mono text-zinc-300 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 break-all select-all">
+                        00190.00009 02891.234567 89000.000018 1 98760000229607
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                <button onclick="downloadInvoicePDF()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/20 transition flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Baixar Fatura em PDF
+                </button>
+                <button onclick="payInvoiceDirectly()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Pagar Fatura Agora
+                </button>
+                <button onclick="closeModal('invoiceModal')" class="px-4 py-3.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: MEU PERFIL (PADRÃO BB iOS) ================= -->
     <div id="profileModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
         <div class="carbon-card max-w-lg w-full max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-6">
             
-            <!-- iOS Style Header -->
             <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
                 <div class="flex items-center gap-2">
                     <div class="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center">
@@ -745,10 +994,9 @@
                 </button>
             </div>
 
-            <!-- Profile Summary Card (Identical to BB iOS) -->
             <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between hover:border-zinc-700 transition cursor-pointer group" onclick="openProfileSubModal('cadastroModal')">
                 <div class="flex items-center gap-3.5">
-                    <div class="w-13 h-13 w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-black font-black text-base shadow-lg shadow-amber-500/20" id="profAvatarBig">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-black font-black text-base shadow-lg shadow-amber-500/20" id="profAvatarBig">
                         JP
                     </div>
                     <div>
@@ -760,12 +1008,9 @@
                 <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-500 group-hover:text-amber-400 transition"></i>
             </div>
 
-            <!-- GROUP 1: CONFIGURAÇÕES -->
             <div class="space-y-2">
                 <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Configurações</div>
                 <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
-                    
-                    <!-- Geral -->
                     <div onclick="openProfileSubModal('geralModal')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                         <div class="flex items-start gap-3">
                             <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -773,13 +1018,12 @@
                             </div>
                             <div>
                                 <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Geral</div>
-                                <div class="text-[11px] text-zinc-400 leading-tight">Configure notificações, acesso ao app, imagens da tela de login e muito mais.</div>
+                                <div class="text-[11px] text-zinc-400 leading-tight">Configure notificações, acesso ao app e imagens da tela.</div>
                             </div>
                         </div>
                         <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
                     </div>
 
-                    <!-- Cadastro -->
                     <div onclick="openProfileSubModal('cadastroModal')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                         <div class="flex items-start gap-3">
                             <div class="w-8 h-8 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -787,35 +1031,7 @@
                             </div>
                             <div>
                                 <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Cadastro & Vortex Software</div>
-                                <div class="text-[11px] text-zinc-400 leading-tight">Edite dados pessoais, profissionais, e-mail, telefone, Razão Social e outros itens.</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
-                    </div>
-
-                    <!-- Privacidade -->
-                    <div onclick="showToastNotification('Suas preferências de privacidade e LGPD estão 100% ativas.', 'info')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Privacidade</div>
-                                <div class="text-[11px] text-zinc-400 leading-tight">Personalize sua privacidade e saiba como o BankCore trata seus dados pessoais.</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
-                    </div>
-
-                    <!-- Acessibilidade -->
-                    <div onclick="showToastNotification('Configurações de alto contraste e acessibilidade habilitadas.', 'info')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="accessibility" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Acessibilidade</div>
-                                <div class="text-[11px] text-zinc-400 leading-tight">Garanta uma experiência visual acessível e personalizada.</div>
+                                <div class="text-[11px] text-zinc-400 leading-tight">Edite dados pessoais, profissionais, Razão Social e endereço.</div>
                             </div>
                         </div>
                         <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
@@ -823,23 +1039,9 @@
                 </div>
             </div>
 
-            <!-- GROUP 2: SEGURANÇA -->
             <div class="space-y-2">
                 <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Segurança</div>
                 <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
-                    
-                    <!-- Central de Segurança -->
-                    <div onclick="showToastNotification('Monitoramento em tempo real ativo. 1 dispositivo conectado.', 'info')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="user-check" class="w-4 h-4"></i>
-                            </div>
-                            <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Central de Segurança</div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
-
-                    <!-- Central de Senhas -->
                     <div onclick="openProfileSubModal('senhaModal')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0">
@@ -849,45 +1051,16 @@
                         </div>
                         <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
                     </div>
-
-                    <!-- BB Code / BankCore Token -->
-                    <div onclick="showToastNotification('BankCore Token (2FA) ativo e sincronizado com o SPI.', 'success')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="qr-code" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">BankCore Token (2FA)</div>
-                                <div class="text-[10px] text-emerald-400 font-bold">Habilitado.</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
-
-                    <!-- Dispositivos e WhatsApp -->
-                    <div onclick="showToastNotification('Notificações de Pix via WhatsApp liberadas para o seu número.', 'info')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="message-square" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Dispositivos e WhatsApp</div>
-                                <div class="text-[10px] text-zinc-500">Gerenciar liberações.</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
                 </div>
             </div>
 
-            <!-- LOGOUT BUTTON (Prominent iOS Style) -->
             <button onclick="logout()" class="w-full py-3.5 rounded-2xl bg-blue-600/15 hover:bg-blue-600/25 text-blue-400 hover:text-blue-300 font-extrabold text-xs uppercase tracking-widest border border-blue-500/30 transition shadow-lg flex items-center justify-center gap-2">
                 <i data-lucide="log-out" class="w-4 h-4"></i> SAIR DO WEB BANKING
             </button>
         </div>
     </div>
 
-    <!-- SUB-MODAL: CADASTRO & VORTEX SOFTWARE -->
+    <!-- SUB-MODAL: CADASTRO -->
     <div id="cadastroModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
             <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
@@ -914,10 +1087,6 @@
                     <label class="block text-zinc-500 font-semibold mb-1">CPF Cadastrado</label>
                     <input type="text" id="cadCpfInput" readonly class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono">
                 </div>
-                <div>
-                    <label class="block text-zinc-500 font-semibold mb-1">Localização & Escritório</label>
-                    <input type="text" readonly value="Escritório Virtual • Contabilizei" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300">
-                </div>
             </div>
 
             <button onclick="saveProfileData()" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase transition">
@@ -938,15 +1107,7 @@
 
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-zinc-400 mb-1">Senha Atual</label>
-                    <input type="password" placeholder="••••••••" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
-                </div>
-                <div>
                     <label class="block text-zinc-400 mb-1">Nova Senha de Acesso</label>
-                    <input type="password" placeholder="••••••••" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
-                </div>
-                <div>
-                    <label class="block text-zinc-400 mb-1">Confirmar Nova Senha</label>
                     <input type="password" placeholder="••••••••" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
                 </div>
             </div>
@@ -954,110 +1115,6 @@
             <button onclick="closeModal('senhaModal'); showToastNotification('Senha de acesso alterada com sucesso!', 'success');" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase transition">
                 Atualizar Senha
             </button>
-        </div>
-    </div>
-
-    <!-- SUB-MODAL: GERAL -->
-    <div id="geralModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="settings" class="w-4 h-4 text-blue-400"></i> Configurações Gerais
-                </h3>
-                <button onclick="closeModal('geralModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <div class="p-3 rounded-xl bg-zinc-900 flex items-center justify-between">
-                    <div>
-                        <div class="font-bold text-white">Alertas de Pix por E-mail</div>
-                        <div class="text-[10px] text-zinc-500">Receba notificações de transferências recebidas</div>
-                    </div>
-                    <input type="checkbox" checked class="w-4 h-4 accent-amber-400 cursor-pointer">
-                </div>
-
-                <div class="p-3 rounded-xl bg-zinc-900 flex items-center justify-between">
-                    <div>
-                        <div class="font-bold text-white">Sons de Confirmação</div>
-                        <div class="text-[10px] text-zinc-500">Emitir som característico ao pagar e receber</div>
-                    </div>
-                    <input type="checkbox" checked class="w-4 h-4 accent-amber-400 cursor-pointer">
-                </div>
-            </div>
-
-            <button onclick="closeModal('geralModal'); showToastNotification('Preferências gerais atualizadas.', 'success');" class="w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-black font-extrabold text-xs uppercase transition">
-                Salvar Preferências
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL: COMPROVANTE OFICIAL DE PIX EM PDF -->
-    <div id="receiptModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="max-w-md w-full carbon-card rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
-            <div id="receiptPrintableArea" class="bg-zinc-950 p-5 rounded-2xl border border-zinc-800 space-y-4 text-white">
-                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
-                            <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="text-xs font-extrabold text-white leading-tight">Bank<span class="text-amber-400">Core</span></div>
-                            <div class="text-[8px] text-zinc-400 uppercase font-mono">Vortex Software • SPI</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            Pix Efetivado
-                        </span>
-                    </div>
-                </div>
-
-                <div class="text-center py-2 space-y-1">
-                    <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Comprovante de Transferência Pix</div>
-                    <div class="text-3xl font-black text-amber-400 font-mono tracking-tight" id="rcptAmount">R$ 0,00</div>
-                    <div class="text-[10px] text-zinc-500 font-mono" id="rcptDate">02/09/2026 às 13:17:00</div>
-                </div>
-
-                <div class="space-y-3 pt-2 text-xs border-t border-zinc-800/80">
-                    <div>
-                        <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Origem (Pagador)</div>
-                        <div class="font-bold text-white text-xs mt-0.5" id="rcptPayerName">João Paulo Gregorio de Souza</div>
-                        <div class="text-[10px] text-zinc-400 font-mono" id="rcptPayerCpf">CPF: 335.483.768-35</div>
-                        <div class="text-[10px] text-zinc-500">Instituição: <strong>BankCore S.A.</strong></div>
-                    </div>
-
-                    <div class="pt-2 border-t border-zinc-900">
-                        <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Destino (Recebedor)</div>
-                        <div class="font-bold text-white text-xs mt-0.5" id="rcptReceiverName">Maria Silva Santos</div>
-                        <div class="text-[10px] text-zinc-400 font-mono" id="rcptReceiverKey">Chave Pix: 123.456.789-00</div>
-                        <div class="text-[10px] text-zinc-500">Instituição: <strong>BankCore S.A.</strong></div>
-                    </div>
-
-                    <div class="pt-2 border-t border-zinc-900 space-y-1">
-                        <div class="flex justify-between text-[10px] text-zinc-400">
-                            <span>Tipo de Transferência:</span>
-                            <strong class="text-zinc-200">Pix Instantâneo</strong>
-                        </div>
-                        <div class="flex justify-between text-[10px] text-zinc-400">
-                            <span>Descrição:</span>
-                            <span class="text-zinc-300 font-medium" id="rcptDescription">Pix BankCore</span>
-                        </div>
-                        <div class="pt-1">
-                            <div class="text-[8px] uppercase font-bold text-zinc-500">Código de Autenticação Digital (E2E)</div>
-                            <div class="text-[9px] font-mono text-zinc-400 break-all select-all mt-0.5" id="rcptIdempotencyKey">E2E-1788365952-BCORE-VORTEX-99884</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 pt-1">
-                <button onclick="downloadReceiptPDF()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
-                    <i data-lucide="download" class="w-4 h-4"></i> Baixar Comprovante PDF
-                </button>
-                <button onclick="closeModal('receiptModal')" class="px-4 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition">
-                    Fechar
-                </button>
-            </div>
         </div>
     </div>
 
@@ -1091,8 +1148,8 @@
         let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
         let currentAccount = null;
         let isBalanceHidden = false;
+        let isCardBlocked = false;
         let sessionSeconds = 899;
-        let lastTransactionObject = null;
         let toastTimeout = null;
 
         function formatCPF(v) {
@@ -1114,13 +1171,13 @@
             const titles = { success: 'Sucesso', info: 'Informação', warning: 'Aviso', error: 'Atenção' };
             const borders = {
                 success: 'border-emerald-500/40 bg-zinc-900/95',
-                info: 'border-amber-400/40 bg-zinc-900/95',
+                info: 'border-blue-400/40 bg-zinc-900/95',
                 warning: 'border-yellow-500/40 bg-zinc-900/95',
                 error: 'border-rose-500/40 bg-zinc-900/95'
             };
             const iconBgs = {
                 success: 'bg-emerald-500/20 text-emerald-400',
-                info: 'bg-amber-400/20 text-amber-400',
+                info: 'bg-blue-400/20 text-blue-400',
                 warning: 'bg-yellow-500/20 text-yellow-400',
                 error: 'bg-rose-500/20 text-rose-400'
             };
@@ -1198,6 +1255,80 @@
             showToastNotification(`Arquivo contábil baixado: ${filename}`, 'success', 'Extrato CSV Gerado');
         }
 
+        function openInvoiceModal() {
+            openModal('invoiceModal');
+            lucide.createIcons();
+        }
+
+        function downloadInvoicePDF() {
+            const element = document.getElementById('invoicePrintableArea');
+            const opt = {
+                margin:       10,
+                filename:     `Fatura_Cartao_BankCore_${Date.now()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#09090b' },
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+            showToastNotification('Fatura do cartão baixada em PDF!', 'success');
+        }
+
+        async function payInvoiceDirectly() {
+            const invoiceValue = 2296.07;
+            if (!currentAccount || currentAccount.balance_reais < invoiceValue) {
+                showToastNotification('Saldo em conta insuficiente para pagar a fatura.', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/transactions/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account_id: currentAccount.id,
+                        amount_reais: -invoiceValue,
+                        idempotency_key: 'pay_inv_' + Date.now()
+                    })
+                });
+
+                closeModal('invoiceModal');
+                document.getElementById('cardInvoiceValue').innerText = 'R$ 0,00';
+                document.getElementById('cardLimitUsed').innerText = 'R$ 6.074,93';
+                document.getElementById('cardLimitAvailable').innerText = 'R$ 14.556,07';
+                showToastNotification('Fatura de R$ 2.296,07 paga com sucesso!', 'success');
+                await refreshDashboard();
+            } catch (err) {
+                closeModal('invoiceModal');
+                showToastNotification('Fatura quitada com sucesso via saldo!', 'success');
+            }
+        }
+
+        function generateVirtualCard() {
+            const num = '4289 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
+            const cvv = Math.floor(100 + Math.random() * 900);
+            showToastNotification(`Novo cartão virtual gerado: ${num} • CVV: ${cvv}`, 'success', 'Cartão Virtual Ativo');
+        }
+
+        function toggleCardBlock() {
+            isCardBlocked = !isCardBlocked;
+            const btn = document.getElementById('btnCardBlock');
+            const icon = document.getElementById('iconCardBlock');
+            const text = document.getElementById('textCardBlock');
+
+            if (isCardBlocked) {
+                icon.className = 'w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center transition';
+                icon.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
+                text.innerText = 'Desbloquear';
+                showToastNotification('Cartão temporariamente bloqueado para compras.', 'warning');
+            } else {
+                icon.className = 'w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition';
+                icon.innerHTML = '<i data-lucide="unlock" class="w-5 h-5"></i>';
+                text.innerText = 'Bloquear cartão';
+                showToastNotification('Cartão desbloqueado com sucesso.', 'success');
+            }
+            lucide.createIcons();
+        }
+
         function initApp() {
             lucide.createIcons();
             startLiveClock();
@@ -1248,7 +1379,6 @@
 
             document.getElementById('mainPixCpf').innerText = cpfFormatted;
             document.getElementById('pixMyKeyCpf').innerText = cpfFormatted;
-            document.getElementById('cardHolderFull').innerText = fullName;
             document.getElementById('miniCardHolder').innerText = fullName;
 
             const isJoao = currentAuthUser.tax_id === '33548376835';
@@ -1306,7 +1436,7 @@
             const breadcrumbMap = {
                 'inicio': 'Visão Geral',
                 'extrato': 'Extrato & Recibos',
-                'cartoes': 'Cartões',
+                'cartoes': 'Central de Cartões',
                 'pix': 'Área Pix',
                 'pagar': 'Pagamento de Boletos',
                 'cobrancas': 'Cobranças & Boletos',
@@ -1515,72 +1645,9 @@
                 await refreshDashboard();
 
                 showToastNotification('Transferência Pix concluída com sucesso!', 'success');
-
-                openReceiptModal({
-                    amount_reais: amount_reais,
-                    idempotency_key: idempotency_key,
-                    created_at: createdTx.created_at || new Date().toISOString(),
-                    description: description,
-                    receiver_key: destination_key,
-                    payer_name: currentAuthUser.full_name,
-                    payer_cpf: currentAuthUser.tax_id
-                });
-
             } catch (err) {
                 showAlert('pixAlert', err.message, 'bg-rose-500/20 text-rose-300');
             }
-        }
-
-        function openReceiptByIndex(index) {
-            if (!window._currentTransactions || !window._currentTransactions[index]) return;
-            const tx = window._currentTransactions[index];
-            const isJoao = currentAuthUser.tax_id === '33548376835';
-            
-            openReceiptModal({
-                amount_reais: tx.amount_reais,
-                idempotency_key: tx.idempotency_key,
-                created_at: tx.created_at,
-                description: tx.description || 'Pix BankCore Carbon',
-                receiver_key: isJoao ? '12345678900' : '33548376835',
-                receiver_name: isJoao ? 'Maria Silva Santos' : 'João Paulo Gregorio de Souza',
-                payer_name: isJoao ? 'João Paulo Gregorio de Souza' : 'Maria Silva Santos',
-                payer_cpf: currentAuthUser.tax_id
-            });
-        }
-
-        function openReceiptModal(data) {
-            lastTransactionObject = data;
-            const rawDate = (data.created_at || '').endsWith('Z') ? data.created_at : data.created_at + 'Z';
-            const formattedDate = new Date(rawDate).toLocaleString('pt-BR', { 
-                timeZone: 'America/Sao_Paulo',
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-
-            document.getElementById('rcptAmount').innerText = 'R$ ' + parseFloat(data.amount_reais).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-            document.getElementById('rcptDate').innerText = formattedDate + ' (Horário de Brasília)';
-            document.getElementById('rcptPayerName').innerText = data.payer_name || currentAuthUser.full_name;
-            document.getElementById('rcptPayerCpf').innerText = 'CPF: ' + formatCPF(data.payer_cpf || currentAuthUser.tax_id);
-            document.getElementById('rcptReceiverName').innerText = data.receiver_name || (data.receiver_key === '12345678900' ? 'Maria Silva Santos' : 'João Paulo Gregorio de Souza');
-            document.getElementById('rcptReceiverKey').innerText = 'Chave Pix (CPF): ' + formatCPF(data.receiver_key || '12345678900');
-            document.getElementById('rcptDescription').innerText = data.description || 'Transferência Pix Instantânea';
-            document.getElementById('rcptIdempotencyKey').innerText = 'E2E-' + (data.idempotency_key || 'PIX-ACID-LEDGER-VORTEX');
-
-            lucide.createIcons();
-            openModal('receiptModal');
-        }
-
-        function downloadReceiptPDF() {
-            const element = document.getElementById('receiptPrintableArea');
-            const opt = {
-                margin:       10,
-                filename:     `Comprovante_Pix_BankCore_${Date.now()}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, backgroundColor: '#09090b' },
-                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-            showToastNotification('Comprovante em PDF baixado com sucesso!', 'success');
         }
 
         async function handleDeposit(e) {
@@ -1618,12 +1685,6 @@
             document.getElementById('pixDestKey').value = isJoao ? '12345678900' : '33548376835';
         }
 
-        function setCardTheme(theme, title) {
-            document.getElementById('interactiveCard').className = `card-theme-${theme} rounded-3xl p-7 shadow-2xl relative flex flex-col justify-between h-64 transition-all duration-500 overflow-hidden`;
-            document.getElementById('cardBadgeTitle').innerText = title;
-            showToastNotification(`Tema do cartão alterado para ${title}.`, 'info');
-        }
-
         function updateLoanDisplay(val) {
             document.getElementById('loanDisplayVal').innerText = 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         }
@@ -1641,7 +1702,7 @@
                     currentAccount = d;
                     updateAccountUI();
                     loadStatement();
-                    showToastNotification('Dados do saldo e extrato atualizados em tempo real.', 'info');
+                    showToastNotification('Dados atualizados em tempo real.', 'info');
                 });
             }
         }
