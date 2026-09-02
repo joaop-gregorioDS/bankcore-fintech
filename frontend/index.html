@@ -614,7 +614,7 @@
                     </div>
                 </section>
 
-                <!-- 4. VIEW: CENTRAL PIX COMPLETA (PADRÃO BB iOS) -->
+                <!-- 4. VIEW: CENTRAL PIX COMPLETA -->
                 <section id="view-pix" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
@@ -631,12 +631,10 @@
                         </button>
                     </div>
 
-                    <!-- Módulo 1: Pagar -->
+                    <!-- Módulo Pagar -->
                     <div class="space-y-4">
                         <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Pagar</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            
-                            <!-- 1. Fazer um Pix -->
                             <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-3xl p-6 hover:border-amber-500/50 cursor-pointer transition flex items-start gap-4.5 group">
                                 <div class="w-13 h-13 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="send" class="w-6 h-6"></i>
@@ -647,7 +645,6 @@
                                 </div>
                             </div>
 
-                            <!-- 2. Ler QR Code -->
                             <div onclick="showToastNotification('Leitor de QR Code Pix ativo pela câmera!', 'info')" class="carbon-card rounded-3xl p-6 hover:border-blue-500/50 cursor-pointer transition flex items-start gap-4.5 group">
                                 <div class="w-13 h-13 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="scan-line" class="w-6 h-6"></i>
@@ -658,7 +655,6 @@
                                 </div>
                             </div>
 
-                            <!-- 3. Pix Copia e Cola -->
                             <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-3xl p-6 hover:border-indigo-500/50 cursor-pointer transition flex items-start gap-4.5 group">
                                 <div class="w-13 h-13 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="copy-check" class="w-6 h-6"></i>
@@ -669,7 +665,6 @@
                                 </div>
                             </div>
 
-                            <!-- 4. Pix de Presente -->
                             <div onclick="showToastNotification('Módulo Pix de Presente aberto com temas personalizados!', 'success')" class="carbon-card rounded-3xl p-6 hover:border-emerald-500/50 cursor-pointer transition flex items-start gap-4.5 group relative overflow-hidden">
                                 <div class="w-13 h-13 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="gift" class="w-6 h-6"></i>
@@ -685,12 +680,10 @@
                         </div>
                     </div>
 
-                    <!-- Módulo 2: Receber -->
+                    <!-- Módulo Receber -->
                     <div class="space-y-4">
                         <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Receber</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            
-                            <!-- 5. Criar QR Code -->
                             <div onclick="showToastNotification('QR Code gerado para cobrança instantânea!', 'success')" class="carbon-card rounded-3xl p-6 hover:border-amber-500/50 cursor-pointer transition flex items-start gap-4.5 group">
                                 <div class="w-13 h-13 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="qr-code" class="w-6 h-6"></i>
@@ -701,7 +694,6 @@
                                 </div>
                             </div>
 
-                            <!-- 6. Minhas Chaves Pix -->
                             <div onclick="copyPixKey()" class="carbon-card rounded-3xl p-6 hover:border-blue-500/50 cursor-pointer transition flex items-start gap-4.5 group">
                                 <div class="w-13 h-13 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="key" class="w-6 h-6"></i>
@@ -714,12 +706,10 @@
                         </div>
                     </div>
 
-                    <!-- Módulo 3: Consultar & Segurança BACEN -->
+                    <!-- Módulo Segurança BACEN -->
                     <div class="space-y-4">
                         <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Consultar & Segurança BACEN</div>
                         <div class="divide-y divide-inherit rounded-3xl carbon-card overflow-hidden">
-                            
-                            <!-- Extrato Pix -->
                             <div onclick="navigateTo('extrato')" class="p-5 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition group">
                                 <div class="flex items-start gap-4">
                                     <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -733,7 +723,6 @@
                                 <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:opacity-100 transition flex-shrink-0 ml-2"></i>
                             </div>
 
-                            <!-- Meus Limites Pix -->
                             <div onclick="showToastNotification('Gestão de limites Pix diurno/noturno aberta!', 'info')" class="p-5 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition group">
                                 <div class="flex items-start gap-4">
                                     <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -747,7 +736,6 @@
                                 <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:opacity-100 transition flex-shrink-0 ml-2"></i>
                             </div>
 
-                            <!-- MED BACEN -->
                             <div onclick="showToastNotification('MED - Mecanismo Especial de Devolução do Banco Central pronto para abertura de chamado.', 'warning', 'MED BACEN')" class="p-5 flex items-center justify-between hover:bg-rose-500/10 cursor-pointer transition group">
                                 <div class="flex items-start gap-4">
                                     <div class="w-10 h-10 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -764,7 +752,7 @@
                     </div>
                 </section>
 
-                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS (PADRÃO BB iOS) -->
+                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS EXPANDIDA (PADRÃO BB iOS) -->
                 <section id="view-pagar" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
@@ -778,6 +766,7 @@
                         </div>
                     </div>
 
+                    <!-- Card Superior Saldo vs Agendamentos -->
                     <div class="carbon-card rounded-3xl p-7 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <div class="text-xs font-bold opacity-70">Saldo disponível</div>
@@ -791,6 +780,7 @@
                         </div>
                     </div>
 
+                    <!-- 4 Botões Circulares -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         <button onclick="openModal('modalBoletoPay')" class="p-5 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-3 transition">
                             <div class="w-14 h-14 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center p-3">
@@ -817,25 +807,137 @@
                             <span class="text-xs font-black">Agenda DDA</span>
                         </button>
                     </div>
+
+                    <!-- Módulo Agenda de Boletos DDA -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                            <div>
+                                <h3 class="text-base font-black flex items-center gap-2">
+                                    <i data-lucide="calendar-check" class="w-5 h-5 text-blue-500"></i> Boletos Eletrônicos em Aberto (DDA CIP)
+                                </h3>
+                                <p class="text-xs opacity-60 mt-0.5">Capturados automaticamente pelo CNPJ/CPF da Vortex</p>
+                            </div>
+                            <button onclick="openModal('modalDDA')" class="text-xs font-bold text-blue-500 hover:underline">Ver Todos →</button>
+                        </div>
+                        <div class="divide-y divide-inherit" id="payDdaFullList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Módulo Débito Automático -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="refresh-cw" class="w-5 h-5 text-emerald-500"></i> Contas em Débito Automático
+                            </h3>
+                            <span class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">3 Contas Ativas</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                            <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex items-center justify-between">
+                                <div>
+                                    <div class="font-black">Enel Energia SP</div>
+                                    <div class="text-[11px] opacity-60">Débito todo dia 15</div>
+                                </div>
+                                <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 cursor-pointer" onchange="showToastNotification('Débito automático da Enel alterado.', 'info')">
+                            </div>
+                            <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex items-center justify-between">
+                                <div>
+                                    <div class="font-black">Sabesp Água PJ</div>
+                                    <div class="text-[11px] opacity-60">Débito todo dia 18</div>
+                                </div>
+                                <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 cursor-pointer" onchange="showToastNotification('Débito automático da Sabesp alterado.', 'info')">
+                            </div>
+                            <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex items-center justify-between">
+                                <div>
+                                    <div class="font-black">Claro Fibra 1Gbps</div>
+                                    <div class="text-[11px] opacity-60">Débito todo dia 22</div>
+                                </div>
+                                <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 cursor-pointer" onchange="showToastNotification('Débito automático da Claro alterado.', 'info')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gerenciar Pagamentos & Limites -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="sliders" class="w-5 h-5 text-amber-500"></i> Limites de Pagamento & Tributos
+                            </h3>
+                        </div>
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <div class="flex justify-between font-bold mb-1.5">
+                                    <span>Limite Diário para Boletos e Tributos (DARF / GPS / DAS)</span>
+                                    <strong class="text-amber-500 font-mono text-sm" id="payLimitValue">R$ 50.000,00</strong>
+                                </div>
+                                <input type="range" min="5000" max="100000" step="5000" value="50000" class="w-full accent-amber-500 cursor-pointer" oninput="document.getElementById('payLimitValue').innerText = 'R$ ' + parseFloat(this.value).toLocaleString('pt-BR', {minimumFractionDigits:2});">
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
-                <!-- 6. VIEW: COBRANÇAS -->
-                <section id="view-cobrancas" class="view-panel hidden space-y-6">
-                    <div class="carbon-card rounded-3xl p-7 sm:p-9">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                            <div>
-                                <h2 class="text-2xl font-black">Cobranças & Boletos Emitidos</h2>
-                                <p class="text-xs opacity-70 mt-1">Acompanhamento de faturamento de contratos da empresa</p>
-                            </div>
-                            <button onclick="showToastNotification('Formulário de emissão de cobrança aberto.', 'info')" class="px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition flex items-center gap-2">
+                <!-- 6. VIEW: COBRANÇAS COMPLETA -->
+                <section id="view-cobrancas" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-inherit">
+                        <div>
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                                </div>
+                                <span>Gestão de Cobranças & Contratos</span>
+                            </h2>
+                            <p class="text-xs opacity-70 mt-1">Emissão de faturas, links de pagamento e relatórios de recebíveis PJ</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openModal('modalEmitirCobranca')" class="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition flex items-center gap-2 shadow-lg shadow-amber-500/15">
                                 <i data-lucide="plus" class="w-4.5 h-4.5"></i> Nova Cobrança
                             </button>
+                            <button onclick="showToastNotification('Link de pagamento gerado e copiado!', 'success')" class="px-4 py-3 rounded-2xl carbon-card hover:border-amber-500/50 font-bold text-xs transition flex items-center gap-2">
+                                <i data-lucide="link" class="w-4 h-4"></i> Link Rápido
+                            </button>
                         </div>
+                    </div>
+
+                    <!-- Métricas de Faturamento -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">Total Recebido (Mês)</div>
+                            <div class="text-2xl font-black text-emerald-500 font-mono mt-1" id="cobTotalReceived">R$ 12.700,00</div>
+                            <div class="text-[10px] opacity-60 mt-1">2 contratos quitados</div>
+                        </div>
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">A Vencer (Setembro)</div>
+                            <div class="text-2xl font-black text-amber-500 font-mono mt-1" id="cobPending">R$ 3.850,00</div>
+                            <div class="text-[10px] opacity-60 mt-1">Previsão até 30/Set</div>
+                        </div>
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">Em Atraso</div>
+                            <div class="text-2xl font-black text-rose-500 font-mono mt-1">R$ 0,00</div>
+                            <div class="text-[10px] opacity-60 mt-1 text-emerald-500 font-bold">Inadimplência Zero</div>
+                        </div>
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">Taxa de Liquidação</div>
+                            <div class="text-2xl font-black text-blue-500 font-mono mt-1">100%</div>
+                            <div class="text-[10px] opacity-60 mt-1">Pontualidade fiscal</div>
+                        </div>
+                    </div>
+
+                    <!-- Tabela Completa de Contratos -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-inherit">
+                            <h3 class="text-lg font-black">Histórico de Cobranças Emitidas</h3>
+                            <div class="flex items-center gap-2">
+                                <button onclick="filterCobrancas('all')" class="px-3 py-1.5 rounded-xl bg-amber-400 text-black text-xs font-black">Todos</button>
+                                <button onclick="filterCobrancas('paid')" class="px-3 py-1.5 rounded-xl carbon-card text-xs font-bold opacity-80 hover:opacity-100">Pagos</button>
+                                <button onclick="filterCobrancas('pending')" class="px-3 py-1.5 rounded-xl carbon-card text-xs font-bold opacity-80 hover:opacity-100">A Vencer</button>
+                            </div>
+                        </div>
+
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="border-b border-inherit opacity-60 font-bold uppercase text-[11px]">
-                                        <th class="py-3.5 px-4">Identificação</th>
+                                        <th class="py-3.5 px-4">Sacado / Contrato</th>
                                         <th class="py-3.5 px-4">Status</th>
                                         <th class="py-3.5 px-4">Vencimento</th>
                                         <th class="py-3.5 px-4 text-right">Valor</th>
@@ -848,43 +950,245 @@
                     </div>
                 </section>
 
-                <!-- 7. VIEW: INVESTIMENTOS -->
-                <section id="view-invest" class="view-panel hidden space-y-6">
-                    <div class="carbon-card rounded-3xl p-7 sm:p-9 space-y-6">
+                <!-- 7. VIEW: BANKCORE INVEST COMPLETA -->
+                <section id="view-invest" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
-                            <h2 class="text-2xl font-black flex items-center gap-3">
-                                <i data-lucide="trending-up" class="w-6 h-6 text-amber-500"></i> BankCore Invest
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                </div>
+                                <span>BankCore Invest</span>
                             </h2>
-                            <p class="text-xs opacity-70 mt-1">Rentabilidade diária com proteção do FGC até R$ 250.000,00</p>
+                            <p class="text-xs opacity-70 mt-1">Plataforma corporativa de investimentos com garantia do FGC até R$ 250 mil</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-5 rounded-3xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                        <button onclick="showToastNotification('Aporte de capital nos investimentos liberado!', 'success')" class="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-4.5 h-4.5"></i> Novo Aporte
+                        </button>
+                    </div>
+
+                    <!-- Painel da Carteira -->
+                    <div class="carbon-card rounded-3xl p-7 sm:p-9 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                 <div class="text-xs uppercase font-black opacity-60">Patrimônio Investido</div>
                                 <div class="text-3xl font-black text-emerald-500 font-mono mt-1">R$ 45.890,20</div>
+                                <div class="text-[11px] text-emerald-500 font-bold mt-1">+ R$ 480,20 este mês</div>
                             </div>
-                            <div class="p-5 rounded-3xl bg-black/5 dark:bg-zinc-900 border border-inherit">
-                                <div class="text-xs uppercase font-black opacity-60">Rendimento Previsto (12m)</div>
-                                <div class="text-3xl font-black font-mono mt-1">R$ 5.240,00</div>
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                <div class="text-xs uppercase font-black opacity-60">Rendimento Acumulado</div>
+                                <div class="text-3xl font-black text-inherit font-mono mt-1">104% do CDI</div>
+                                <div class="text-[11px] opacity-60 mt-1">Taxa Selic Over</div>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                <div class="text-xs uppercase font-black opacity-60">Liquidez Imediata (D+0)</div>
+                                <div class="text-3xl font-black text-blue-500 font-mono mt-1">R$ 25.000,00</div>
+                                <div class="text-[11px] opacity-60 mt-1">Resgate 24h por dia</div>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico de Alocação -->
+                        <div class="pt-4 border-t border-inherit space-y-3">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span>Alocação da Carteira</span>
+                                <span class="opacity-70">65% Renda Fixa • 20% Tesouro • 15% Fundos</span>
+                            </div>
+                            <div class="w-full bg-slate-200 dark:bg-zinc-800 h-4 rounded-full overflow-hidden flex p-0.5 gap-1">
+                                <div class="bg-emerald-500 h-full w-[65%] rounded-full" title="Renda Fixa 65%"></div>
+                                <div class="bg-blue-500 h-full w-[20%] rounded-full" title="Tesouro 20%"></div>
+                                <div class="bg-amber-400 h-full w-[15%] rounded-full" title="Fundos 15%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vitrine de Produtos de Investimento -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-black">Produtos de Renda Fixa & Títulos Públicos</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-emerald-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">CDB BankCore Liquidez Diária</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Rentabilidade: 104% do CDI • Resgate D+0</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">FGC Protegido</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Aplicação mínima: <strong>R$ 100,00</strong></span>
+                                    <button onclick="showToastNotification('Aplicação em CDB iniciada com sucesso!', 'success')" class="px-4 py-2 rounded-xl bg-emerald-500 text-black font-black">Investir</button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-blue-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">LCA Sustentabilidade Agro</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Rentabilidade: 98% do CDI • Isento de IR</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-blue-500/10 text-blue-500 border border-blue-500/20">Isento IR</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Vencimento: <strong>12 meses</strong></span>
+                                    <button onclick="showToastNotification('Aplicação em LCA iniciada com sucesso!', 'success')" class="px-4 py-2 rounded-xl bg-blue-500 text-white font-black">Investir</button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-amber-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">Tesouro Direto Selic 2029</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Rentabilidade: Selic + 0,15% a.a.</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">Tesouro Nacional</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Aplicação mínima: <strong>R$ 150,00</strong></span>
+                                    <button onclick="showToastNotification('Aplicação no Tesouro Direto iniciada!', 'success')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-black">Investir</button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">Fundo Vortex Tech Global</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Multimercado Ações de Tecnologia (Nasdaq)</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">Alta Rentabilidade</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Rentabilidade 12m: <strong class="text-emerald-500">+ 24,8%</strong></span>
+                                    <button onclick="showToastNotification('Aplicação no Fundo Tech iniciada!', 'success')" class="px-4 py-2 rounded-xl bg-indigo-500 text-white font-black">Investir</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simulador de Rendimento -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-4">
+                        <div class="pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-amber-500"></i> Simulador de Rendimento em 12 Meses
+                            </h3>
+                        </div>
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <div class="flex justify-between font-bold mb-1.5">
+                                    <span>Valor do Aporte Simulado:</span>
+                                    <strong class="text-amber-500 font-mono text-base" id="simInvestAmount">R$ 10.000,00</strong>
+                                </div>
+                                <input type="range" min="1000" max="100000" step="1000" value="10000" class="w-full accent-amber-500 cursor-pointer" oninput="updateInvestSimulation(this.value)">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 pt-2">
+                                <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                    <div class="opacity-60">Rendimento no BankCore (104% CDI)</div>
+                                    <div class="text-xl font-black text-emerald-500 font-mono mt-0.5" id="simBankCoreTotal">R$ 11.144,00</div>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                    <div class="opacity-60">Rendimento na Poupança Antiga</div>
+                                    <div class="text-xl font-black opacity-60 font-mono mt-0.5" id="simPoupancaTotal">R$ 10.617,00</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 8. VIEW: CRÉDITO -->
-                <section id="view-credito" class="view-panel hidden space-y-6">
-                    <div class="max-w-3xl mx-auto carbon-card rounded-3xl p-7 sm:p-9 space-y-6">
+                <!-- 8. VIEW: EMPRÉSTIMOS & LIMITES COMPLETA -->
+                <section id="view-credito" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
-                            <span class="text-xs font-black uppercase px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Crédito Pré-Aprovado</span>
-                            <h2 class="text-3xl font-black mt-3">Linha de Empréstimo Carbon</h2>
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                    <i data-lucide="coins" class="w-5 h-5"></i>
+                                </div>
+                                <span>Empréstimos & Crédito Inteligente</span>
+                            </h2>
+                            <p class="text-xs opacity-70 mt-1">Crédito pré-aprovado corporativo com liberação em até 2 minutos na conta corrente</p>
                         </div>
-                        <div class="p-7 rounded-3xl bg-black/5 dark:bg-zinc-900 border border-amber-500/30 flex items-center justify-between">
+                    </div>
+
+                    <!-- Card de Linha Pré-Aprovada -->
+                    <div class="carbon-card rounded-3xl p-7 sm:p-9 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black uppercase px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Linha de Crédito Carbon Pré-Aprovada</span>
+                            <span class="text-xs opacity-70">Taxa especial: <strong class="text-amber-500">0,99% a.m.</strong></span>
+                        </div>
+                        <div class="p-7 rounded-3xl bg-black/5 dark:bg-zinc-900 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div>
-                                <div class="text-xs opacity-70">Valor Máximo Pré-Aprovado</div>
+                                <div class="text-xs opacity-70">Valor Total Disponível</div>
                                 <div class="text-4xl font-black text-amber-500 font-mono mt-1" id="creditMaxDisplay">R$ 50.000,00</div>
                             </div>
-                            <div class="text-right text-xs opacity-70">
-                                <div>Carência: <strong>90 dias</strong></div>
-                                <div>Prazo: <strong>até 48x</strong></div>
+                            <div class="sm:text-right text-xs opacity-70">
+                                <div>Carência: <strong class="text-inherit">90 dias para a 1ª parcela</strong></div>
+                                <div>Prazo flexível: <strong class="text-inherit">de 6x até 48x</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simulador Dinâmico de Parcelamento -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-amber-500"></i> Simulador de Contratação Imediata
+                            </h3>
+                        </div>
+
+                        <div class="space-y-5 text-xs">
+                            <div>
+                                <div class="flex justify-between font-bold mb-1.5">
+                                    <span>Valor do Empréstimo:</span>
+                                    <strong class="text-amber-500 font-mono text-base" id="loanAmountText">R$ 15.000,00</strong>
+                                </div>
+                                <input type="range" min="1000" max="50000" step="1000" value="15000" id="loanRangeInput" class="w-full accent-amber-500 cursor-pointer" oninput="recalcLoan()">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold opacity-70 mb-2">Selecione o Número de Parcelas:</label>
+                                <div class="grid grid-cols-5 gap-2">
+                                    <button onclick="setLoanMonths(6)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">6x</button>
+                                    <button onclick="setLoanMonths(12)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">12x</button>
+                                    <button onclick="setLoanMonths(24)" class="loan-term-btn py-2.5 rounded-xl bg-amber-400 text-black font-black text-xs">24x</button>
+                                    <button onclick="setLoanMonths(36)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">36x</button>
+                                    <button onclick="setLoanMonths(48)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">48x</button>
+                                </div>
+                            </div>
+
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <div class="text-xs opacity-60">Valor da Parcela Mensal</div>
+                                    <div class="text-3xl font-black text-emerald-500 font-mono mt-0.5" id="loanInstallmentValue">24x de R$ 706,12</div>
+                                    <div class="text-[11px] opacity-60 mt-0.5">IOF e tarifas bancárias inclusas</div>
+                                </div>
+                                <button onclick="showToastNotification('Crédito Carbon contratado e depositado na conta corrente!', 'success')" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
+                                    Contratar Crédito Agora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modalidades de Crédito Corporativo -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-black">Soluções de Crédito para Empresas</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                            <div class="carbon-card rounded-3xl p-6 space-y-3">
+                                <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                                </div>
+                                <div class="text-sm font-black">Capital de Giro Rápido</div>
+                                <div class="opacity-70 leading-snug">Liquidez para fluxo de caixa e pagamento de fornecedores da empresa.</div>
+                            </div>
+                            <div class="carbon-card rounded-3xl p-6 space-y-3">
+                                <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center">
+                                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                                </div>
+                                <div class="text-sm font-black">Antecipação de Recebíveis</div>
+                                <div class="opacity-70 leading-snug">Receba hoje o valor de cobranças e contratos que venceriam nos próximos 90 dias.</div>
+                            </div>
+                            <div class="carbon-card rounded-3xl p-6 space-y-3">
+                                <div class="w-10 h-10 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center">
+                                    <i data-lucide="laptop" class="w-5 h-5"></i>
+                                </div>
+                                <div class="text-sm font-black">Financiamento de Equipamentos</div>
+                                <div class="opacity-70 leading-snug">Renove computadores, servidores e infraestrutura com taxas de fomento.</div>
                             </div>
                         </div>
                     </div>
@@ -892,8 +1196,6 @@
 
                 <!-- 9. VIEW DEDICADA: MEU PERFIL & AJUSTES -->
                 <section id="view-perfil" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
-                    
-                    <!-- Header Banner do Perfil -->
                     <div class="carbon-card rounded-3xl p-7 sm:p-9 relative overflow-hidden shadow-xl">
                         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                             <div class="flex items-center gap-6">
@@ -923,13 +1225,8 @@
                         </div>
                     </div>
 
-                    <!-- Grid de Configurações -->
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        
-                        <!-- Coluna 1: Dados Cadastrais & Empresa -->
                         <div class="lg:col-span-7 space-y-6">
-                            
-                            <!-- 1. Dados Cadastrais Pessoais -->
                             <div class="carbon-card rounded-3xl p-7 space-y-5">
                                 <div class="flex items-center justify-between pb-3 border-b border-inherit">
                                     <h3 class="text-base font-black flex items-center gap-2.5">
@@ -937,13 +1234,11 @@
                                     </h3>
                                     <span class="text-xs font-bold opacity-60 uppercase">Edição Imediata</span>
                                 </div>
-
                                 <form onsubmit="saveProfilePageData(event)" class="space-y-4 text-xs">
                                     <div>
                                         <label class="block font-bold opacity-70 mb-1.5">Nome Completo</label>
                                         <input type="text" id="perfilInputName" value="João Paulo Gregorio de Souza" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500 focus:outline-none font-bold">
                                     </div>
-
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block font-bold opacity-70 mb-1.5">CPF do Titular</label>
@@ -954,24 +1249,20 @@
                                             <input type="text" id="perfilInputPhone" value="(11) 98765-4321" class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit font-mono">
                                         </div>
                                     </div>
-
                                     <div>
                                         <label class="block font-bold opacity-70 mb-1.5">E-mail Corporativo</label>
                                         <input type="email" id="perfilInputEmail" value="joao.paulo@vortexsoftware.com.br" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500">
                                     </div>
-
                                     <div>
                                         <label class="block font-bold opacity-70 mb-1.5">Endereço Fiscal / Residencial</label>
                                         <input type="text" id="perfilInputAddress" value="Av. Paulista, 1000 - Bela Vista, São Paulo - SP" class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                     </div>
-
                                     <button type="submit" class="w-full py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/15">
                                         Salvar Alterações Cadastrais
                                     </button>
                                 </form>
                             </div>
 
-                            <!-- 2. Dados da Empresa (Vortex Software) -->
                             <div class="carbon-card rounded-3xl p-7 space-y-5">
                                 <div class="flex items-center justify-between pb-3 border-b border-inherit">
                                     <h3 class="text-base font-black flex items-center gap-2.5">
@@ -979,13 +1270,11 @@
                                     </h3>
                                     <span class="text-xs font-black uppercase px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-500 border border-blue-500/20">Contabilizei Conectada</span>
                                 </div>
-
                                 <div class="space-y-3.5 text-xs">
                                     <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                         <div class="text-[11px] uppercase font-black opacity-60">Razão Social Oficial</div>
                                         <div class="text-sm font-black mt-0.5">JOAO PAULO GREGORIO DE SOUZA DESENVOLVIMENTO DE SOFTWARE LTDA</div>
                                     </div>
-
                                     <div class="grid grid-cols-2 gap-3.5">
                                         <div class="p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                             <div class="text-[11px] uppercase font-black opacity-60">Nome Fantasia</div>
@@ -996,7 +1285,6 @@
                                             <div class="text-sm font-black mt-0.5">Simples Nacional</div>
                                         </div>
                                     </div>
-
                                     <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                         <div class="text-[11px] uppercase font-black opacity-60">Atividade Principal (CNAE)</div>
                                         <div class="text-xs font-semibold opacity-80 mt-0.5">6201-5/01 - Desenvolvimento de programas de computador sob encomenda</div>
@@ -1005,17 +1293,13 @@
                             </div>
                         </div>
 
-                        <!-- Coluna 2: Segurança & Dispositivos -->
                         <div class="lg:col-span-5 space-y-6">
-                            
-                            <!-- 3. Segurança & Senhas -->
                             <div class="carbon-card rounded-3xl p-7 space-y-5">
                                 <div class="pb-3 border-b border-inherit">
                                     <h3 class="text-base font-black flex items-center gap-2.5">
                                         <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i> Segurança & 2FA
                                     </h3>
                                 </div>
-
                                 <div class="space-y-3.5 text-xs">
                                     <div class="flex items-center justify-between p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                         <div>
@@ -1024,7 +1308,6 @@
                                         </div>
                                         <input type="checkbox" checked class="accent-emerald-500 w-5 h-5 cursor-pointer">
                                     </div>
-
                                     <div class="flex items-center justify-between p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                         <div>
                                             <div class="font-black">Token Virtual 2FA</div>
@@ -1032,21 +1315,18 @@
                                         </div>
                                         <span class="text-xs font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">Ativo</span>
                                     </div>
-
                                     <button onclick="showToastNotification('Formulário de alteração de senha de 8 dígitos aberto.', 'info')" class="w-full py-3 rounded-2xl carbon-card hover:border-amber-500/40 text-xs font-bold transition">
                                         Alterar Senha de Acesso
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- 4. Dispositivos Autorizados -->
                             <div class="carbon-card rounded-3xl p-7 space-y-5">
                                 <div class="flex items-center justify-between pb-3 border-b border-inherit">
                                     <h3 class="text-base font-black flex items-center gap-2.5">
                                         <i data-lucide="smartphone" class="w-5 h-5 text-indigo-500"></i> Dispositivos Conectados
                                     </h3>
                                 </div>
-
                                 <div class="divide-y divide-inherit text-xs">
                                     <div class="py-3 flex items-center justify-between">
                                         <div class="flex items-center gap-3">
@@ -1058,7 +1338,6 @@
                                         </div>
                                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                     </div>
-
                                     <div class="py-3 flex items-center justify-between">
                                         <div class="flex items-center gap-3">
                                             <i data-lucide="smartphone" class="w-5 h-5 opacity-70"></i>
@@ -1070,7 +1349,6 @@
                                         <span class="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-zinc-600"></span>
                                     </div>
                                 </div>
-
                                 <button onclick="showToastNotification('Todas as outras sessões foram desconectadas.', 'warning')" class="w-full py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold border border-rose-500/20 transition">
                                     Encerrar Outras Sessões
                                 </button>
@@ -1216,7 +1494,7 @@
                 <h3 class="text-lg font-black flex items-center gap-2">
                     <i data-lucide="send" class="w-5 h-5 text-amber-500"></i> Transferência Pix Instantânea
                 </h3>
-                <button onclick="closeModal('modalPixTransfer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeModal('modalPixTransfer')"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <form onsubmit="handlePixTransfer(event)" class="space-y-4">
                 <div>
@@ -1266,6 +1544,48 @@
         </div>
     </div>
 
+    <!-- MODAL: NOVA COBRANÇA -->
+    <div id="modalEmitirCobranca" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-7 relative shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-black">Emitir Nova Cobrança PJ</h3>
+                </div>
+                <button onclick="closeModal('modalEmitirCobranca')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleEmitirCobranca(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold opacity-70 mb-1">Nome do Cliente / Empresa</label>
+                    <input type="text" id="cobClientName" required placeholder="Ex: Nexus Cloud Tecnologia" class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <div>
+                    <label class="block font-bold opacity-70 mb-1">CPF ou CNPJ</label>
+                    <input type="text" id="cobClientDoc" required placeholder="00.000.000/0001-00" class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit font-mono">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold opacity-70 mb-1">Valor (R$)</label>
+                        <input type="number" step="0.01" min="1.00" id="cobAmount" value="1500.00" required class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit font-mono font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="block font-bold opacity-70 mb-1">Vencimento</label>
+                        <input type="date" id="cobDueDate" value="2026-09-25" required class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold opacity-70 mb-1">Descrição do Serviço</label>
+                    <input type="text" id="cobDesc" value="Desenvolvimento de Módulo Customizado" class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <button type="submit" class="w-full py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition">
+                    Emitir Boleto & Pix Copia e Cola
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- SPA LOGIC -->
     <script>
         let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
@@ -1276,6 +1596,7 @@
         let currentTheme = localStorage.getItem('bankcore_theme') || 'dark';
         let sessionSeconds = 899;
         let toastTimeout = null;
+        let currentLoanMonths = 24;
 
         function applyTheme(theme) {
             currentTheme = theme;
@@ -1465,25 +1786,47 @@
                         <div><div class="text-sm font-extrabold">Zp *olx Sergi</div><div class="text-xs opacity-60">Ourocard-e 6884 • 30/Ago</div></div>
                         <div class="text-right"><div class="text-sm font-black font-mono">R$ 2.785,99</div><div class="text-xs text-blue-500 font-bold">em 10x no crédito</div></div>
                     </div>
-                    <div class="py-4 flex items-center justify-between hover:bg-black/5 dark:hover:bg-zinc-900/50 rounded-2xl px-3 transition">
-                        <div><div class="text-sm font-extrabold">Mp*aliexpress</div><div class="text-xs opacity-60">Ourocard-e 6884 • 28/Ago</div></div>
-                        <div class="text-right"><div class="text-sm font-black font-mono">R$ 1.302,18</div><div class="text-xs opacity-60 font-bold">no crédito</div></div>
-                    </div>
                 `;
                 document.getElementById('ddaSubtitle').innerText = 'Emitidos para Vortex Software (CNPJ)';
-                document.getElementById('ddaItemsList').innerHTML = `
+                
+                const ddaHtml = `
                     <div class="py-3.5 flex items-center justify-between">
                         <div><div class="text-xs font-black">Amazon Web Services (AWS)</div><div class="text-xs opacity-60 font-mono">Vencimento: 10/09/2026 • DDA CIP</div></div>
                         <div class="text-right"><div class="text-xs font-black font-mono">R$ 650,00</div><button onclick="showToastNotification('Boleto AWS quitado via DDA!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
                     </div>
+                    <div class="py-3.5 flex items-center justify-between">
+                        <div><div class="text-xs font-black">Contabilizei Tecnologia LTDA</div><div class="text-xs opacity-60 font-mono">Vencimento: 15/09/2026 • DDA CIP</div></div>
+                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 189,00</div><button onclick="showToastNotification('Boleto Contabilizei quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
+                    </div>
+                    <div class="py-3.5 flex items-center justify-between">
+                        <div><div class="text-xs font-black">Vivo Fibra Empresas 1Gbps</div><div class="text-xs opacity-60 font-mono">Vencimento: 20/09/2026 • DDA CIP</div></div>
+                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 249,90</div><button onclick="showToastNotification('Boleto Vivo Fibra quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
+                    </div>
                 `;
+                document.getElementById('ddaItemsList').innerHTML = ddaHtml;
+                document.getElementById('payDdaFullList').innerHTML = ddaHtml;
+
                 document.getElementById('cobrancasTableBody').innerHTML = `
                     <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
                         <td class="py-4 px-4"><div class="font-black">TechCorp Solutions LTDA</div><div class="text-xs opacity-60 font-mono">Contrato Software Enterprise</div></td>
                         <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Pago</span></td>
                         <td class="py-4 px-4 font-mono opacity-80">01/09/2026</td>
                         <td class="py-4 px-4 text-right font-black text-emerald-500 font-mono text-sm">R$ 8.500,00</td>
-                        <td class="py-4 px-4 text-center"><button class="opacity-60 hover:opacity-100"><i data-lucide="chevron-right" class="w-4 h-4"></i></button></td>
+                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via do Contrato TechCorp aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
+                    </tr>
+                    <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
+                        <td class="py-4 px-4"><div class="font-black">André Morais</div><div class="text-xs opacity-60 font-mono">Licença SaaS Mensal</div></td>
+                        <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/10 text-amber-500 border border-amber-400/20">À vencer</span></td>
+                        <td class="py-4 px-4 font-mono opacity-80">16/09/2026</td>
+                        <td class="py-4 px-4 text-right font-black text-inherit font-mono text-sm">R$ 850,00</td>
+                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via da Licença André Morais aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
+                    </tr>
+                    <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
+                        <td class="py-4 px-4"><div class="font-black">Alpha Logística & Transportes</div><div class="text-xs opacity-60 font-mono">API de Rastreamento de Frotas</div></td>
+                        <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Pago</span></td>
+                        <td class="py-4 px-4 font-mono opacity-80">28/08/2026</td>
+                        <td class="py-4 px-4 text-right font-black text-emerald-500 font-mono text-sm">R$ 4.200,00</td>
+                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via Alpha Logística aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
                     </tr>
                 `;
             } else {
@@ -1507,27 +1850,78 @@
                     </div>
                 `;
                 document.getElementById('ddaSubtitle').innerText = 'Emitidos para Maria Silva Santos (CPF)';
-                document.getElementById('ddaItemsList').innerHTML = `
+                const ddaHtml = `
                     <div class="py-3.5 flex items-center justify-between">
                         <div><div class="text-xs font-black">Condomínio Edifício Paulista</div><div class="text-xs opacity-60 font-mono">Vencimento: 08/09/2026 • DDA CIP</div></div>
                         <div class="text-right"><div class="text-xs font-black font-mono">R$ 650,00</div><button onclick="showToastNotification('Boleto Condomínio quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
                     </div>
+                    <div class="py-3.5 flex items-center justify-between">
+                        <div><div class="text-xs font-black">Unimed Saúde Corporativo</div><div class="text-xs opacity-60 font-mono">Vencimento: 12/09/2026 • DDA CIP</div></div>
+                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 890,00</div><button onclick="showToastNotification('Boleto Unimed quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
+                    </div>
                 `;
+                document.getElementById('ddaItemsList').innerHTML = ddaHtml;
+                document.getElementById('payDdaFullList').innerHTML = ddaHtml;
+
                 document.getElementById('cobrancasTableBody').innerHTML = `
                     <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
                         <td class="py-4 px-4"><div class="font-black">Finanças & Gestão Integrada</div><div class="text-xs opacity-60 font-mono">Consultoria Financeira</div></td>
                         <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Pago</span></td>
                         <td class="py-4 px-4 font-mono opacity-80">28/08/2026</td>
                         <td class="py-4 px-4 text-right font-black text-emerald-500 font-mono text-sm">R$ 4.200,00</td>
-                        <td class="py-4 px-4 text-center"><button class="opacity-60 hover:opacity-100"><i data-lucide="chevron-right" class="w-4 h-4"></i></button></td>
+                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via da Consultoria aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
                     </tr>
                 `;
             }
 
             await loadOrCreateAccount();
             await loadStatement();
+            recalcLoan();
             navigateTo('inicio');
             lucide.createIcons();
+        }
+
+        function recalcLoan() {
+            const amount = parseFloat(document.getElementById('loanRangeInput').value);
+            document.getElementById('loanAmountText').innerText = 'R$ ' + amount.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            
+            // Taxa 0.99% a.m. Price formula
+            const rate = 0.0099;
+            const installment = (amount * rate) / (1 - Math.pow(1 + rate, -currentLoanMonths));
+            document.getElementById('loanInstallmentValue').innerText = `${currentLoanMonths}x de R$ ${installment.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
+
+        function setLoanMonths(m) {
+            currentLoanMonths = m;
+            document.querySelectorAll('.loan-term-btn').forEach(btn => {
+                if (btn.innerText === `${m}x`) {
+                    btn.className = 'loan-term-btn py-2.5 rounded-xl bg-amber-400 text-black font-black text-xs';
+                } else {
+                    btn.className = 'loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50';
+                }
+            });
+            recalcLoan();
+        }
+
+        function updateInvestSimulation(val) {
+            const amount = parseFloat(val);
+            document.getElementById('simInvestAmount').innerText = 'R$ ' + amount.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            const bankcoreVal = amount * 1.1144; // 104% do CDI
+            const poupancaVal = amount * 1.0617; // 6.17% poupança
+            document.getElementById('simBankCoreTotal').innerText = 'R$ ' + bankcoreVal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            document.getElementById('simPoupancaTotal').innerText = 'R$ ' + poupancaVal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+
+        function handleEmitirCobranca(e) {
+            e.preventDefault();
+            const client = document.getElementById('cobClientName').value;
+            const amount = parseFloat(document.getElementById('cobAmount').value);
+            closeModal('modalEmitirCobranca');
+            showToastNotification(`Cobrança de R$ ${amount.toFixed(2).replace('.',',')} para ${client} emitida com sucesso!`, 'success', 'Cobrança Criada');
+        }
+
+        function filterCobrancas(status) {
+            showToastNotification(`Filtro de cobranças aplicado: ${status}`, 'info');
         }
 
         function saveProfilePageData(e) {
