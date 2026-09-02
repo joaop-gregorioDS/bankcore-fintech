@@ -37,20 +37,20 @@
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
 
-        #toastContainer { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        #toastContainer { transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
     </style>
 </head>
 <body class="text-zinc-100 h-full flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
-    <!-- FLOATING TOAST NOTIFICATION SYSTEM -->
-    <div id="toastContainer" class="fixed top-6 right-6 z-50 transform translate-y-[-150%] opacity-0 pointer-events-none transition-all duration-300">
-        <div class="carbon-card px-5 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3.5 backdrop-blur-xl" id="toastCard">
-            <div id="toastIcon" class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0">
-                <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <!-- FLOATING TOAST POP-UP (MAIOR, LADO ESQUERDO, ELEVADO ACIMA DO FINAL DA PÁGINA) -->
+    <div id="toastContainer" class="fixed bottom-12 left-6 sm:left-72 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="carbon-card px-6 py-4.5 rounded-3xl shadow-2xl border-2 flex items-center gap-4.5 backdrop-blur-2xl max-w-lg" id="toastCard">
+            <div id="toastIcon" class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
             </div>
-            <div>
-                <div class="text-xs font-bold text-white" id="toastTitle">Sucesso</div>
-                <div class="text-[11px] text-zinc-400 font-medium" id="toastMessage">Operação realizada com sucesso.</div>
+            <div class="pr-2">
+                <div class="text-sm font-extrabold text-white tracking-tight" id="toastTitle">Sucesso</div>
+                <div class="text-xs text-zinc-300 font-medium mt-0.5 leading-snug" id="toastMessage">Operação realizada com sucesso.</div>
             </div>
         </div>
     </div>
@@ -395,13 +395,9 @@
                     </div>
                 </section>
 
-                <!-- 3. VIEW: CENTRAL DE CARTÕES (PADRÃO BB iOS + CARBON LUXURY) -->
+                <!-- 3. VIEW: CENTRAL DE CARTÕES -->
                 <section id="view-cartoes" class="view-panel hidden space-y-6">
-                    
-                    <!-- Top Section: Limite Único + Meus Cartões -->
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        
-                        <!-- Limite Único Card (Exact BB iOS Reference) -->
                         <div class="lg:col-span-5 carbon-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-xl font-black text-white">Limite único</h2>
@@ -410,7 +406,6 @@
                                 </button>
                             </div>
 
-                            <!-- Values Display -->
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <div class="text-lg sm:text-xl font-black text-white font-mono" id="cardLimitUsed">R$ 8.371,00</div>
@@ -422,7 +417,6 @@
                                 </div>
                             </div>
 
-                            <!-- Progress Bar (BB Style) -->
                             <div>
                                 <div class="w-full bg-zinc-800 h-3 rounded-full overflow-hidden border border-zinc-700/60 p-0.5">
                                     <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[40%] rounded-full shadow-sm"></div>
@@ -434,7 +428,6 @@
                             </div>
                         </div>
 
-                        <!-- Meus Cartões Card (BB iOS Card & Invoice Box) -->
                         <div class="lg:col-span-7 carbon-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-xl font-black text-white">Meus cartões</h2>
@@ -448,7 +441,6 @@
                                     <div class="text-xs text-zinc-400 font-medium mt-0.5">Fatura vence em <strong class="text-zinc-200">10 de setembro</strong></div>
                                 </div>
 
-                                <!-- Mini Card Illustration -->
                                 <div class="w-44 h-24 rounded-xl card-theme-carbon p-3 flex flex-col justify-between border border-zinc-700/80 shadow-xl flex-shrink-0">
                                     <div class="flex justify-between items-center text-[10px] font-bold text-white">
                                         <span>Bank<span class="text-amber-400">Core</span></span>
@@ -475,7 +467,6 @@
                         </div>
                     </div>
 
-                    <!-- Grid of 8 Circular Quick Actions (BB iOS Style) -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
                         <button onclick="openInvoiceModal()" class="p-3.5 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2 group transition">
                             <div class="w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition">
@@ -534,17 +525,13 @@
                         </button>
                     </div>
 
-                    <!-- Section: Últimos Lançamentos (Exact BB iOS Items) -->
                     <div class="carbon-card rounded-3xl p-6 sm:p-8 space-y-4">
                         <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
                             <h2 class="text-xl font-black text-white">Últimos lançamentos</h2>
                             <span class="text-xs font-bold text-zinc-400">Fatura Atual • Setembro</span>
                         </div>
 
-                        <!-- Purchases List -->
                         <div class="divide-y divide-zinc-800/70">
-                            
-                            <!-- Item 1 -->
                             <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
                                 <div>
                                     <div class="text-sm font-extrabold text-white">Pg *qb Quero</div>
@@ -558,7 +545,6 @@
                                 </div>
                             </div>
 
-                            <!-- Item 2 -->
                             <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
                                 <div>
                                     <div class="text-sm font-extrabold text-white">Zp *olx Sergi</div>
@@ -572,7 +558,6 @@
                                 </div>
                             </div>
 
-                            <!-- Item 3 -->
                             <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
                                 <div>
                                     <div class="text-sm font-extrabold text-white">Zp *olx Sergio H</div>
@@ -586,7 +571,6 @@
                                 </div>
                             </div>
 
-                            <!-- Item 4 -->
                             <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
                                 <div>
                                     <div class="text-sm font-extrabold text-white">Mp*aliexpress</div>
@@ -599,7 +583,6 @@
                                 </div>
                             </div>
 
-                            <!-- Item 5 -->
                             <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
                                 <div>
                                     <div class="text-sm font-extrabold text-white">Aliexpress</div>
@@ -612,7 +595,6 @@
                                 </div>
                             </div>
 
-                            <!-- Item 6 -->
                             <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
                                 <div>
                                     <div class="text-sm font-extrabold text-white">Apple.com/bill</div>
@@ -625,7 +607,6 @@
                                 </div>
                             </div>
 
-                            <!-- Item 7 -->
                             <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
                                 <div>
                                     <div class="text-sm font-extrabold text-white">Apple.com/bill</div>
@@ -889,7 +870,6 @@
             
             <div id="invoicePrintableArea" class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 space-y-5 text-white">
                 
-                <!-- Invoice Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
@@ -907,7 +887,6 @@
                     </div>
                 </div>
 
-                <!-- Invoice Summary -->
                 <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 flex items-center justify-between">
                     <div>
                         <div class="text-[10px] uppercase font-bold text-zinc-500">Total da Fatura</div>
@@ -920,7 +899,6 @@
                     </div>
                 </div>
 
-                <!-- Purchases Breakdown -->
                 <div>
                     <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Detalhamento dos Lançamentos</div>
                     <div class="divide-y divide-zinc-800/60 text-xs">
@@ -955,7 +933,6 @@
                     </div>
                 </div>
 
-                <!-- Barcode & Payment Info -->
                 <div class="pt-3 border-t border-zinc-800 space-y-1.5">
                     <div class="text-[9px] uppercase font-bold text-zinc-500">Linha Digitável para Pagamento</div>
                     <div class="text-[10px] font-mono text-zinc-300 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 break-all select-all">
@@ -1170,34 +1147,34 @@
 
             const titles = { success: 'Sucesso', info: 'Informação', warning: 'Aviso', error: 'Atenção' };
             const borders = {
-                success: 'border-emerald-500/40 bg-zinc-900/95',
-                info: 'border-blue-400/40 bg-zinc-900/95',
-                warning: 'border-yellow-500/40 bg-zinc-900/95',
-                error: 'border-rose-500/40 bg-zinc-900/95'
+                success: 'border-emerald-500/50 bg-zinc-900/95 shadow-emerald-500/10',
+                info: 'border-blue-400/50 bg-zinc-900/95 shadow-blue-500/10',
+                warning: 'border-yellow-500/50 bg-zinc-900/95 shadow-yellow-500/10',
+                error: 'border-rose-500/50 bg-zinc-900/95 shadow-rose-500/10'
             };
             const iconBgs = {
-                success: 'bg-emerald-500/20 text-emerald-400',
-                info: 'bg-blue-400/20 text-blue-400',
-                warning: 'bg-yellow-500/20 text-yellow-400',
-                error: 'bg-rose-500/20 text-rose-400'
+                success: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+                info: 'bg-blue-400/20 text-blue-400 border border-blue-400/30',
+                warning: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
+                error: 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
             };
             const iconNames = { success: 'check-circle', info: 'info', warning: 'alert-triangle', error: 'alert-circle' };
 
             toastTitle.innerText = title || titles[type];
             toastMessage.innerText = message;
-            toastCard.className = `carbon-card px-5 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3.5 backdrop-blur-xl ${borders[type]}`;
-            toastIcon.className = `w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBgs[type]}`;
-            toastIcon.innerHTML = `<i data-lucide="${iconNames[type]}" class="w-4 h-4"></i>`;
+            toastCard.className = `carbon-card px-6 py-4.5 rounded-3xl shadow-2xl border-2 flex items-center gap-4.5 backdrop-blur-2xl max-w-lg ${borders[type]}`;
+            toastIcon.className = `w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${iconBgs[type]}`;
+            toastIcon.innerHTML = `<i data-lucide="${iconNames[type]}" class="w-6 h-6"></i>`;
 
             lucide.createIcons();
 
-            container.classList.remove('translate-y-[-150%]', 'opacity-0', 'pointer-events-none');
+            container.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
             container.classList.add('translate-y-0', 'opacity-100');
 
             toastTimeout = setTimeout(() => {
                 container.classList.remove('translate-y-0', 'opacity-100');
-                container.classList.add('translate-y-[-150%]', 'opacity-0', 'pointer-events-none');
-            }, 3500);
+                container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 4000);
         }
 
         function exportStatementCSV() {
@@ -1317,12 +1294,12 @@
 
             if (isCardBlocked) {
                 icon.className = 'w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center transition';
-                icon.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
+                icon.innerHTML = '<i data-lucide="lock" class="w-6 h-6"></i>';
                 text.innerText = 'Desbloquear';
                 showToastNotification('Cartão temporariamente bloqueado para compras.', 'warning');
             } else {
                 icon.className = 'w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition';
-                icon.innerHTML = '<i data-lucide="unlock" class="w-5 h-5"></i>';
+                icon.innerHTML = '<i data-lucide="unlock" class="w-6 h-6"></i>';
                 text.innerText = 'Bloquear cartão';
                 showToastNotification('Cartão desbloqueado com sucesso.', 'success');
             }
