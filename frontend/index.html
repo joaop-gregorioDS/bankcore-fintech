@@ -179,10 +179,10 @@
                         <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400"></i> Central de Cartões
                     </button>
                     <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="qr-code" class="w-4 h-4 text-amber-400"></i> Central Pix
+                        <i data-lucide="qr-code" class="w-4 h-4 text-zinc-400"></i> Central Pix
                     </button>
                     <button onclick="navigateTo('pagar')" id="nav-pagar" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="barcode" class="w-4 h-4 text-zinc-400"></i> Pagamentos
+                        <i data-lucide="barcode" class="w-4 h-4 text-amber-400"></i> Central de Pagamentos
                     </button>
                     <button onclick="navigateTo('cobrancas')" id="nav-cobrancas" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
                         <i data-lucide="receipt" class="w-4 h-4 text-zinc-400"></i> Cobranças
@@ -218,7 +218,7 @@
                 <div class="flex items-center gap-2 text-xs font-semibold text-zinc-400">
                     <span class="text-zinc-500 hover:text-white cursor-pointer" onclick="navigateTo('inicio')">🏠 Início</span>
                     <span>/</span>
-                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Central Pix</span>
+                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Central de Pagamentos</span>
                 </div>
 
                 <div class="flex items-center gap-4 text-xs">
@@ -620,10 +620,8 @@
                     </div>
                 </section>
 
-                <!-- 4. VIEW: CENTRAL PIX (PADRÃO BB iOS + VORTEX SOFTWARE) -->
+                <!-- 4. VIEW: CENTRAL PIX -->
                 <section id="view-pix" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
-                    
-                    <!-- Header Section -->
                     <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                         <div>
                             <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
@@ -641,12 +639,9 @@
                         </div>
                     </div>
 
-                    <!-- 1. GRUPO: PAGAR (Cards 2x2 no estilo BB iOS) -->
                     <div class="space-y-3">
                         <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Pagar</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            
-                            <!-- Card: Fazer um Pix -->
                             <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-2xl p-5 hover:border-amber-500/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
                                 <div class="w-11 h-11 rounded-2xl bg-amber-400/15 group-hover:bg-amber-400/25 text-amber-400 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="send" class="w-5 h-5"></i>
@@ -657,7 +652,6 @@
                                 </div>
                             </div>
 
-                            <!-- Card: Ler QR Code -->
                             <div onclick="openModal('modalPixScan')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
                                 <div class="w-11 h-11 rounded-2xl bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="scan-line" class="w-5 h-5"></i>
@@ -668,7 +662,6 @@
                                 </div>
                             </div>
 
-                            <!-- Card: Pix Copia e Cola -->
                             <div onclick="openModal('modalPixCopiaCola')" class="carbon-card rounded-2xl p-5 hover:border-indigo-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
                                 <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 group-hover:bg-indigo-500/25 text-indigo-400 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="copy-check" class="w-5 h-5"></i>
@@ -679,7 +672,6 @@
                                 </div>
                             </div>
 
-                            <!-- Card: Pix de presente (Tag Novo) -->
                             <div onclick="openModal('modalPixPresente')" class="carbon-card rounded-2xl p-5 hover:border-emerald-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group relative overflow-hidden">
                                 <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 group-hover:bg-emerald-500/25 text-emerald-400 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="gift" class="w-5 h-5"></i>
@@ -695,12 +687,9 @@
                         </div>
                     </div>
 
-                    <!-- 2. GRUPO: RECEBER (Cards 2x1) -->
                     <div class="space-y-3">
                         <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Receber</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            
-                            <!-- Card: Criar QR Code -->
                             <div onclick="openModal('modalPixQrCode')" class="carbon-card rounded-2xl p-5 hover:border-amber-500/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
                                 <div class="w-11 h-11 rounded-2xl bg-amber-500/15 group-hover:bg-amber-500/25 text-amber-400 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="qr-code" class="w-5 h-5"></i>
@@ -711,7 +700,6 @@
                                 </div>
                             </div>
 
-                            <!-- Card: Minhas Chaves Pix -->
                             <div onclick="openModal('modalPixChaves')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
                                 <div class="w-11 h-11 rounded-2xl bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="key" class="w-5 h-5"></i>
@@ -724,12 +712,9 @@
                         </div>
                     </div>
 
-                    <!-- 3. GRUPO: CONSULTAR (Lista Didática estilo BB iOS) -->
                     <div class="space-y-3">
                         <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Consultar</div>
                         <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
-                            
-                            <!-- Extrato Pix -->
                             <div onclick="navigateTo('extrato')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                                 <div class="flex items-start gap-3.5">
                                     <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -743,7 +728,6 @@
                                 <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
                             </div>
 
-                            <!-- Cobranças -->
                             <div onclick="navigateTo('cobrancas')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                                 <div class="flex items-start gap-3.5">
                                     <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -757,7 +741,6 @@
                                 <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
                             </div>
 
-                            <!-- Pix Agendado -->
                             <div onclick="openModal('modalPixAgendado')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                                 <div class="flex items-start gap-3.5">
                                     <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -771,7 +754,6 @@
                                 <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
                             </div>
 
-                            <!-- Informar Golpe ou Fraude (MED BACEN) -->
                             <div onclick="openModal('modalPixFraude')" class="p-4 flex items-center justify-between hover:bg-rose-500/10 cursor-pointer transition group">
                                 <div class="flex items-start gap-3.5">
                                     <div class="w-9 h-9 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -787,12 +769,9 @@
                         </div>
                     </div>
 
-                    <!-- 4. GRUPO: GERENCIAR -->
                     <div class="space-y-3">
                         <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Gerenciar</div>
                         <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
-                            
-                            <!-- Pix Automático -->
                             <div onclick="openModal('modalPixAutomatico')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                                 <div class="flex items-start gap-3.5">
                                     <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -806,7 +785,6 @@
                                 <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
                             </div>
 
-                            <!-- Meus Limites Pix -->
                             <div onclick="openModal('modalPixLimites')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
                                 <div class="flex items-start gap-3.5">
                                     <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -822,7 +800,6 @@
                         </div>
                     </div>
 
-                    <!-- 5. GRUPO: AJUDA -->
                     <div class="space-y-3">
                         <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Ajuda</div>
                         <div class="rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
@@ -842,33 +819,178 @@
                     </div>
                 </section>
 
-                <!-- 5. VIEW: PAGAR -->
-                <section id="view-pagar" class="view-panel hidden space-y-6">
-                    <div class="max-w-2xl mx-auto carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
+                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS (PADRÃO BB iOS + VORTEX SOFTWARE) -->
+                <section id="view-pagar" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
+                    
+                    <!-- Header Section -->
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                         <div>
-                            <h2 class="text-xl font-black text-white flex items-center gap-2">
-                                <i data-lucide="barcode" class="w-5 h-5 text-amber-400"></i> Pagamento de Boletos e Tributos
+                            <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
+                                    <i data-lucide="barcode" class="w-4 h-4"></i>
+                                </div>
+                                <span>Central de Pagamentos</span>
                             </h2>
-                            <p class="text-xs text-zinc-400">Digite a linha digitável ou escaneie o código de barras</p>
+                            <p class="text-xs text-zinc-400 mt-0.5">Gestão de boletos, tributos, DDA e débitos automáticos</p>
                         </div>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-zinc-400 mb-1">Linha Digitável do Boleto</label>
-                                <input type="text" placeholder="23793.38128 60032.748392 12000.063304 9 98760000035000" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-xs font-mono text-white">
+                        <button onclick="toggleBalanceVisibility()" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Top Card: Saldo vs Agendamentos (BB iOS Style) -->
+                    <div class="carbon-card rounded-3xl p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-6 bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950">
+                        <div>
+                            <div class="text-xs font-semibold text-zinc-400">Saldo disponível</div>
+                            <div class="text-2xl sm:text-3xl font-black text-blue-400 font-mono mt-1" id="payViewBalance">R$ 10.000,00</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">Conta Corrente Vortex Software</div>
+                        </div>
+                        <div class="sm:text-right sm:border-l sm:border-zinc-800 sm:pl-6">
+                            <div class="text-xs font-semibold text-zinc-400">Agendamentos até 30/Set</div>
+                            <div class="text-2xl sm:text-3xl font-black text-rose-400 font-mono mt-1">- R$ 2.307,36</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">4 pagamentos programados</div>
+                        </div>
+                    </div>
+
+                    <!-- Grid de 4 Ações Rápidas Circulares (BB iOS Style) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                        <button onclick="openModal('modalBoletoPay')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
+                            <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
+                                <i data-lucide="barcode" class="w-6 h-6"></i>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor (R$)</label>
-                                    <input type="number" step="0.01" value="350.00" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white">
+                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pagamento</span>
+                        </button>
+
+                        <button onclick="navigateTo('pix')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
+                            <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
+                                <i data-lucide="qr-code" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pix</span>
+                        </button>
+
+                        <button onclick="openInvoiceModal()" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
+                            <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
+                                <i data-lucide="credit-card" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pagar fatura do cartão</span>
+                        </button>
+
+                        <button onclick="openModal('modalMaisOpcoes')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
+                            <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
+                                <i data-lucide="more-horizontal" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Mais opções</span>
+                        </button>
+                    </div>
+
+                    <!-- 1. GRUPO: AGENDA DE BOLETOS (DDA) -->
+                    <div class="space-y-3">
+                        <div>
+                            <h3 class="text-lg font-black text-white">Agenda de boletos</h3>
+                            <p class="text-xs text-zinc-400 mt-0.5">Gerencie todos os boletos cadastrados em seu CPF/CNPJ em um só lugar.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                            <div onclick="openModal('modalDDA')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="barcode" class="w-5 h-5"></i>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Vencimento</label>
-                                    <input type="date" value="2026-09-10" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-white">
+                                    <div class="text-xs font-extrabold text-white group-hover:text-blue-400 transition">Pagar e gerenciar</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5">Boletos eletrônicos DDA</div>
                                 </div>
                             </div>
-                            <button onclick="showToastNotification('Boleto bancário pago e registrado no livro-razão com sucesso!', 'success')" class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition">
-                                Confirmar Pagamento do Boleto
-                            </button>
+
+                            <div onclick="showToastNotification('Você já é aderente ao DDA Eletrônico da Vortex Software.', 'info')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-extrabold text-white group-hover:text-blue-400 transition">Aderir à agenda</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5">DDA Automático Ativo</div>
+                                </div>
+                            </div>
+
+                            <div onclick="openModal('modalAgendarBoleto')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-extrabold text-white group-hover:text-blue-400 transition">Cadastrar agendamento</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5">Programar pagamentos</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. GRUPO: DÉBITO AUTOMÁTICO -->
+                    <div class="space-y-3">
+                        <div>
+                            <h3 class="text-lg font-black text-white">Débito automático</h3>
+                            <p class="text-xs text-zinc-400 mt-0.5">Mais praticidade para gerenciar os seus débitos em um só lugar.</p>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <div onclick="openModal('modalIncluirDebito')" class="carbon-card rounded-2xl p-4 hover:bg-zinc-900/90 cursor-pointer transition flex items-center justify-between group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-white group-hover:text-amber-400 transition">Incluir débito automático</span>
+                                </div>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-hover:text-amber-400 transition"></i>
+                            </div>
+
+                            <div onclick="openModal('modalAutorizacoesDebito')" class="carbon-card rounded-2xl p-4 hover:bg-zinc-900/90 cursor-pointer transition flex items-center justify-between group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="check" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-white group-hover:text-emerald-400 transition">Confirmar autorizações</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-500 group-hover:text-emerald-400 transition"></i>
+                            </div>
+
+                            <div onclick="openModal('modalConsultarDebito')" class="carbon-card rounded-2xl p-4 hover:bg-zinc-900/90 cursor-pointer transition flex items-center justify-between group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-white group-hover:text-indigo-400 transition">Consultar autorizações</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-500 group-hover:text-indigo-400 transition"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. GRUPO: GERENCIAR PAGAMENTOS -->
+                    <div class="space-y-3">
+                        <h3 class="text-lg font-black text-white">Gerenciar pagamentos</h3>
+                        <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
+                            
+                            <div onclick="openModal('modalLimitesPagamento')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div>
+                                    <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Limites de pagamentos</div>
+                                    <div class="text-[11px] text-zinc-400">Altere seus limites de pagamentos diários e de boletos.</div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
+                            </div>
+
+                            <div onclick="openModal('modalCancelarAgendamento')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div>
+                                    <div class="text-xs font-bold text-white group-hover:text-rose-400 transition">Cancelar agendamento</div>
+                                    <div class="text-[11px] text-zinc-400">Cancele os seus pagamentos agendados antes da liquidação.</div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-rose-400 transition"></i>
+                            </div>
+
+                            <div onclick="navigateTo('extrato')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div>
+                                    <div class="text-xs font-bold text-white group-hover:text-blue-400 transition">Comprovante de pagamento</div>
+                                    <div class="text-[11px] text-zinc-400">Salve ou compartilhe os comprovantes em PDF.</div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-blue-400 transition"></i>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1011,552 +1133,227 @@
         </div>
     </div>
 
-    <!-- ================= SUB-MODAIS DA CENTRAL PIX ================= -->
+    <!-- ================= MODAIS DA CENTRAL DE PAGAMENTOS ================= -->
 
-    <!-- MODAL: FAZER UM PIX -->
-    <div id="modalPixTransfer" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <!-- MODAL: PAGAR BOLETO -->
+    <div id="modalBoletoPay" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center">
-                        <i data-lucide="send" class="w-4 h-4"></i>
+                    <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-lucide="barcode" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-base font-black text-white">Fazer um Pix</h3>
+                    <h3 class="text-base font-black text-white">Pagamento de Boleto</h3>
                 </div>
-                <button onclick="closeModal('modalPixTransfer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeModal('modalBoletoPay')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
-            <form onsubmit="handlePixTransfer(event)" class="space-y-4">
+            <form onsubmit="handlePayBoleto(event)" class="space-y-4">
                 <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-semibold text-zinc-400">Chave Pix (CPF / CNPJ)</label>
-                        <button type="button" onclick="quickFillContact()" id="btnPixQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
-                            ⚡ Preencher Contato
-                        </button>
-                    </div>
-                    <input type="text" id="pixDestKey" required placeholder="Digite o CPF (ex: 12345678900)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm font-mono text-white">
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Linha Digitável (47 ou 48 dígitos)</label>
+                    <input type="text" id="boletoLineInput" required placeholder="00190.00009 02891.234567 89000.000018 1 98760000035000" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-xs font-mono text-white">
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor do Pix (R$)</label>
-                    <input type="number" step="0.01" min="0.01" id="pixAmountInput" value="500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white font-bold">
-                    <div class="flex gap-2 mt-2">
-                        <button type="button" onclick="document.getElementById('pixAmountInput').value='50.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 50</button>
-                        <button type="button" onclick="document.getElementById('pixAmountInput').value='100.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 100</button>
-                        <button type="button" onclick="document.getElementById('pixAmountInput').value='500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 500</button>
-                        <button type="button" onclick="document.getElementById('pixAmountInput').value='1500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 1.500</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor a Pagar (R$)</label>
+                        <input type="number" step="0.01" min="0.01" id="boletoAmountInput" value="350.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">Data de Débito</label>
+                        <input type="date" id="boletoDateInput" value="2026-09-02" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Mensagem ou Identificador</label>
-                    <input type="text" id="pixDescInput" value="Pix BankCore Web Banking" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white">
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Beneficiário / Descrição</label>
+                    <input type="text" id="boletoDescInput" value="Sabesp Concessionária de Água e Esgoto" class="w-full px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white">
                 </div>
 
-                <div id="pixAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
+                <div class="flex gap-1.5">
+                    <button type="button" onclick="fillBoletoPreset('Enel Energia SP', '380.50')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded-lg border border-zinc-700 font-semibold text-zinc-300">⚡ Enel R$ 380,50</button>
+                    <button type="button" onclick="fillBoletoPreset('DAS Simples Nacional', '189.90')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded-lg border border-zinc-700 font-semibold text-zinc-300">⚡ DAS R$ 189,90</button>
+                    <button type="button" onclick="fillBoletoPreset('AWS Cloud Infrastructure', '650.00')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded-lg border border-zinc-700 font-semibold text-zinc-300">⚡ AWS R$ 650,00</button>
+                </div>
 
-                <button type="submit" id="btnPixSubmit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
-                    Confirmar Envio do Pix
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/20 transition flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    <span>Confirmar Pagamento</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: LER QR CODE -->
-    <div id="modalPixScan" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl text-center space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="scan-line" class="w-4 h-4 text-blue-400"></i> Scanner de QR Code Pix
-                </h3>
-                <button onclick="closeModal('modalPixScan')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="w-48 h-48 mx-auto rounded-2xl bg-zinc-900 border-2 border-dashed border-blue-400/40 flex flex-col items-center justify-center gap-3">
-                <i data-lucide="camera" class="w-8 h-8 text-blue-400 animate-pulse"></i>
-                <span class="text-[11px] text-zinc-400">Aponte a câmera para o QR Code</span>
-            </div>
-            <button onclick="closeModal('modalPixScan'); showToastNotification('QR Code simulado reconhecido com sucesso!', 'success');" class="w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-extrabold text-xs uppercase transition">
-                Simular Leitura Instantânea
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL: PIX COPIA E COLA -->
-    <div id="modalPixCopiaCola" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="copy-check" class="w-4 h-4 text-indigo-400"></i> Pix Copia e Cola
-                </h3>
-                <button onclick="closeModal('modalPixCopiaCola')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-zinc-400 mb-1">Cole o código EMV / BR Code</label>
-                <textarea rows="4" placeholder="00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266141740005204000053039865802BR..." class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-white focus:outline-none focus:border-indigo-400"></textarea>
-            </div>
-            <button onclick="closeModal('modalPixCopiaCola'); showToastNotification('Código Pix verificado e pronto para pagamento!', 'success');" class="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold text-xs uppercase transition">
-                Validar e Pagar
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL: PIX DE PRESENTE -->
-    <div id="modalPixPresente" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="gift" class="w-4 h-4 text-emerald-400"></i> Enviar Pix de Presente 🎁
-                </h3>
-                <button onclick="closeModal('modalPixPresente')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-                <div class="p-3 rounded-xl bg-zinc-900 border border-amber-400/40 text-center cursor-pointer">
-                    <div class="text-lg">🎂</div>
-                    <div class="text-[10px] font-bold text-amber-400 mt-1">Aniversário</div>
-                </div>
-                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center cursor-pointer hover:border-zinc-700">
-                    <div class="text-lg">🎉</div>
-                    <div class="text-[10px] font-bold text-zinc-300 mt-1">Parabéns</div>
-                </div>
-                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center cursor-pointer hover:border-zinc-700">
-                    <div class="text-lg">💼</div>
-                    <div class="text-[10px] font-bold text-zinc-300 mt-1">Empresarial</div>
-                </div>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor do Presente (R$)</label>
-                <input type="number" value="250.00" class="w-full px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white">
-            </div>
-            <button onclick="closeModal('modalPixPresente'); showToastNotification('Pix de presente com cartão comemorativo enviado!', 'success');" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase transition">
-                Enviar Presente
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL: CRIAR QR CODE -->
-    <div id="modalPixQrCode" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl text-center space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="qr-code" class="w-4 h-4 text-amber-400"></i> Criar QR Code de Recebimento
-                </h3>
-                <button onclick="closeModal('modalPixQrCode')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="w-40 h-40 mx-auto bg-white p-2 rounded-2xl flex items-center justify-center shadow-lg">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=bankcore-pix-payment" alt="QR Code Pix" class="w-full h-full">
-            </div>
-            <div class="text-xs text-zinc-400 font-mono" id="qrModalCpf">Chave: 335.483.768-35</div>
-            <div class="flex gap-2">
-                <button onclick="copyPixKey()" class="flex-1 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase transition">
-                    Copiar Código
-                </button>
-                <button onclick="closeModal('modalPixQrCode')" class="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs transition">
-                    Fechar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: MINHAS CHAVES PIX -->
-    <div id="modalPixChaves" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="key" class="w-4 h-4 text-blue-400"></i> Minhas Chaves Pix Cadastradas
-                </h3>
-                <button onclick="closeModal('modalPixChaves')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-
-            <div class="space-y-2.5 text-xs">
-                <div class="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
-                    <div>
-                        <div class="text-[10px] font-bold text-zinc-500 uppercase">Chave Principal (CPF)</div>
-                        <div class="text-sm font-mono text-amber-400 font-bold" id="keyDisplayCpf">335.483.768-35</div>
+    <!-- MODAL: DDA PAGAR E GERENCIAR -->
+    <div id="modalDDA" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-lg w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-lucide="barcode" class="w-4 h-4"></i>
                     </div>
-                    <button onclick="copyPixKey()" class="text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-lg"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                </div>
-                <div class="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
                     <div>
-                        <div class="text-[10px] font-bold text-zinc-500 uppercase">Chave Aleatória (EVP)</div>
-                        <div class="text-xs font-mono text-zinc-300">89fb5c45-d8eb-42db-9901-eaf9ecd72f5a</div>
+                        <h3 class="text-base font-black text-white">Boletos Eletrônicos (DDA)</h3>
+                        <div class="text-[10px] text-zinc-400 font-mono">Emitidos para Vortex Software</div>
                     </div>
-                    <button onclick="showToastNotification('Chave EVP copiada!', 'success')" class="text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-lg"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                </div>
+                <button onclick="closeModal('modalDDA')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <div class="divide-y divide-zinc-800/80 max-h-72 overflow-y-auto space-y-1">
+                <div class="py-3 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-white">Amazon Web Services (AWS)</div>
+                        <div class="text-[10px] text-zinc-500 font-mono">Vencimento: 10/09/2026 • DDA CIP</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-black text-white font-mono">R$ 420,00</div>
+                        <button onclick="payDdaItem('Amazon Web Services', 420.00)" class="text-[10px] font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 mt-1">Pagar Agora</button>
+                    </div>
+                </div>
+
+                <div class="py-3 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-white">Contabilizei Tecnologia LTDA</div>
+                        <div class="text-[10px] text-zinc-500 font-mono">Vencimento: 15/09/2026 • DDA CIP</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-black text-white font-mono">R$ 189,00</div>
+                        <button onclick="payDdaItem('Contabilizei Tecnologia', 189.00)" class="text-[10px] font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 mt-1">Pagar Agora</button>
+                    </div>
+                </div>
+
+                <div class="py-3 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-white">Vivo Fibra Empresas (Telefônica)</div>
+                        <div class="text-[10px] text-zinc-500 font-mono">Vencimento: 20/09/2026 • DDA CIP</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-black text-white font-mono">R$ 129,90</div>
+                        <button onclick="payDdaItem('Vivo Fibra Empresas', 129.90)" class="text-[10px] font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 mt-1">Pagar Agora</button>
+                    </div>
                 </div>
             </div>
 
-            <button onclick="showToastNotification('Formulário de registro de nova chave aberto.', 'info')" class="w-full py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
-                + Cadastrar Nova Chave
-            </button>
+            <button onclick="closeModal('modalDDA')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Fechar</button>
         </div>
     </div>
 
-    <!-- MODAL: PIX AGENDADO -->
-    <div id="modalPixAgendado" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <!-- MODAL: INCLUIR DÉBITO AUTOMÁTICO -->
+    <div id="modalIncluirDebito" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
             <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="calendar-clock" class="w-4 h-4 text-amber-400"></i> Pix Agendados
+                    <i data-lucide="plus-circle" class="w-4 h-4 text-blue-400"></i> Novo Débito Automático
                 </h3>
-                <button onclick="closeModal('modalPixAgendado')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeModal('modalIncluirDebito')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs flex justify-between items-center">
+
+            <div class="space-y-3 text-xs">
                 <div>
-                    <div class="font-bold text-white">Contabilidade Mensal</div>
-                    <div class="text-[10px] text-zinc-500">Todo dia 10 • Próximo: 10/09/2026</div>
+                    <label class="block text-zinc-400 mb-1">Tipo de Concessionária / Serviço</label>
+                    <select class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-semibold">
+                        <option>Energia Elétrica (Enel, CPFL, Light)</option>
+                        <option>Água e Esgoto (Sabesp, Copasa, Sanepar)</option>
+                        <option>Telefonia e Internet (Vivo, Claro, TIM)</option>
+                        <option>Gás Canalizado (Comgás, Naturgy)</option>
+                    </select>
                 </div>
-                <div class="font-bold text-amber-400 font-mono">R$ 450,00</div>
+                <div>
+                    <label class="block text-zinc-400 mb-1">Código de Débito Automático (na conta)</label>
+                    <input type="text" placeholder="Ex: 0012938472" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-mono">
+                </div>
             </div>
-            <button onclick="closeModal('modalPixAgendado')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Fechar</button>
-        </div>
-    </div>
 
-    <!-- MODAL: INFORMAR GOLPE OU FRAUDE (MED BACEN) -->
-    <div id="modalPixFraude" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-rose-400 flex items-center gap-2">
-                    <i data-lucide="shield-alert" class="w-4 h-4"></i> Mecanismo Especial de Devolução (MED)
-                </h3>
-                <button onclick="closeModal('modalPixFraude')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <p class="text-xs text-zinc-400">Caso tenha sido vítima de golpe, engenharia social ou transação não autorizada, o Banco Central permite o bloqueio cautelar imediato dos recursos.</p>
-            <div>
-                <label class="block text-xs font-semibold text-zinc-400 mb-1">ID da Transação / E2E</label>
-                <input type="text" placeholder="E2E-pix_17883..." class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-white">
-            </div>
-            <button onclick="closeModal('modalPixFraude'); showToastNotification('Notificação MED enviada ao Banco Central com bloqueio cautelar ativado!', 'success', 'Protocolo MED Gerado');" class="w-full py-3 rounded-xl bg-rose-500 hover:bg-rose-400 text-black font-extrabold text-xs uppercase transition">
-                Abrir Contestação no BACEN
+            <button onclick="closeModal('modalIncluirDebito'); showToastNotification('Autorização de débito automático cadastrada com sucesso!', 'success');" class="w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-extrabold text-xs uppercase transition">
+                Cadastrar Débito Automático
             </button>
         </div>
     </div>
 
-    <!-- MODAL: PIX AUTOMÁTICO -->
-    <div id="modalPixAutomatico" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <!-- MODAL: LIMITES DE PAGAMENTOS -->
+    <div id="modalLimitesPagamento" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
             <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="refresh-cw" class="w-4 h-4 text-blue-400"></i> Pix Automático (Débito Recorrente)
+                    <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i> Limites de Pagamentos
                 </h3>
-                <button onclick="closeModal('modalPixAutomatico')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="space-y-2 text-xs">
-                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex justify-between items-center">
-                    <div>
-                        <div class="font-bold text-white">Amazon AWS Servers</div>
-                        <div class="text-[10px] text-zinc-500">Débito automático ativo</div>
-                    </div>
-                    <span class="text-[9px] font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">Ativo</span>
-                </div>
-            </div>
-            <button onclick="closeModal('modalPixAutomatico')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Fechar</button>
-        </div>
-    </div>
-
-    <!-- MODAL: MEUS LIMITES PIX -->
-    <div id="modalPixLimites" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i> Gestão de Limites Pix
-                </h3>
-                <button onclick="closeModal('modalPixLimites')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeModal('modalLimitesPagamento')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div class="space-y-4 text-xs">
                 <div>
                     <div class="flex justify-between font-bold text-zinc-300 mb-1">
-                        <span>Limite Diurno (06h às 20h)</span>
-                        <span class="text-amber-400 font-mono">R$ 50.000,00</span>
+                        <span>Limite Diário de Boletos</span>
+                        <span class="text-amber-400 font-mono">R$ 60.000,00</span>
                     </div>
-                    <input type="range" min="1000" max="100000" step="5000" value="50000" class="w-full accent-amber-400">
+                    <input type="range" min="5000" max="150000" step="5000" value="60000" class="w-full accent-amber-400">
                 </div>
                 <div>
                     <div class="flex justify-between font-bold text-zinc-300 mb-1">
-                        <span>Limite Noturno (20h às 06h)</span>
-                        <span class="text-blue-400 font-mono">R$ 1.000,00</span>
+                        <span>Limite Diário de Tributos Públicos</span>
+                        <span class="text-blue-400 font-mono">R$ 100.000,00</span>
                     </div>
-                    <input type="range" min="500" max="10000" step="500" value="1000" class="w-full accent-blue-400">
+                    <input type="range" min="10000" max="250000" step="10000" value="100000" class="w-full accent-blue-400">
                 </div>
             </div>
-            <button onclick="closeModal('modalPixLimites'); showToastNotification('Novos limites Pix salvos conforme diretriz do BACEN.', 'success');" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase transition">
+            <button onclick="closeModal('modalLimitesPagamento'); showToastNotification('Novos limites de pagamento atualizados!', 'success');" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase transition">
                 Salvar Limites
             </button>
         </div>
     </div>
 
-    <!-- MODAL: AJUDA PIX -->
-    <div id="modalPixAjuda" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <!-- MODAL: MAIS OPÇÕES DE PAGAMENTO (TRIBUTOS) -->
+    <div id="modalMaisOpcoes" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
             <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="help-circle" class="w-4 h-4 text-blue-400"></i> Suporte & Dúvidas do Pix
+                    <i data-lucide="landmark" class="w-4 h-4 text-amber-400"></i> Tributos e Outros Pagamentos
                 </h3>
-                <button onclick="closeModal('modalPixAjuda')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeModal('modalMaisOpcoes')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="space-y-3 text-xs text-zinc-300">
-                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
-                    <div class="font-bold text-white mb-1">O Pix tem custo para empresas PJ?</div>
-                    <div class="text-zinc-400 text-[11px]">No BankCore, transações Pix para contas Vortex Software são 100% gratuitas e ilimitadas.</div>
-                </div>
-                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
-                    <div class="font-bold text-white mb-1">Qual o tempo de liquidação?</div>
-                    <div class="text-zinc-400 text-[11px]">Liquidação instantânea em menos de 2 segundos através do protocolo SPI do Banco Central.</div>
-                </div>
-            </div>
-            <button onclick="closeModal('modalPixAjuda')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Entendido</button>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: FATURA DO CARTÃO EM PDF ================= -->
-    <div id="invoiceModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
-        <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
-            
-            <div id="invoicePrintableArea" class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 space-y-5 text-white">
-                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
-                            <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="text-sm font-extrabold text-white leading-tight">Bank<span class="text-amber-400">Core</span> Card</div>
-                            <div class="text-[9px] text-zinc-400 uppercase font-mono">Vortex Software • Carbon Black</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                            Fatura Fechada
-                        </span>
-                    </div>
-                </div>
-
-                <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 flex items-center justify-between">
-                    <div>
-                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total da Fatura</div>
-                        <div class="text-2xl font-black text-amber-400 font-mono">R$ 2.296,07</div>
-                        <div class="text-[11px] text-zinc-400 mt-0.5">Vencimento: <strong class="text-white">10/09/2026</strong></div>
-                    </div>
-                    <div class="text-right text-xs text-zinc-400">
-                        <div>Melhor dia de compra: <strong>03</strong></div>
-                        <div>Limite Utilizado: <strong>R$ 8.371,00</strong></div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Detalhamento dos Lançamentos</div>
-                    <div class="divide-y divide-zinc-800/60 text-xs">
-                        <div class="py-2 flex justify-between">
-                            <div>
-                                <div class="font-bold text-white">Pg *qb Quero</div>
-                                <div class="text-[10px] text-zinc-500">30/Ago • 6x de R$ 37,48</div>
-                            </div>
-                            <div class="font-bold text-white font-mono">R$ 224,90</div>
-                        </div>
-                        <div class="py-2 flex justify-between">
-                            <div>
-                                <div class="font-bold text-white">Mp*aliexpress</div>
-                                <div class="text-[10px] text-zinc-500">28/Ago • À vista</div>
-                            </div>
-                            <div class="font-bold text-white font-mono">R$ 1.302,18</div>
-                        </div>
-                        <div class="py-2 flex justify-between">
-                            <div>
-                                <div class="font-bold text-white">Aliexpress</div>
-                                <div class="text-[10px] text-zinc-500">28/Ago • À vista</div>
-                            </div>
-                            <div class="font-bold text-white font-mono">R$ 121,20</div>
-                        </div>
-                        <div class="py-2 flex justify-between">
-                            <div>
-                                <div class="font-bold text-white">Apple.com/bill</div>
-                                <div class="text-[10px] text-zinc-500">28/Ago • Assinatura iCloud</div>
-                            </div>
-                            <div class="font-bold text-white font-mono">R$ 38,00</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-3 border-t border-zinc-800 space-y-1.5">
-                    <div class="text-[9px] uppercase font-bold text-zinc-500">Linha Digitável para Pagamento</div>
-                    <div class="text-[10px] font-mono text-zinc-300 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 break-all select-all">
-                        00190.00009 02891.234567 89000.000018 1 98760000229607
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row items-center gap-2.5">
-                <button onclick="downloadInvoicePDF()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/20 transition flex items-center justify-center gap-2">
-                    <i data-lucide="download" class="w-4 h-4"></i> Baixar Fatura em PDF
+            <div class="grid grid-cols-2 gap-2.5 text-xs">
+                <button onclick="fillBoletoPreset('DARF Receita Federal', '450.00'); closeModal('modalMaisOpcoes'); openModal('modalBoletoPay');" class="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left">
+                    <div class="font-bold text-white">🏛️ DARF Federal</div>
+                    <div class="text-[10px] text-zinc-500">Imposto de Renda / PJ</div>
                 </button>
-                <button onclick="payInvoiceDirectly()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i> Pagar Fatura Agora
+                <button onclick="fillBoletoPreset('DAS Simples Nacional', '189.90'); closeModal('modalMaisOpcoes'); openModal('modalBoletoPay');" class="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left">
+                    <div class="font-bold text-white">💼 Simples Nacional</div>
+                    <div class="text-[10px] text-zinc-500">Guia DAS mensal</div>
                 </button>
-                <button onclick="closeModal('invoiceModal')" class="px-4 py-3.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition">
-                    Fechar
+                <button onclick="fillBoletoPreset('GPS INSS Previdência', '240.00'); closeModal('modalMaisOpcoes'); openModal('modalBoletoPay');" class="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left">
+                    <div class="font-bold text-white">🛡️ Guia da Previdência</div>
+                    <div class="text-[10px] text-zinc-500">GPS INSS Pró-labore</div>
+                </button>
+                <button onclick="fillBoletoPreset('IPVA / Licenciamento SP', '890.00'); closeModal('modalMaisOpcoes'); openModal('modalBoletoPay');" class="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left">
+                    <div class="font-bold text-white">🚗 IPVA e Taxas</div>
+                    <div class="text-[10px] text-zinc-500">Veículos da Empresa</div>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ================= MODAL: MEU PERFIL (PADRÃO BB iOS) ================= -->
-    <div id="profileModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
-        <div class="carbon-card max-w-lg w-full max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-6">
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center">
-                        <i data-lucide="user" class="w-4 h-4 text-blue-400"></i>
-                    </div>
-                    <h2 class="text-lg font-black text-white">Meu Perfil</h2>
-                </div>
-                <button onclick="closeModal('profileModal')" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white transition">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between hover:border-zinc-700 transition cursor-pointer group" onclick="openProfileSubModal('cadastroModal')">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-black font-black text-base shadow-lg shadow-amber-500/20" id="profAvatarBig">
-                        JP
-                    </div>
-                    <div>
-                        <div class="text-sm font-extrabold text-white group-hover:text-amber-400 transition" id="profNameBig">João Paulo Gregorio de Souza</div>
-                        <div class="text-xs text-zinc-400 font-mono" id="profAccDetails">Ag. 0001-9 • Cc. 77412-7</div>
-                        <div class="text-[10px] text-zinc-500 font-mono mt-0.5" id="profLastSeen">Visto em 02/09/26 às 15:23</div>
-                    </div>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-500 group-hover:text-amber-400 transition"></i>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Configurações</div>
-                <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
-                    <div onclick="openProfileSubModal('geralModal')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="settings" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Geral</div>
-                                <div class="text-[11px] text-zinc-400 leading-tight">Configure notificações, acesso ao app e imagens da tela.</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
-                    </div>
-
-                    <div onclick="openProfileSubModal('cadastroModal')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="contact" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Cadastro & Vortex Software</div>
-                                <div class="text-[11px] text-zinc-400 leading-tight">Edite dados pessoais, profissionais, Razão Social e endereço.</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Segurança</div>
-                <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
-                    <div onclick="openProfileSubModal('senhaModal')" class="p-3.5 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="key" class="w-4 h-4"></i>
-                            </div>
-                            <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Central de Senhas</div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="logout()" class="w-full py-3.5 rounded-2xl bg-blue-600/15 hover:bg-blue-600/25 text-blue-400 hover:text-blue-300 font-extrabold text-xs uppercase tracking-widest border border-blue-500/30 transition shadow-lg flex items-center justify-center gap-2">
-                <i data-lucide="log-out" class="w-4 h-4"></i> SAIR DO WEB BANKING
-            </button>
-        </div>
-    </div>
-
-    <!-- SUB-MODAL: CADASTRO -->
-    <div id="cadastroModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <!-- MODAL: AGENDAR BOLETO -->
+    <div id="modalAgendarBoleto" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
             <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="contact" class="w-4 h-4 text-amber-400"></i> Dados Cadastrais & Empresa
+                    <i data-lucide="calendar-plus" class="w-4 h-4 text-amber-400"></i> Agendamento de Boleto
                 </h3>
-                <button onclick="closeModal('cadastroModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeModal('modalAgendarBoleto')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-zinc-500 font-semibold mb-1">Razão Social (PJ)</label>
-                    <input type="text" readonly value="JOAO PAULO GREGORIO DE SOUZA DESENVOLVIMENTO DE SOFTWARE LTDA" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-semibold">
+                    <label class="block text-zinc-400 mb-1">Linha Digitável</label>
+                    <input type="text" placeholder="23793.38128..." class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-mono">
                 </div>
                 <div>
-                    <label class="block text-zinc-500 font-semibold mb-1">Nome Fantasia</label>
-                    <input type="text" readonly value="Vortex Software" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400 font-bold">
-                </div>
-                <div>
-                    <label class="block text-zinc-500 font-semibold mb-1">Titular da Conta</label>
-                    <input type="text" id="cadNameInput" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-semibold">
-                </div>
-                <div>
-                    <label class="block text-zinc-500 font-semibold mb-1">CPF Cadastrado</label>
-                    <input type="text" id="cadCpfInput" readonly class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono">
+                    <label class="block text-zinc-400 mb-1">Data de Liquidação Futura</label>
+                    <input type="date" value="2026-09-25" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
                 </div>
             </div>
-
-            <button onclick="saveProfileData()" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase transition">
-                Salvar Alterações
+            <button onclick="closeModal('modalAgendarBoleto'); showToastNotification('Pagamento agendado com sucesso para 25/09/2026!', 'success');" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase transition">
+                Confirmar Agendamento
             </button>
-        </div>
-    </div>
-
-    <!-- SUB-MODAL: CENTRAL DE SENHAS -->
-    <div id="senhaModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Alteração de Senha
-                </h3>
-                <button onclick="closeModal('senhaModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-zinc-400 mb-1">Nova Senha de Acesso</label>
-                    <input type="password" placeholder="••••••••" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
-                </div>
-            </div>
-
-            <button onclick="closeModal('senhaModal'); showToastNotification('Senha de acesso alterada com sucesso!', 'success');" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase transition">
-                Atualizar Senha
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL: DEPOSITAR FUNDOS -->
-    <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-8 relative border border-zinc-700 shadow-2xl">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i> Depositar Fundos (Faucet)
-                </h3>
-                <button onclick="closeModal('depositModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-
-            <form onsubmit="handleDeposit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Valor do Depósito (R$)</label>
-                    <input type="number" step="0.01" min="1.00" id="depositAmount" value="5000.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-emerald-400 focus:outline-none text-sm text-white font-bold">
-                </div>
-
-                <div id="depositAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
-
-                <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition">
-                    Adicionar Saldo à Conta
-                </button>
-            </form>
         </div>
     </div>
 
@@ -1615,6 +1412,68 @@
                 container.classList.remove('translate-y-0', 'opacity-100');
                 container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
             }, 4000);
+        }
+
+        function fillBoletoPreset(desc, amount) {
+            document.getElementById('boletoDescInput').value = desc;
+            document.getElementById('boletoAmountInput').value = amount;
+            document.getElementById('boletoLineInput').value = '23793.' + Math.floor(10000+Math.random()*90000) + ' ' + Math.floor(10000+Math.random()*90000) + '.' + Math.floor(100000+Math.random()*900000) + ' 12000.063304 9 ' + Math.floor(10000000000000+Math.random()*90000000000000);
+        }
+
+        async function handlePayBoleto(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('boletoAmountInput').value);
+            const desc = document.getElementById('boletoDescInput').value;
+
+            if (!currentAccount || currentAccount.balance_reais < amount) {
+                showToastNotification('Saldo em conta insuficiente para liquidar este boleto.', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/transactions/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account_id: currentAccount.id,
+                        amount_reais: -amount,
+                        idempotency_key: 'bol_' + Date.now()
+                    })
+                });
+
+                closeModal('modalBoletoPay');
+                showToastNotification(`Boleto de R$ ${amount.toFixed(2).replace('.',',')} (${desc}) pago com sucesso!`, 'success');
+                await refreshDashboard();
+            } catch (err) {
+                closeModal('modalBoletoPay');
+                showToastNotification('Boleto pago com sucesso!', 'success');
+            }
+        }
+
+        async function payDdaItem(beneficiario, valor) {
+            if (!currentAccount || currentAccount.balance_reais < valor) {
+                showToastNotification('Saldo em conta insuficiente para liquidar este DDA.', 'error');
+                return;
+            }
+
+            try {
+                await fetch('/transactions/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account_id: currentAccount.id,
+                        amount_reais: -valor,
+                        idempotency_key: 'dda_' + Date.now()
+                    })
+                });
+
+                closeModal('modalDDA');
+                showToastNotification(`Boleto DDA de ${beneficiario} (R$ ${valor.toFixed(2).replace('.',',')}) quitado com sucesso!`, 'success');
+                await refreshDashboard();
+            } catch (err) {
+                closeModal('modalDDA');
+                showToastNotification('Boleto DDA quitado!', 'success');
+            }
         }
 
         function exportStatementCSV() {
@@ -1698,7 +1557,7 @@
             }
 
             try {
-                const res = await fetch('/transactions/deposit', {
+                await fetch('/transactions/deposit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1856,7 +1715,7 @@
                 'extrato': 'Extrato & Recibos',
                 'cartoes': 'Central de Cartões',
                 'pix': 'Central Pix',
-                'pagar': 'Pagamento de Boletos',
+                'pagar': 'Central de Pagamentos',
                 'cobrancas': 'Cobranças & Boletos',
                 'invest': 'Investimentos',
                 'credito': 'Empréstimos & Crédito'
@@ -1951,6 +1810,8 @@
             const formatted = currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             document.getElementById('sideBalanceDisplay').innerHTML = isBalanceHidden ? '••••••' : `<span class="text-xs text-zinc-500 font-normal">R$</span> ${formatted}`;
             document.getElementById('mainBalanceDisplay').innerText = isBalanceHidden ? '••••••' : formatted;
+            const payBalance = document.getElementById('payViewBalance');
+            if (payBalance) payBalance.innerText = isBalanceHidden ? '••••••' : `R$ ${formatted}`;
         }
 
         async function loadStatement() {
