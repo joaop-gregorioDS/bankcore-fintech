@@ -7,9 +7,8 @@ app = FastAPI(
     title="BankCore - Auth Service",
     description="Microsserviço de Autenticação e Gestão de Correntistas",
     version="1.0.0",
-    docs_url="/docs",
-    openapi_url="/openapi.json",
-    swagger_ui_parameters={"url": "/auth/openapi.json"}
+    docs_url="/auth/docs",
+    openapi_url="/auth/openapi.json"
 )
 
 @app.on_event("startup")
@@ -22,7 +21,7 @@ async def startup():
         except Exception:
             await asyncio.sleep(2)
 
-@app.get("/health", tags=["Health"])
+@app.get("/auth/health", tags=["Health"])
 async def health_check():
     return {"service": "bankcore-auth-service", "status": "UP"}
 

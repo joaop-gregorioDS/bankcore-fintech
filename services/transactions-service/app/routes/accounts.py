@@ -24,10 +24,23 @@ async def create_or_get_account(payload: AccountCreateRequest, db: AsyncSession 
         )
 
     acc_num = f"{random.randint(10000, 99999)}-{random.randint(0, 9)}"
-    acc = Account(user_id=payload.user_id, account_number=acc_num, balance_cents=0)
+    acc = Account(user_id=payload.user_id, account_number=acc_num, balance_cents=1000000) # Saldo Inicial R$ 10.000
     db.add(acc)
     await db.commit()
     await db.refresh(acc)
+
+    # Inserir depósito inicial no ledger
+    dep = LedgerTransaction(
+        idempotency_key=f"init_dep_{acc.id}",
+        destination_account_id=acc.id,
+        amount_cents=1000000,
+        transaction_type="DEPOSIT",
+        status="COMPLETED",
+        description="Depósito Inicial BankCore Carbon"
+    )
+    db.add(dep)
+    await db.commit()
+
     return AccountResponse(
         id=acc.id,
         user_id=acc.user_id,
@@ -59,16 +72,20 @@ async def get_statement(account_id: UUID, db: AsyncSession = Depends(get_db)):
     ).order_by(LedgerTransaction.created_at.desc())
     result = await db.execute(query)
     txs = result.scalars().all()
-    return [
-        TransactionResponse(
+    
+    response = []
+    for tx in txs:
+        is_credit = (tx.transaction_type == "DEPOSIT") or (tx.destination_account_id == account_id and tx.source_account_id != account_id)
+        response.append(TransactionResponse(
             transaction_id=tx.id,
             idempotency_key=tx.idempotency_key,
             source_account_id=tx.source_account_id,
             destination_account_id=tx.destination_account_id,
             amount_reais=tx.amount_cents / 100.0,
             transaction_type=tx.transaction_type,
+            direction="CREDIT" if is_credit else "DEBIT",
             status=tx.status,
             created_at=tx.created_at,
             description=tx.description
-        ) for tx in txs
-    ]
+        ))
+    return response

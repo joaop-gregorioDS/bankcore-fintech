@@ -7,9 +7,8 @@ app = FastAPI(
     title="BankCore - Transactions & Ledger Service",
     description="Motor Financeiro de Pix, Idempotência e Livro-Razão ACID",
     version="1.0.0",
-    docs_url="/docs",
-    openapi_url="/openapi.json",
-    swagger_ui_parameters={"url": "/transactions/openapi.json"}
+    docs_url="/transactions/docs",
+    openapi_url="/transactions/openapi.json"
 )
 
 @app.on_event("startup")
@@ -22,7 +21,7 @@ async def startup():
         except Exception:
             await asyncio.sleep(2)
 
-@app.get("/health", tags=["Health"])
+@app.get("/transactions/health", tags=["Health"])
 async def health():
     return {"service": "bankcore-transactions-service", "status": "UP", "engine": "Ledger ACID Active"}
 

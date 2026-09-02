@@ -17,9 +17,9 @@ class DepositRequest(BaseModel):
     amount_reais: float = Field(..., gt=0)
     idempotency_key: str
 
-class TransferRequest(BaseModel):
+class PixTransferRequest(BaseModel):
     source_account_id: UUID
-    destination_account_id: UUID
+    destination_key: str  # Pode ser CPF (11 dígitos) ou UUID
     amount_reais: float = Field(..., gt=0)
     idempotency_key: str
     description: str | None = None
@@ -31,6 +31,7 @@ class TransactionResponse(BaseModel):
     destination_account_id: UUID | None = None
     amount_reais: float
     transaction_type: str
+    direction: str  # "CREDIT" ou "DEBIT"
     status: str
     created_at: datetime
     description: str | None = None

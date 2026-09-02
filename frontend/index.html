@@ -19,7 +19,7 @@
 </head>
 <body class="text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Header / Navbar -->
+    <!-- Header -->
     <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -62,7 +62,7 @@
                     <span class="text-[10px] text-zinc-500 uppercase font-mono">Fintech Core</span>
                 </div>
                 <p class="text-xs text-zinc-400 mb-4 leading-relaxed">
-                    Clique em um dos correntistas abaixo para preencher as credenciais e testar o envio de Pix com garantia ACID:
+                    Clique em um dos correntistas abaixo para preencher as credenciais e testar o envio de Pix:
                 </p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -71,7 +71,7 @@
                             <span>👤 João Paulo (Conta A)</span>
                             <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-400 opacity-0 group-hover:opacity-100 transition"></i>
                         </div>
-                        <div class="text-[11px] text-zinc-500 font-mono mt-1">CPF: 33548376835</div>
+                        <div class="text-[11px] text-zinc-400 font-mono mt-1">Chave Pix: 33548376835</div>
                     </button>
 
                     <button onclick="fillDemo('12345678900', 'teste123456')" class="p-3.5 rounded-xl bg-zinc-900/90 hover:bg-amber-500/10 border border-zinc-800 hover:border-amber-500/40 text-left transition group">
@@ -79,7 +79,7 @@
                             <span>👤 Maria Silva (Conta B)</span>
                             <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-400 opacity-0 group-hover:opacity-100 transition"></i>
                         </div>
-                        <div class="text-[11px] text-zinc-500 font-mono mt-1">CPF: 12345678900</div>
+                        <div class="text-[11px] text-zinc-400 font-mono mt-1">Chave Pix: 12345678900</div>
                     </button>
                 </div>
             </div>
@@ -238,15 +238,16 @@
 
             <!-- Account Meta & Financial Flow Bar -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Chave Pix Oficial com CPF -->
                 <div class="carbon-card rounded-2xl p-5 flex items-center gap-4">
                     <div class="w-11 h-11 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
-                        <i data-lucide="key-round" class="w-5 h-5"></i>
+                        <i data-lucide="qr-code" class="w-5 h-5"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[10px] uppercase font-bold text-zinc-500">Chave Pix (CPF / UUID)</div>
-                        <div class="text-xs font-mono text-zinc-300 truncate select-all" id="accountIdFull">---</div>
+                        <div class="text-[10px] uppercase font-bold text-zinc-500">Sua Chave Pix (CPF)</div>
+                        <div class="text-sm font-bold font-mono text-amber-400" id="pixCpfDisplay">000.000.000-00</div>
                     </div>
-                    <button onclick="copyPixKey()" class="text-xs font-bold text-amber-400 hover:text-amber-300 p-2 hover:bg-zinc-800 rounded-xl transition">
+                    <button onclick="copyPixKey()" class="text-xs font-bold text-amber-400 hover:text-amber-300 p-2 hover:bg-zinc-800 rounded-xl transition" title="Copiar Chave Pix">
                         <i data-lucide="copy" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -294,7 +295,7 @@
         </section>
     </main>
 
-    <!-- MODAL: FAZER PIX COM RESOLUÇÃO POR CPF OU UUID -->
+    <!-- MODAL: FAZER PIX -->
     <div id="transferModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-8 relative border border-zinc-700 shadow-2xl">
             <div class="flex items-center justify-between mb-6">
@@ -307,12 +308,12 @@
             <form onsubmit="handleTransfer(event)" class="space-y-4">
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <label class="block text-xs font-semibold text-zinc-400">Chave Pix (CPF ou UUID da Conta)</label>
+                        <label class="block text-xs font-semibold text-zinc-400">Chave Pix do Destinatário (CPF)</label>
                         <button type="button" onclick="selectQuickContact()" id="btnQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
                             ⚡ Preencher Destinatário
                         </button>
                     </div>
-                    <input type="text" id="transferDestId" required placeholder="Digite o CPF (ex: 12345678900) ou UUID" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-xs font-mono text-white">
+                    <input type="text" id="transferDestKey" required placeholder="Digite o CPF (ex: 12345678900)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm font-mono text-white">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Valor do Pix (R$)</label>
@@ -372,6 +373,14 @@
         let currentAccount = null;
         let isBalanceHidden = false;
 
+        function formatCPF(v) {
+            v = v.replace(/\D/g, "");
+            if (v.length === 11) {
+                return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+            }
+            return v;
+        }
+
         function initApp() {
             lucide.createIcons();
             if (currentAuthUser) {
@@ -409,6 +418,7 @@
             
             const fullName = currentAuthUser.full_name || 'Correntista';
             document.getElementById('cardHolderName').innerText = fullName;
+            document.getElementById('pixCpfDisplay').innerText = formatCPF(currentAuthUser.tax_id || '');
 
             const isJoao = currentAuthUser.tax_id === '33548376835';
             document.getElementById('btnQuickContact').innerText = isJoao ? '⚡ Enviar para Maria Silva' : '⚡ Enviar para João Paulo';
@@ -500,7 +510,6 @@
 
         function updateAccountUI() {
             if (!currentAccount) return;
-            document.getElementById('accountIdFull').innerText = currentAccount.id;
             document.getElementById('balanceDisplay').innerText = isBalanceHidden ? '••••••' : currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         }
 
@@ -523,10 +532,7 @@
                 }
 
                 container.innerHTML = txs.map(tx => {
-                    const isDeposit = tx.transaction_type === 'DEPOSIT';
-                    const isReceivedPix = tx.transaction_type === 'TRANSFER' && String(tx.destination_account_id).toLowerCase() === String(currentAccount.id).toLowerCase();
-                    const isCredit = isDeposit || isReceivedPix;
-
+                    const isCredit = tx.direction === 'CREDIT';
                     const rawDate = tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z';
                     const formattedDate = new Date(rawDate).toLocaleString('pt-BR', { 
                         timeZone: 'America/Sao_Paulo',
@@ -535,10 +541,8 @@
                     });
 
                     let title = tx.description || tx.transaction_type;
-                    if (isReceivedPix) {
-                        title = 'Pix Recebido (Crédito)';
-                    } else if (tx.transaction_type === 'TRANSFER') {
-                        title = 'Pix Enviado (Débito)';
+                    if (tx.transaction_type === 'TRANSFER') {
+                        title = isCredit ? 'Pix Recebido (Crédito)' : 'Pix Enviado (Débito)';
                     }
                     
                     if (isCredit) {
@@ -606,55 +610,21 @@
             }
         }
 
-        async function resolveDestinationAccount(inputVal) {
-            inputVal = inputVal.trim();
-            // Se for UUID (contém traços)
-            if (inputVal.includes('-')) return inputVal;
-
-            // Se for CPF (apenas números)
-            const resLogin = await fetch('/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tax_id: inputVal, password: 'teste123456' })
-            });
-
-            if (!resLogin.ok) throw new Error('Chave Pix (CPF) não encontrada no BankCore.');
-            const d = await resLogin.json();
-            const p = JSON.parse(atob(d.access_token.split('.')[1]));
-            
-            const resAcc = await fetch('/accounts/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: p.sub })
-            });
-
-            if (!resAcc.ok) throw new Error('Conta bancária vinculada ao CPF não encontrada.');
-            const accData = await resAcc.json();
-            return accData.id;
-        }
-
         async function handleTransfer(e) {
             e.preventDefault();
-            const keyOrUuid = document.getElementById('transferDestId').value.trim();
+            const destination_key = document.getElementById('transferDestKey').value.trim();
             const amount_reais = parseFloat(document.getElementById('transferAmount').value);
             const description = document.getElementById('transferDesc').value.trim() || 'Pix BankCore Carbon';
             const idempotency_key = 'pix_' + Date.now() + '_' + Math.random().toString(36).substring(7);
 
             try {
-                showAlert('transferAlert', 'Localizando conta de destino...', 'bg-amber-400/20 text-amber-300');
-                const destination_account_id = await resolveDestinationAccount(keyOrUuid);
-
-                if (destination_account_id.toLowerCase() === currentAccount.id.toLowerCase()) {
-                    throw new Error('A conta de origem e destino não podem ser iguais.');
-                }
-
                 showAlert('transferAlert', 'Executando Pix com isolamento ACID...', 'bg-amber-400/20 text-amber-300');
-                const res = await fetch('/transactions/transfer', {
+                const res = await fetch('/transactions/pix', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         source_account_id: currentAccount.id,
-                        destination_account_id: destination_account_id,
+                        destination_key: destination_key,
                         amount_reais: amount_reais,
                         idempotency_key: idempotency_key,
                         description: description
@@ -678,8 +648,7 @@
 
         function selectQuickContact() {
             const isJoao = currentAuthUser.tax_id === '33548376835';
-            // Preenche diretamente o CPF do destinatário!
-            document.getElementById('transferDestId').value = isJoao ? '12345678900' : '33548376835';
+            document.getElementById('transferDestKey').value = isJoao ? '12345678900' : '33548376835';
         }
 
         function setCardTheme(theme) {
@@ -700,7 +669,7 @@
         function copyPixKey() {
             if (!currentAuthUser) return;
             navigator.clipboard.writeText(currentAuthUser.tax_id);
-            alert('Chave Pix (CPF ' + currentAuthUser.tax_id + ') copiada para a área de transferência!');
+            alert('Chave Pix (CPF ' + formatCPF(currentAuthUser.tax_id) + ') copiada com sucesso!');
         }
 
         function toggleBalanceVisibility() {
