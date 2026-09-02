@@ -53,8 +53,6 @@
 
         <!-- ================= AUTH VIEW ================= -->
         <section id="authView" class="max-w-lg mx-auto my-6 sm:my-10 space-y-6">
-            
-            <!-- Demo Quick Access Card -->
             <div class="p-5 rounded-2xl carbon-card border border-amber-500/30 shadow-2xl relative overflow-hidden">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
@@ -370,17 +368,14 @@
     </div>
 
     <script>
-        // Contas Oficiais Demo cadastradas
         const DEMO_ACCOUNTS = {
             JOAO: {
                 tax_id: '33548376835',
-                name: 'JOÃO PAULO GREGORIO DE SOUZA',
-                account_id: 'da6ce33e-36a7-4f39-89bb-d8ba42334309'
+                account_id: '11111111-1111-1111-1111-111111111111'
             },
             MARIA: {
                 tax_id: '12345678900',
-                name: 'MARIA SILVA SANTOS',
-                account_id: 'ac7d8886-06d5-4e84-8be0-cb9b9cc63f34'
+                account_id: '22222222-2222-2222-2222-222222222222'
             }
         };
 
@@ -629,9 +624,8 @@
             const description = document.getElementById('transferDesc').value.trim() || 'Pix BankCore Carbon';
             const idempotency_key = 'pix_' + Date.now() + '_' + Math.random().toString(36).substring(7);
 
-            // Bloqueio de auto-transferência
             if (destination_account_id.toLowerCase() === currentAccount.id.toLowerCase()) {
-                showAlert('transferAlert', 'Não é possível fazer Pix para a sua própria conta.', 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
+                showAlert('transferAlert', 'A conta de origem e destino não podem ser iguais.', 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
                 return;
             }
 
@@ -667,10 +661,10 @@
         function selectQuickContact() {
             const isJoao = currentAuthUser.tax_id === DEMO_ACCOUNTS.JOAO.tax_id;
             if (isJoao) {
-                // Se o João estiver logado, preenche o UUID da Maria
+                // João envia para a Maria (Conta B)
                 document.getElementById('transferDestId').value = DEMO_ACCOUNTS.MARIA.account_id;
             } else {
-                // Se a Maria estiver logada, preenche o UUID do João
+                // Maria envia para o João (Conta A)
                 document.getElementById('transferDestId').value = DEMO_ACCOUNTS.JOAO.account_id;
             }
         }
