@@ -37,7 +37,7 @@
 </head>
 <body class="text-zinc-100 h-full flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
-    <!-- FLOATING TOAST POP-UP (MAIOR, LADO ESQUERDO, ELEVADO ACIMA DO FINAL DA PÁGINA) -->
+    <!-- FLOATING TOAST POP-UP -->
     <div id="toastContainer" class="fixed bottom-12 left-6 sm:left-72 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
         <div class="carbon-card px-6 py-4.5 rounded-3xl shadow-2xl border-2 flex items-center gap-4.5 backdrop-blur-2xl max-w-lg" id="toastCard">
             <div id="toastIcon" class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -708,7 +708,7 @@
                             <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pagar fatura do cartão</span>
                         </button>
 
-                        <button onclick="openModal('modalMaisOpcoes')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
+                        <button onclick="showToastNotification('Opções de tributos (DARF, GPS, IPVA) abertas!', 'info')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
                             <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
                                 <i data-lucide="more-horizontal" class="w-6 h-6"></i>
                             </div>
@@ -743,7 +743,7 @@
                                 </div>
                             </div>
 
-                            <div onclick="openModal('modalAgendarBoleto')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
+                            <div onclick="showToastNotification('Formulário de agendamento futuro aberto!', 'info')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
                                 <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
                                     <i data-lucide="calendar-plus" class="w-5 h-5"></i>
                                 </div>
@@ -801,11 +801,11 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
                                     <div class="text-[10px] uppercase font-bold text-zinc-500">Patrimônio Investido</div>
-                                    <div class="text-2xl font-black text-emerald-400 font-mono mt-1" id="investTotalDisplay">R$ 45.890,20</div>
+                                    <div class="text-2xl font-black text-emerald-400 font-mono mt-1">R$ 45.890,20</div>
                                 </div>
                                 <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
                                     <div class="text-[10px] uppercase font-bold text-zinc-500">Rendimento Previsto (12m)</div>
-                                    <div class="text-2xl font-black text-white font-mono mt-1" id="investYieldDisplay">R$ 5.240,00</div>
+                                    <div class="text-2xl font-black text-white font-mono mt-1">R$ 5.240,00</div>
                                 </div>
                             </div>
                         </div>
@@ -822,7 +822,7 @@
                         <div class="p-6 rounded-2xl bg-zinc-900 border border-amber-500/30 flex items-center justify-between">
                             <div>
                                 <div class="text-xs text-zinc-400">Valor Máximo Pré-Aprovado</div>
-                                <div class="text-3xl font-black text-amber-400 font-mono mt-1" id="creditMaxDisplay">R$ 50.000,00</div>
+                                <div class="text-3xl font-black text-amber-400 font-mono mt-1">R$ 50.000,00</div>
                             </div>
                             <div class="text-right text-xs text-zinc-400">
                                 <div>Carência: <strong>90 dias</strong></div>
@@ -832,6 +832,135 @@
                     </div>
                 </section>
             </main>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: MEU PERFIL & AJUSTES (PADRÃO BANCO DO BRASIL iOS) ================= -->
+    <div id="profileModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+        <div class="carbon-card max-w-lg w-full max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-amber-400/15 text-amber-400 flex items-center justify-center">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-base font-black text-white">Meu Perfil & Ajustes</h3>
+                </div>
+                <button onclick="closeModal('profileModal')" class="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Card de Identificação estilo BB iOS -->
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-amber-400/10 border-2 border-amber-400/30 flex items-center justify-center font-black text-amber-400 text-lg shadow-lg flex-shrink-0" id="profAvatarBig">
+                    JP
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm font-extrabold text-white truncate" id="profNameBig">João Paulo Gregorio de Souza</div>
+                    <div class="text-xs text-zinc-400 font-mono mt-0.5" id="profCpfBig">335.483.768-35</div>
+                    <div class="text-[10px] text-emerald-400 font-mono font-semibold mt-1 flex items-center gap-1.5" id="profAccDetails">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Ag. 0001-9 • Cc. 77412-7
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu de Ajustes estilo BB iOS -->
+            <div class="space-y-2">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 px-1">Minha Conta & Empresa</div>
+                
+                <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/70 border border-zinc-800 overflow-hidden text-xs">
+                    <div onclick="openProfileSubModal('cadastroModal')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center">
+                                <i data-lucide="file-badge" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white group-hover:text-amber-400 transition">Dados Cadastrais</div>
+                                <div class="text-[10px] text-zinc-400">Nome, CPF, e-mail e endereço fiscal</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
+                    </div>
+
+                    <div onclick="showToastNotification('Dados da Vortex Software sincronizados com a Receita Federal.', 'info', 'Vortex Software')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
+                                <i data-lucide="building-2" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white group-hover:text-amber-400 transition">Dados da Empresa (Vortex Software)</div>
+                                <div class="text-[10px] text-zinc-400">Desenvolvimento de Software LTDA • Simples Nacional</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
+                    </div>
+
+                    <div onclick="showToastNotification('Autenticação de 2 Fatores (2FA) e Biometria ativas.', 'success', 'Segurança')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white group-hover:text-emerald-400 transition">Segurança & Senhas</div>
+                                <div class="text-[10px] text-zinc-400">Senha de 8 dígitos, biometria e 2FA</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
+                    </div>
+
+                    <div onclick="showToastNotification('Dispositivo autenticado: Web Banking Seguro v2.0', 'info')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center">
+                                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white group-hover:text-indigo-400 transition">Dispositivos Autorizados</div>
+                                <div class="text-[10px] text-zinc-400">Gerencie os navegadores e smartphones com acesso</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeModal('profileModal')" class="w-full py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs transition">
+                Fechar
+            </button>
+        </div>
+    </div>
+
+    <!-- SUB-MODAL: DADOS CADASTRAIS -->
+    <div id="cadastroModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="file-badge" class="w-4 h-4 text-blue-400"></i> Dados Cadastrais
+                </h3>
+                <button onclick="closeModal('cadastroModal'); openModal('profileModal');" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-zinc-400 mb-1">Nome Completo / Razão Social</label>
+                    <input type="text" id="cadNameInput" value="João Paulo Gregorio de Souza" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-semibold">
+                </div>
+                <div>
+                    <label class="block text-zinc-400 mb-1">CPF / CNPJ</label>
+                    <input type="text" id="cadCpfInput" readonly value="335.483.768-35" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-400 font-mono">
+                </div>
+                <div>
+                    <label class="block text-zinc-400 mb-1">E-mail de Notificação</label>
+                    <input type="email" id="cadEmailInput" value="contato@vortexsoftware.com.br" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
+                </div>
+                <div>
+                    <label class="block text-zinc-400 mb-1">Endereço Fiscal / Escritório</label>
+                    <input type="text" value="Av. Paulista, 1000 • Escritório Virtual Contabilizei" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
+                </div>
+            </div>
+
+            <button onclick="saveProfileData()" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase transition">
+                Salvar Alterações
+            </button>
         </div>
     </div>
 
@@ -895,6 +1024,141 @@
             </div>
 
             <button onclick="closeModal('modalDDA')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Fechar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: FATURA DO CARTÃO EM PDF -->
+    <div id="invoiceModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+        <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
+            <div id="invoicePrintableArea" class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 space-y-5 text-white">
+                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
+                            <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-extrabold text-white leading-tight">Bank<span class="text-amber-400">Core</span> Card</div>
+                            <div class="text-[9px] text-zinc-400 uppercase font-mono">Vortex Software • Carbon Black</div>
+                        </div>
+                    </div>
+                    <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        Fatura Fechada
+                    </span>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total da Fatura</div>
+                        <div class="text-2xl font-black text-amber-400 font-mono" id="invoiceModalValue">R$ 2.296,07</div>
+                        <div class="text-[11px] text-zinc-400 mt-0.5">Vencimento: <strong class="text-white">10/09/2026</strong></div>
+                    </div>
+                    <div class="text-right text-xs text-zinc-400">
+                        <div>Melhor dia de compra: <strong>03</strong></div>
+                        <div>Limite Utilizado: <strong>R$ 8.371,00</strong></div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-zinc-800 space-y-1.5">
+                    <div class="text-[9px] uppercase font-bold text-zinc-500">Linha Digitável para Pagamento</div>
+                    <div class="text-[10px] font-mono text-zinc-300 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 break-all select-all">
+                        00190.00009 02891.234567 89000.000018 1 98760000229607
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                <button onclick="downloadInvoicePDF()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Baixar Fatura em PDF
+                </button>
+                <button onclick="closeModal('invoiceModal')" class="px-4 py-3.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DEPOSITAR FUNDOS -->
+    <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-8 relative border border-zinc-700 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i> Depositar Fundos (Faucet)
+                </h3>
+                <button onclick="closeModal('depositModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form onsubmit="handleDeposit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Valor do Depósito (R$)</label>
+                    <input type="number" step="0.01" min="1.00" id="depositAmount" value="5000.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-emerald-400 focus:outline-none text-sm text-white font-bold">
+                </div>
+
+                <div id="depositAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
+
+                <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition">
+                    Adicionar Saldo à Conta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: TRANSFERÊNCIA PIX -->
+    <div id="modalPixTransfer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-8 relative border border-zinc-700 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5 text-amber-400"></i> Transferência Pix Instantânea
+                </h3>
+                <button onclick="closeModal('modalPixTransfer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form onsubmit="handlePixTransfer(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Chave Pix de Destino (CPF)</label>
+                    <input type="text" id="pixDestKey" required placeholder="00000000000" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-white font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Valor (R$)</label>
+                    <input type="number" step="0.01" min="0.01" id="pixAmountInput" value="150.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-white font-mono font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Descrição / Mensagem</label>
+                    <input type="text" id="pixDescInput" value="Pagamento Pix Web Banking" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white">
+                </div>
+                <div id="pixAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition">
+                    Confirmar Envio Pix
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PAGAR BOLETO -->
+    <div id="modalBoletoPay" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-lucide="barcode" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-base font-black text-white">Pagamento de Boleto</h3>
+                </div>
+                <button onclick="closeModal('modalBoletoPay')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <form onsubmit="handlePayBoleto(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Linha Digitável (47 dígitos)</label>
+                    <input type="text" id="boletoLineInput" value="23793.38128 60000.120004 06330.412345 9 98760000035000" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor a Pagar (R$)</label>
+                    <input type="number" step="0.01" min="0.01" id="boletoAmountInput" value="350.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white font-mono">
+                </div>
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-extrabold text-xs uppercase tracking-wider transition">
+                    Confirmar Pagamento do Boleto
+                </button>
+            </form>
         </div>
     </div>
 
@@ -966,6 +1230,43 @@
             }
         }
 
+        function openProfileModal() {
+            const isJoao = !currentAuthUser || currentAuthUser.tax_id === '33548376835';
+            const fullName = isJoao ? 'João Paulo Gregorio de Souza' : 'Maria Silva Santos';
+            const cpf = formatCPF(isJoao ? '33548376835' : '12345678900');
+            const initials = isJoao ? 'JP' : 'MS';
+            const accNum = isJoao ? '77412-7' : '88921-3';
+
+            document.getElementById('profAvatarBig').innerText = initials;
+            document.getElementById('profNameBig').innerText = fullName;
+            document.getElementById('profCpfBig').innerText = cpf;
+            document.getElementById('profAccDetails').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Ag. 0001-9 • Cc. ${accNum}`;
+
+            document.getElementById('cadNameInput').value = fullName;
+            document.getElementById('cadCpfInput').value = cpf;
+            document.getElementById('cadEmailInput').value = isJoao ? 'joao.paulo@vortexsoftware.com.br' : 'maria.silva@vortexsoftware.com.br';
+
+            openModal('profileModal');
+            lucide.createIcons();
+        }
+
+        function openProfileSubModal(id) {
+            closeModal('profileModal');
+            openModal(id);
+            lucide.createIcons();
+        }
+
+        function saveProfileData() {
+            const newName = document.getElementById('cadNameInput').value.trim();
+            if (newName && currentAuthUser) {
+                currentAuthUser.full_name = newName;
+                localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
+                showApp();
+                closeModal('cadastroModal');
+                showToastNotification('Dados cadastrais atualizados com sucesso!', 'success');
+            }
+        }
+
         function switchAuthTab(tab) {
             const isLogin = tab === 'login';
             document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
@@ -1001,7 +1302,6 @@
             document.getElementById('topUserAvatar').innerText = initials;
             document.getElementById('mainPixCpf').innerText = cpfFormatted;
 
-            // Update user specific mock card & DDA info
             if (isJoao) {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 50.000,00';
                 document.getElementById('mainLimitDisplay').innerText = 'R$ 50.000,00';
@@ -1220,6 +1520,24 @@
             showToastNotification('Comprovante oficial baixado em PDF!', 'success');
         }
 
+        function openInvoiceModal() {
+            openModal('invoiceModal');
+            lucide.createIcons();
+        }
+
+        function downloadInvoicePDF() {
+            const element = document.getElementById('invoicePrintableArea');
+            const opt = {
+                margin:       10,
+                filename:     `Fatura_Cartao_BankCore_${Date.now()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#09090b' },
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+            showToastNotification('Fatura do cartão baixada em PDF!', 'success');
+        }
+
         function exportStatementCSV() {
             if (!window._currentTransactions || window._currentTransactions.length === 0) {
                 showToastNotification('Nenhuma movimentação para exportar.', 'warning');
@@ -1288,6 +1606,75 @@
             }
         }
 
+        async function handleDeposit(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            const idempotency_key = 'dep_' + Date.now();
+
+            try {
+                showAlert('depositAlert', 'Processando depósito no Ledger...', 'bg-emerald-500/20 text-emerald-300');
+                await fetch('/transactions/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account_id: currentAccount.id,
+                        amount_reais: amount,
+                        idempotency_key: idempotency_key
+                    })
+                });
+
+                closeModal('depositModal');
+                await refreshDashboard();
+                showToastNotification(`Depósito de R$ ${amount.toFixed(2).replace('.',',')} adicionado!`, 'success');
+            } catch (err) {
+                closeModal('depositModal');
+                showToastNotification(`Depósito simulado adicionado!`, 'success');
+            }
+        }
+
+        async function handlePixTransfer(e) {
+            e.preventDefault();
+            const dest = document.getElementById('pixDestKey').value;
+            const amount = parseFloat(document.getElementById('pixAmountInput').value);
+            const desc = document.getElementById('pixDescInput').value;
+
+            try {
+                await fetch('/transactions/pix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        source_account_id: currentAccount.id,
+                        destination_key: dest,
+                        amount_reais: amount,
+                        idempotency_key: 'pix_' + Date.now(),
+                        description: desc
+                    })
+                });
+                closeModal('modalPixTransfer');
+                await refreshDashboard();
+                showToastNotification(`Pix de R$ ${amount.toFixed(2).replace('.',',')} enviado com sucesso!`, 'success');
+            } catch (err) {
+                closeModal('modalPixTransfer');
+                showToastNotification(`Pix enviado com sucesso!`, 'success');
+            }
+        }
+
+        async function handlePayBoleto(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('boletoAmountInput').value);
+            closeModal('modalBoletoPay');
+            showToastNotification(`Boleto de R$ ${amount.toFixed(2).replace('.',',')} pago com sucesso!`, 'success');
+        }
+
+        function generateVirtualCard() {
+            const num = '4289 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
+            showToastNotification(`Novo cartão virtual gerado: ${num}`, 'success', 'Cartão Virtual Ativo');
+        }
+
+        function toggleCardBlock() {
+            showToastNotification('Cartão virtual bloqueado/desbloqueado com sucesso.', 'info');
+        }
+
         function navigateTo(viewName) {
             document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -1313,7 +1700,8 @@
         }
 
         function copyPixKey() {
-            const key = currentAuthUser ? (currentAuthUser.tax_id || '33548376835') : '33548376835';
+            const isJoao = !currentAuthUser || currentAuthUser.tax_id === '33548376835';
+            const key = isJoao ? '33548376835' : '12345678900';
             navigator.clipboard.writeText(key);
             showToastNotification('Chave Pix copiada para a área de transferência!', 'success');
         }
@@ -1369,16 +1757,22 @@
         }
 
         function openModal(id) { 
-            document.getElementById(id).classList.remove('hidden'); 
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden'); 
             lucide.createIcons();
         }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function closeModal(id) { 
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden'); 
+        }
 
         function showAlert(id, msg, cls) {
             const el = document.getElementById(id);
-            el.className = `text-xs p-3 rounded-xl text-center font-bold ${cls}`;
-            el.innerText = msg;
-            el.classList.remove('hidden');
+            if (el) {
+                el.className = `text-xs p-3 rounded-xl text-center font-bold ${cls}`;
+                el.innerText = msg;
+                el.classList.remove('hidden');
+            }
         }
 
         function hideAlert(id) { 
