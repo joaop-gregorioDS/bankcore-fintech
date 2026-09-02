@@ -24,22 +24,10 @@ async def create_or_get_account(payload: AccountCreateRequest, db: AsyncSession 
         )
 
     acc_num = f"{random.randint(10000, 99999)}-{random.randint(0, 9)}"
-    acc = Account(user_id=payload.user_id, account_number=acc_num, balance_cents=1000000) # Saldo Inicial R$ 10.000
+    acc = Account(user_id=payload.user_id, account_number=acc_num, balance_cents=1000000)
     db.add(acc)
     await db.commit()
     await db.refresh(acc)
-
-    # Inserir depósito inicial no ledger
-    dep = LedgerTransaction(
-        idempotency_key=f"init_dep_{acc.id}",
-        destination_account_id=acc.id,
-        amount_cents=1000000,
-        transaction_type="DEPOSIT",
-        status="COMPLETED",
-        description="Depósito Inicial BankCore Carbon"
-    )
-    db.add(dep)
-    await db.commit()
 
     return AccountResponse(
         id=acc.id,

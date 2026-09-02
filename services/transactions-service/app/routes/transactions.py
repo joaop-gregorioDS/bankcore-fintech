@@ -36,11 +36,9 @@ async def pix_transfer(payload: PixTransferRequest, db: AsyncSession = Depends(g
     dest_key = payload.destination_key.strip().replace(".", "").replace("-", "")
     dest_account_id = None
 
-    # 1. Se for UUID direto
     if "-" in dest_key and len(dest_key) == 36:
         dest_account_id = UUID(dest_key)
     else:
-        # 2. Se for CPF, resolve via Auth Service
         try:
             async with httpx.AsyncClient() as client:
                 res = await client.post("http://bankcore-auth-service:8000/auth/login", json={
@@ -51,7 +49,7 @@ async def pix_transfer(payload: PixTransferRequest, db: AsyncSession = Depends(g
                     token = res.json()["access_token"]
                     import base64, json
                     user_id = UUID(json.loads(base64.b64decode(token.split(".")[1] + "==").decode())["sub"])
-                    q = select(Account).where(Account.user_id == user_id)
+                    q = select(Account).where(Account.user_id == user_id).order_by(Account.created_at.asc())
                     r = await db.execute(q)
                     acc = r.scalars().first()
                     if acc:
@@ -60,7 +58,7 @@ async def pix_transfer(payload: PixTransferRequest, db: AsyncSession = Depends(g
             raise HTTPException(status_code=500, detail=f"Erro ao resolver chave Pix: {str(e)}")
 
     if not dest_account_id:
-        raise HTTPException(status_code=404, detail="Chave Pix (CPF ou Conta) não encontrada.")
+        raise HTTPException(status_code=404, detail="Chave Pix (CPF) não encontrada no banco.")
 
     if dest_account_id == payload.source_account_id:
         raise HTTPException(status_code=400, detail="Não é permitido fazer Pix para a própria conta.")
