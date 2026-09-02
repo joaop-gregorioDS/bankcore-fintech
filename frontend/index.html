@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Biblioteca Oficial para Geração de PDF em Alta Definição -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -37,9 +36,25 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+
+        /* Toast Animation */
+        #toastContainer { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     </style>
 </head>
-<body class="text-zinc-100 h-full flex flex-col antialiased selection:bg-amber-500 selection:text-black">
+<body class="text-zinc-100 h-full flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
+
+    <!-- FLOATING TOAST NOTIFICATION SYSTEM -->
+    <div id="toastContainer" class="fixed top-6 right-6 z-50 transform translate-y-[-150%] opacity-0 pointer-events-none transition-all duration-300">
+        <div class="carbon-card px-5 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3 backdrop-blur-xl" id="toastCard">
+            <div id="toastIcon" class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+            </div>
+            <div>
+                <div class="text-xs font-bold text-white" id="toastTitle">Sucesso</div>
+                <div class="text-[11px] text-zinc-400 font-medium" id="toastMessage">Operação realizada com sucesso.</div>
+            </div>
+        </div>
+    </div>
 
     <!-- ================= AUTH SCREEN ================= -->
     <div id="authView" class="min-h-full flex items-center justify-center p-4 sm:p-6 bg-gradient-to-b from-zinc-950 to-[#09090b]">
@@ -355,10 +370,10 @@
                                 <p class="text-xs text-zinc-400">Clique em qualquer transação para visualizar e baixar o comprovante oficial</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="exportStatementCSV()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white border border-zinc-700 transition flex items-center gap-2">
-                                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar CSV
+                                <button onclick="exportStatementCSV()" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-xs font-extrabold text-black shadow-lg shadow-amber-500/15 transition flex items-center gap-2">
+                                    <i data-lucide="download" class="w-4 h-4"></i> Exportar Extrato CSV
                                 </button>
-                                <button onclick="refreshDashboard()" class="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 transition">
+                                <button onclick="refreshDashboard()" class="p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 transition" title="Atualizar">
                                     <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -460,7 +475,7 @@
                                 </div>
                             </div>
 
-                            <button onclick="alert('Dados do cartão virtual visualizados!')" class="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white border border-zinc-700 transition flex items-center justify-center gap-2">
+                            <button onclick="showToastNotification('Dados do cartão virtual visualizados com criptografia.', 'success')" class="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white border border-zinc-700 transition flex items-center justify-center gap-2">
                                 <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i> Visualizar CVV e Senha
                             </button>
                         </div>
@@ -475,7 +490,7 @@
                                 <h2 class="text-xl font-black text-white flex items-center gap-2">
                                     <i data-lucide="qr-code" class="w-5 h-5 text-amber-400"></i> Área Pix Instantâneo
                                 </h2>
-                                <p class="text-xs text-zinc-400">Transferências 24/7 com emissão de comprovante em PDF</p>
+                                <p class="text-xs text-zinc-400">Transferências 24/7 com emissão de comprovante oficial</p>
                             </div>
 
                             <form onsubmit="handlePixTransfer(event)" class="space-y-4">
@@ -532,7 +547,7 @@
                                 <div class="w-36 h-36 mx-auto bg-white p-2 rounded-2xl flex items-center justify-center shadow-lg">
                                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=bankcore-pix-payment" alt="QR Code Pix" class="w-full h-full">
                                 </div>
-                                <button onclick="alert('Código Pix Copia e Cola copiado com sucesso!')" class="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
+                                <button onclick="showToastNotification('Código Pix Copia e Cola copiado para a área de transferência!', 'success')" class="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
                                     Copiar Pix Copia e Cola
                                 </button>
                             </div>
@@ -564,7 +579,7 @@
                                     <input type="date" value="2026-09-10" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-white">
                                 </div>
                             </div>
-                            <button onclick="alert('Boleto pago com sucesso!')" class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition">
+                            <button onclick="showToastNotification('Boleto bancário pago e registrado no livro-razão com sucesso!', 'success')" class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition">
                                 Confirmar Pagamento do Boleto
                             </button>
                         </div>
@@ -579,7 +594,7 @@
                                 <h2 class="text-xl font-black text-white">Cobranças & Boletos Emitidos</h2>
                                 <p class="text-xs text-zinc-400">Acompanhamento de boletos emitidos e links de pagamento</p>
                             </div>
-                            <button onclick="alert('Nova cobrança emitida!')" class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition flex items-center gap-2">
+                            <button onclick="showToastNotification('Formulário de emissão de cobrança aberto.', 'info')" class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition flex items-center gap-2">
                                 <i data-lucide="plus" class="w-4 h-4"></i> Nova Cobrança
                             </button>
                         </div>
@@ -699,7 +714,7 @@
                                 <span class="text-amber-400 font-bold text-base" id="loanDisplayVal">R$ 15.000,00</span>
                                 <span>R$ 25.000</span>
                             </div>
-                            <button onclick="alert('Contratação de crédito enviada com sucesso!')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider transition">
+                            <button onclick="showToastNotification('Proposta de crédito submetida para aprovação instantânea!', 'success')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider transition">
                                 Contratar Crédito em 1-Clique
                             </button>
                         </div>
@@ -712,11 +727,7 @@
     <!-- ================= MODAL: COMPROVANTE OFICIAL DE PIX EM PDF ================= -->
     <div id="receiptModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="max-w-md w-full carbon-card rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
-            
-            <!-- Comprovante Printable Canvas -->
             <div id="receiptPrintableArea" class="bg-zinc-950 p-5 rounded-2xl border border-zinc-800 space-y-4 text-white">
-                
-                <!-- Receipt Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
                     <div class="flex items-center gap-2">
                         <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
@@ -734,16 +745,13 @@
                     </div>
                 </div>
 
-                <!-- Receipt Title & Value -->
                 <div class="text-center py-2 space-y-1">
                     <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Comprovante de Transferência Pix</div>
                     <div class="text-3xl font-black text-amber-400 font-mono tracking-tight" id="rcptAmount">R$ 0,00</div>
                     <div class="text-[10px] text-zinc-500 font-mono" id="rcptDate">02/09/2026 às 13:17:00</div>
                 </div>
 
-                <!-- Parties Info Table -->
                 <div class="space-y-3 pt-2 text-xs border-t border-zinc-800/80">
-                    <!-- Pagador -->
                     <div>
                         <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Origem (Pagador)</div>
                         <div class="font-bold text-white text-xs mt-0.5" id="rcptPayerName">João Paulo Gregorio de Souza</div>
@@ -751,7 +759,6 @@
                         <div class="text-[10px] text-zinc-500">Instituição: <strong>BankCore S.A.</strong></div>
                     </div>
 
-                    <!-- Recebedor -->
                     <div class="pt-2 border-t border-zinc-900">
                         <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Destino (Recebedor)</div>
                         <div class="font-bold text-white text-xs mt-0.5" id="rcptReceiverName">Maria Silva Santos</div>
@@ -759,7 +766,6 @@
                         <div class="text-[10px] text-zinc-500">Instituição: <strong>BankCore S.A.</strong></div>
                     </div>
 
-                    <!-- Detalhes & Hash -->
                     <div class="pt-2 border-t border-zinc-900 space-y-1">
                         <div class="flex justify-between text-[10px] text-zinc-400">
                             <span>Tipo de Transferência:</span>
@@ -777,7 +783,6 @@
                 </div>
             </div>
 
-            <!-- Receipt Actions -->
             <div class="flex items-center gap-2 pt-1">
                 <button onclick="downloadReceiptPDF()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
                     <i data-lucide="download" class="w-4 h-4"></i> Baixar Comprovante PDF
@@ -821,12 +826,110 @@
         let isBalanceHidden = false;
         let sessionSeconds = 899;
         let lastTransactionObject = null;
+        let toastTimeout = null;
 
         function formatCPF(v) {
             if (!v) return '---';
             v = String(v).replace(/\D/g, "");
             if (v.length === 11) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
             return v;
+        }
+
+        function showToastNotification(message, type = 'success', title = '') {
+            const container = document.getElementById('toastContainer');
+            const toastCard = document.getElementById('toastCard');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+
+            const titles = { success: 'Sucesso', info: 'Informação', warning: 'Aviso', error: 'Atenção' };
+            const borders = {
+                success: 'border-emerald-500/40 bg-zinc-900/95',
+                info: 'border-amber-400/40 bg-zinc-900/95',
+                warning: 'border-yellow-500/40 bg-zinc-900/95',
+                error: 'border-rose-500/40 bg-zinc-900/95'
+            };
+            const iconBgs = {
+                success: 'bg-emerald-500/20 text-emerald-400',
+                info: 'bg-amber-400/20 text-amber-400',
+                warning: 'bg-yellow-500/20 text-yellow-400',
+                error: 'bg-rose-500/20 text-rose-400'
+            };
+            const iconNames = { success: 'check-circle', info: 'info', warning: 'alert-triangle', error: 'alert-circle' };
+
+            toastTitle.innerText = title || titles[type];
+            toastMessage.innerText = message;
+            toastCard.className = `carbon-card px-5 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3.5 backdrop-blur-xl ${borders[type]}`;
+            toastIcon.className = `w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBgs[type]}`;
+            toastIcon.innerHTML = `<i data-lucide="${iconNames[type]}" class="w-4 h-4"></i>`;
+
+            lucide.createIcons();
+
+            container.classList.remove('translate-y-[-150%]', 'opacity-0', 'pointer-events-none');
+            container.classList.add('translate-y-0', 'opacity-100');
+
+            toastTimeout = setTimeout(() => {
+                container.classList.remove('translate-y-0', 'opacity-100');
+                container.classList.add('translate-y-[-150%]', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+
+        function exportStatementCSV() {
+            if (!window._currentTransactions || window._currentTransactions.length === 0) {
+                showToastNotification('Nenhuma movimentação no extrato para exportar.', 'warning');
+                return;
+            }
+
+            const now = new Date().toLocaleString('pt-BR', { 
+                timeZone: 'America/Sao_Paulo',
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            // UTF-8 BOM para abrir sem erros de acentuação no Excel
+            let csv = "\uFEFF";
+            csv += `RELATÓRIO CONTÁBIL OFICIAL - BANKCORE | VORTEX SOFTWARE\n`;
+            csv += `Titular da Conta;${currentAuthUser.full_name || 'Correntista'}\n`;
+            csv += `CPF / CNPJ;${formatCPF(currentAuthUser.tax_id)}\n`;
+            csv += `Conta Corrente;${currentAccount ? currentAccount.account_number : '---'}\n`;
+            csv += `Saldo Atual;R$ ${currentAccount ? currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}\n`;
+            csv += `Emissão;${now} (Horário Oficial de Brasília)\n`;
+            csv += `Motor Contábil;ACID Ledger Protocol v1.0.0 • SPI Banco Central\n\n`;
+
+            csv += `Data;Hora (GMT-3);Identificação da Transação;Tipo;Operação;Valor (R$);Status;Código de Autenticação / Protocolo E2E\n`;
+
+            window._currentTransactions.forEach(tx => {
+                const isCredit = tx.direction === 'CREDIT';
+                const rawDate = tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z';
+                const d = new Date(rawDate);
+                const dateStr = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                const timeStr = d.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+                let title = tx.description || tx.transaction_type;
+                if (tx.transaction_type === 'TRANSFER') {
+                    title = isCredit ? 'Pix Recebido' : 'Pix Enviado';
+                }
+
+                const operacao = isCredit ? 'CRÉDITO (+)' : 'DÉBITO (-)';
+                const valorFormatado = (isCredit ? '' : '-') + tx.amount_reais.toFixed(2).replace('.', ',');
+                const protocolo = 'E2E-' + tx.idempotency_key;
+
+                csv += `"${dateStr}";"${timeStr}";"${title}";"${tx.transaction_type}";"${operacao}";"${valorFormatado}";"${tx.status}";"${protocolo}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const filename = `Extrato_BankCore_Vortex_${Date.now()}.csv`;
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            showToastNotification(`Arquivo contábil baixado: ${filename}`, 'success', 'Extrato CSV Gerado');
         }
 
         function initApp() {
@@ -941,6 +1044,7 @@
                 localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
                 hideAlert('authAlert');
                 showApp();
+                showToastNotification(`Bem-vindo ao BankCore, ${currentAuthUser.full_name}!`, 'success');
             } catch (err) {
                 showAlert('authAlert', err.message, 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
             }
@@ -1106,7 +1210,8 @@
                 hideAlert('pixAlert');
                 await refreshDashboard();
 
-                // Abrir o Comprovante Oficial Instantaneamente na tela!
+                showToastNotification('Transferência Pix concluída com sucesso!', 'success');
+
                 openReceiptModal({
                     amount_reais: amount_reais,
                     idempotency_key: idempotency_key,
@@ -1171,6 +1276,7 @@
                 jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
+            showToastNotification('Comprovante em PDF baixado com sucesso!', 'success');
         }
 
         async function handleDeposit(e) {
@@ -1196,6 +1302,7 @@
                 setTimeout(async () => {
                     closeModal('depositModal');
                     await refreshDashboard();
+                    showToastNotification(`Depósito de R$ ${amount.toLocaleString('pt-BR', {minimumFractionDigits: 2})} adicionado ao saldo.`, 'success');
                 }, 800);
             } catch (err) {
                 showAlert('depositAlert', err.message, 'bg-rose-500/20 text-rose-300');
@@ -1210,6 +1317,7 @@
         function setCardTheme(theme, title) {
             document.getElementById('interactiveCard').className = `card-theme-${theme} rounded-3xl p-7 shadow-2xl relative flex flex-col justify-between h-64 transition-all duration-500 overflow-hidden`;
             document.getElementById('cardBadgeTitle').innerText = title;
+            showToastNotification(`Tema do cartão alterado para ${title}.`, 'info');
         }
 
         function updateLoanDisplay(val) {
@@ -1220,10 +1328,7 @@
             const val = parseFloat(document.getElementById('investSimAmount').value) || 0;
             const yieldVal = (val * 0.112875).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             document.getElementById('investResult').innerHTML = `Em 1 ano, R$ ${val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} rendem aproximadamente <strong class="text-amber-400">R$ ${yieldVal}</strong> líquido!`;
-        }
-
-        function exportStatementCSV() {
-            alert('Relatório CSV baixado com sucesso!');
+            showToastNotification('Simulação de CDB 105% CDI calculada.', 'info');
         }
 
         function refreshDashboard() {
@@ -1232,6 +1337,7 @@
                     currentAccount = d;
                     updateAccountUI();
                     loadStatement();
+                    showToastNotification('Dados do saldo e extrato atualizados em tempo real.', 'info');
                 });
             }
         }
@@ -1239,7 +1345,7 @@
         function copyPixKey() {
             if (!currentAuthUser) return;
             navigator.clipboard.writeText(currentAuthUser.tax_id);
-            alert('Chave Pix (CPF ' + formatCPF(currentAuthUser.tax_id) + ') copiada com sucesso!');
+            showToastNotification('Chave Pix (CPF) copiada para a área de transferência!', 'success');
         }
 
         function toggleBalanceVisibility() {
@@ -1248,6 +1354,7 @@
             document.getElementById('sideEyeIcon').setAttribute('data-lucide', iconName);
             updateAccountUI();
             lucide.createIcons();
+            showToastNotification(isBalanceHidden ? 'Saldo ocultado.' : 'Saldo visível.', 'info');
         }
 
         function startLiveClock() {
@@ -1282,6 +1389,7 @@
             currentAuthUser = null;
             currentAccount = null;
             showAuth();
+            showToastNotification('Sessão encerrada com segurança.', 'info');
         }
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
