@@ -1,345 +1,822 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full bg-[#09090b]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BankCore | Carbon Black Banking</title>
+    <title>BankCore | Web Banking Empresas & Carbon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #09090b; }
-        .carbon-card { background: linear-gradient(145deg, #18181b 0%, #111113 100%); border: 1px solid rgba(255, 255, 255, 0.07); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .carbon-sidebar { background: #111113; border-right: 1px solid rgba(255, 255, 255, 0.08); }
+        .carbon-card { background: #18181b; border: 1px solid rgba(255, 255, 255, 0.08); }
+        .carbon-card-subtle { background: #141416; border: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        /* Nav Item Indicator */
+        .nav-item { position: relative; transition: all 0.2s ease; }
+        .nav-item.active { background-color: rgba(255, 255, 255, 0.06); color: #f4f4f5; font-weight: 700; }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.35rem;
+            bottom: 0.35rem;
+            width: 3.5px;
+            background-color: #F5A623;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Card Themes */
         .card-theme-carbon { background: linear-gradient(135deg, #1c1c1f 0%, #0d0d0f 100%); border: 1px solid rgba(255,255,255,0.12); }
         .card-theme-gold { background: linear-gradient(135deg, #2b2311 0%, #171206 100%); border: 1px solid rgba(245,166,35,0.4); }
         .card-theme-silver { background: linear-gradient(135deg, #2a2e39 0%, #14161c 100%); border: 1px solid rgba(148,163,184,0.3); }
         .card-theme-rose { background: linear-gradient(135deg, #2e1a22 0%, #140b0f 100%); border: 1px solid rgba(244,63,94,0.3); }
         .card-theme-blue { background: linear-gradient(135deg, #111d2e 0%, #070e17 100%); border: 1px solid rgba(56,189,248,0.3); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
     </style>
 </head>
-<body class="text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
+<body class="text-zinc-100 h-full flex flex-col antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Header -->
-    <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center shadow-lg shadow-amber-500/10">
-                    <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
+    <!-- ================= AUTH SCREEN ================= -->
+    <div id="authView" class="min-h-full flex items-center justify-center p-4 sm:p-6 bg-gradient-to-b from-zinc-950 to-[#09090b]">
+        <div class="max-w-md w-full space-y-6">
+            <!-- Header Brand -->
+            <div class="text-center space-y-2">
+                <div class="inline-flex w-12 h-12 rounded-2xl bg-zinc-900 border border-amber-500/40 items-center justify-center shadow-xl shadow-amber-500/10">
+                    <i data-lucide="shield" class="w-6 h-6 text-amber-400"></i>
                 </div>
-                <div>
-                    <span class="text-lg font-extrabold text-white tracking-tight">Bank<span class="text-amber-400">Core</span></span>
-                    <span class="hidden sm:inline-block text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-400/10 text-amber-400 ml-2 border border-amber-400/20 tracking-widest">Carbon Black</span>
-                </div>
+                <h1 class="text-2xl font-extrabold text-white tracking-tight">Bank<span class="text-amber-400">Core</span> Web Banking</h1>
+                <p class="text-xs text-zinc-400 font-medium">Acesse sua conta jurídica e pessoa física Carbon Black</p>
             </div>
-            
-            <div class="flex items-center gap-3">
-                <a href="/transactions/docs" target="_blank" class="text-xs font-semibold text-zinc-400 hover:text-amber-400 px-3 py-1.5 rounded-lg hover:bg-zinc-900 transition flex items-center gap-1.5">
-                    <i data-lucide="terminal" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">Swagger API</span>
-                </a>
-                <a href="https://github.com/joaop-gregorioDS/bankcore-fintech" target="_blank" class="text-xs font-semibold text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-zinc-900 transition flex items-center gap-1.5">
-                    <i data-lucide="github" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">GitHub</span>
-                </a>
-                <button id="btnLogout" onclick="logout()" class="hidden text-xs font-bold px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition flex items-center gap-1.5">
-                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair
-                </button>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
-
-        <!-- ================= AUTH VIEW ================= -->
-        <section id="authView" class="max-w-lg mx-auto my-6 sm:my-10 space-y-6">
-            <div class="p-5 rounded-2xl carbon-card border border-amber-500/30 shadow-2xl relative overflow-hidden">
-                <div class="flex items-center justify-between mb-3">
+            <!-- 1-Click Fast Login Demo Card -->
+            <div class="carbon-card rounded-2xl p-4 border border-amber-500/30 shadow-2xl">
+                <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">⚡ Acesso Rápido para Demonstração</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">⚡ Acesso Rápido para Demonstração</span>
                     </div>
-                    <span class="text-[10px] text-zinc-500 uppercase font-mono">Fintech Core</span>
+                    <span class="text-[9px] text-zinc-500 uppercase font-mono">C6 Standard</span>
                 </div>
-                <p class="text-xs text-zinc-400 mb-4 leading-relaxed">
-                    Clique em um dos correntistas abaixo para preencher as credenciais e testar o envio de Pix:
-                </p>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button onclick="fillDemo('33548376835', 'teste123456')" class="p-3.5 rounded-xl bg-zinc-900/90 hover:bg-amber-500/10 border border-zinc-800 hover:border-amber-500/40 text-left transition group">
-                        <div class="text-[12px] font-bold text-white group-hover:text-amber-400 flex items-center justify-between">
-                            <span>👤 João Paulo (Conta A)</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-400 opacity-0 group-hover:opacity-100 transition"></i>
-                        </div>
-                        <div class="text-[11px] text-zinc-400 font-mono mt-1">Chave Pix: 33548376835</div>
+                <div class="grid grid-cols-2 gap-2 mt-3">
+                    <button onclick="fillDemo('33548376835', 'teste123456')" class="p-2.5 rounded-xl bg-zinc-900 hover:bg-amber-500/10 border border-zinc-800 hover:border-amber-500/40 text-left transition group">
+                        <div class="text-[11px] font-bold text-white group-hover:text-amber-400">👤 João Paulo</div>
+                        <div class="text-[9px] text-zinc-400 font-mono">CPF: 33548376835</div>
                     </button>
-
-                    <button onclick="fillDemo('12345678900', 'teste123456')" class="p-3.5 rounded-xl bg-zinc-900/90 hover:bg-amber-500/10 border border-zinc-800 hover:border-amber-500/40 text-left transition group">
-                        <div class="text-[12px] font-bold text-white group-hover:text-amber-400 flex items-center justify-between">
-                            <span>👤 Maria Silva (Conta B)</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-400 opacity-0 group-hover:opacity-100 transition"></i>
-                        </div>
-                        <div class="text-[11px] text-zinc-400 font-mono mt-1">Chave Pix: 12345678900</div>
+                    <button onclick="fillDemo('12345678900', 'teste123456')" class="p-2.5 rounded-xl bg-zinc-900 hover:bg-amber-500/10 border border-zinc-800 hover:border-amber-500/40 text-left transition group">
+                        <div class="text-[11px] font-bold text-white group-hover:text-amber-400">👤 Maria Silva</div>
+                        <div class="text-[9px] text-zinc-400 font-mono">CPF: 12345678900</div>
                     </button>
                 </div>
             </div>
 
             <!-- Auth Form Card -->
-            <div class="carbon-card rounded-2xl p-6 sm:p-8 shadow-2xl relative">
-                <div class="flex rounded-xl bg-zinc-900 p-1 mb-6 border border-zinc-800">
+            <div class="carbon-card rounded-2xl p-6 shadow-2xl">
+                <div class="flex rounded-xl bg-zinc-900 p-1 mb-5 border border-zinc-800">
                     <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg transition bg-amber-400 text-black shadow">Acessar Conta</button>
                     <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-zinc-400 hover:text-white">Abrir Conta Carbon</button>
                 </div>
 
                 <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">CPF do Correntista</label>
-                        <input type="text" id="loginTaxId" required placeholder="Ex: 33548376835" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white placeholder-zinc-600 transition font-mono">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">CPF do Correntista</label>
+                        <input type="text" id="loginTaxId" required placeholder="00000000000" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white font-mono transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Senha de Acesso</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white placeholder-zinc-600 transition">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">Senha de Acesso</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white transition">
                     </div>
-                    <button type="submit" id="btnLoginSubmit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-sm shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
-                        <span>Entrar no Internet Banking</span>
+                    <button type="submit" id="btnLoginSubmit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
+                        <span>Entrar no Web Banking</span>
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </form>
 
                 <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
                     <div>
-                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Nome Completo</label>
-                        <input type="text" id="regName" required placeholder="Nome e Sobrenome" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white placeholder-zinc-600 transition">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">Nome Completo / Razão Social</label>
+                        <input type="text" id="regName" required placeholder="Nome e Sobrenome" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">CPF (11 dígitos)</label>
-                        <input type="text" id="regTaxId" required placeholder="00000000000" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white placeholder-zinc-600 transition font-mono">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">CPF / CNPJ (apenas números)</label>
+                        <input type="text" id="regTaxId" required placeholder="00000000000" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white font-mono transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">E-mail</label>
-                        <input type="email" id="regEmail" required placeholder="seu@email.com" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white placeholder-zinc-600 transition">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">E-mail Corporativo</label>
+                        <input type="email" id="regEmail" required placeholder="contato@empresa.com" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Senha (mínimo 8 caracteres)</label>
-                        <input type="password" id="regPassword" required minlength="8" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white placeholder-zinc-600 transition">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1">Senha Segura</label>
+                        <input type="password" id="regPassword" required minlength="8" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 focus:border-amber-400 focus:outline-none text-sm text-white transition">
                     </div>
-                    <button type="submit" id="btnRegisterSubmit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
                         <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>Abrir Conta Carbon</span>
+                        <span>Criar Conta Carbon</span>
                     </button>
                 </form>
 
-                <div id="authAlert" class="mt-4 text-xs p-3 rounded-xl hidden text-center"></div>
+                <div id="authAlert" class="mt-4 text-xs p-3 rounded-xl hidden text-center font-bold"></div>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- ================= DASHBOARD VIEW ================= -->
-        <section id="dashboardView" class="hidden space-y-8">
+    <!-- ================= MAIN WEB BANKING INTERFACE (SIDEBAR + TOPBAR + CONTENT) ================= -->
+    <div id="appView" class="hidden h-full flex flex-row overflow-hidden">
+        
+        <!-- SIDEBAR (C6 Dark Carbon Style) -->
+        <aside class="w-64 flex-shrink-0 carbon-sidebar flex flex-col justify-between z-30 select-none">
             
-            <!-- Top Row: Balance + Virtual Card -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                <!-- Left: Balance & Quick Actions -->
-                <div class="lg:col-span-7 carbon-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Saldo em Conta Corrente</span>
-                                <button onclick="toggleBalanceVisibility()" class="text-zinc-400 hover:text-amber-400 transition p-1">
-                                    <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Conta Ativa
-                            </span>
+            <!-- Sidebar Top: Brand & Balance Widget -->
+            <div>
+                <!-- Brand Header -->
+                <div class="h-16 px-6 flex items-center justify-between border-b border-zinc-800/80">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
+                            <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
                         </div>
-
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <span class="text-2xl font-bold text-zinc-500">R$</span>
-                            <h2 id="balanceDisplay" class="text-4xl sm:text-5xl font-black text-white tracking-tight">0,00</h2>
-                        </div>
-
-                        <div class="text-xs text-zinc-400 flex items-center gap-2 mb-6">
-                            <span>Limite Carbon Black disponível:</span>
-                            <strong class="text-amber-400 font-mono">R$ 25.000,00</strong>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions Pills -->
-                    <div class="pt-6 border-t border-zinc-800/80">
-                        <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3">Ações Rápidas</div>
-                        <div class="flex flex-wrap items-center gap-3">
-                            <button onclick="openModal('transferModal')" class="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs shadow-lg shadow-amber-500/15 transition flex items-center gap-2">
-                                <i data-lucide="send" class="w-4 h-4"></i> Transferir Pix
-                            </button>
-                            <button onclick="openModal('depositModal')" class="px-5 py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition flex items-center gap-2">
-                                <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i> Depositar
-                            </button>
-                            <button onclick="refreshDashboard()" class="p-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition" title="Atualizar Dados">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            </button>
+                        <div>
+                            <div class="text-sm font-extrabold text-white leading-tight">Bank<span class="text-amber-400">Core</span></div>
+                            <div class="text-[9px] font-bold text-amber-400 uppercase tracking-widest">Web Banking</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Interactive Virtual Credit Card -->
-                <div class="lg:col-span-5 flex flex-col justify-between gap-4">
-                    <div id="virtualCard" class="card-theme-carbon rounded-3xl p-6 sm:p-7 shadow-2xl relative flex flex-col justify-between h-56 transition-all duration-500 overflow-hidden">
-                        <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-zinc-900/80 border border-amber-500/50 flex items-center justify-center">
-                                    <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
-                                </div>
-                                <span class="text-sm font-extrabold tracking-wider text-white">Bank<span class="text-amber-400">Core</span></span>
-                            </div>
-                            <div class="flex items-center gap-1.5 text-zinc-400">
-                                <i data-lucide="wifi" class="w-4 h-4 rotate-90"></i>
-                                <span class="text-[10px] uppercase font-bold tracking-widest text-zinc-400">Black</span>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-3 my-2">
-                            <div class="w-10 h-8 rounded-lg bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-200 border border-amber-600/40 shadow-inner flex items-center justify-center">
-                                <div class="w-6 h-5 border border-amber-800/40 rounded-sm grid grid-cols-2 gap-0.5 opacity-60">
-                                    <div class="border-b border-amber-800/40"></div>
-                                    <div class="border-b border-amber-800/40"></div>
-                                </div>
-                            </div>
-                            <span class="text-xs font-mono text-zinc-400 tracking-widest">•••• 4289</span>
-                        </div>
-
-                        <div class="flex items-end justify-between">
-                            <div>
-                                <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Titular do Cartão</div>
-                                <div class="text-sm font-extrabold text-white uppercase tracking-wide font-mono" id="cardHolderName">JOÃO PAULO SOUZA</div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-6 h-6 rounded-full bg-rose-500/90 -mr-2"></div>
-                                <div class="w-6 h-6 rounded-full bg-amber-500/90"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card Theme Selector -->
-                    <div class="carbon-card rounded-2xl p-3 flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider pl-2">Cor do Cartão:</span>
-                        <div class="flex items-center gap-2">
-                            <button onclick="setCardTheme('carbon')" class="w-6 h-6 rounded-full bg-zinc-900 border-2 border-amber-400 shadow-sm" title="Carbon Black"></button>
-                            <button onclick="setCardTheme('gold')" class="w-6 h-6 rounded-full bg-amber-600 border-2 border-zinc-700" title="Gold"></button>
-                            <button onclick="setCardTheme('silver')" class="w-6 h-6 rounded-full bg-slate-400 border-2 border-zinc-700" title="Titanium Silver"></button>
-                            <button onclick="setCardTheme('blue')" class="w-6 h-6 rounded-full bg-sky-600 border-2 border-zinc-700" title="Acqua Blue"></button>
-                            <button onclick="setCardTheme('rose')" class="w-6 h-6 rounded-full bg-rose-600 border-2 border-zinc-700" title="Rose Gold"></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Account Meta & Financial Flow Bar -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Chave Pix Oficial com CPF -->
-                <div class="carbon-card rounded-2xl p-5 flex items-center gap-4">
-                    <div class="w-11 h-11 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
-                        <i data-lucide="qr-code" class="w-5 h-5"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-[10px] uppercase font-bold text-zinc-500">Sua Chave Pix (CPF)</div>
-                        <div class="text-sm font-bold font-mono text-amber-400" id="pixCpfDisplay">000.000.000-00</div>
-                    </div>
-                    <button onclick="copyPixKey()" class="text-xs font-bold text-amber-400 hover:text-amber-300 p-2 hover:bg-zinc-800 rounded-xl transition" title="Copiar Chave Pix">
-                        <i data-lucide="copy" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <div class="carbon-card rounded-2xl p-5 flex items-center gap-4">
-                    <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Entradas (Créditos)</div>
-                        <div class="text-sm font-extrabold text-emerald-400 font-mono" id="totalIncomeDisplay">+ R$ 0,00</div>
-                    </div>
-                </div>
-
-                <div class="carbon-card rounded-2xl p-5 flex items-center gap-4">
-                    <div class="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
-                        <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Saídas (Débitos)</div>
-                        <div class="text-sm font-extrabold text-rose-400 font-mono" id="totalExpenseDisplay">- R$ 0,00</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statement / Ledger History -->
-            <div class="carbon-card rounded-3xl p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <span>Extrato do Livro-Razão</span>
-                            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-zinc-800 text-amber-400 border border-zinc-700">ACID Ledger</span>
-                        </h3>
-                        <p class="text-xs text-zinc-400">Histórico de transações financeiras em Horário de Brasília (GMT-3)</p>
-                    </div>
-                    <button onclick="refreshDashboard()" class="text-xs font-semibold text-zinc-400 hover:text-white flex items-center gap-1.5 transition">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Atualizar
-                    </button>
-                </div>
-
-                <div id="statementContainer" class="divide-y divide-zinc-800/80">
-                    <div class="text-center py-12 text-zinc-500 text-sm">Carregando extrato bancário...</div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- MODAL: FAZER PIX -->
-    <div id="transferModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-8 relative border border-zinc-700 shadow-2xl">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i data-lucide="send" class="w-5 h-5 text-amber-400"></i> Transferência Pix Instantânea
-                </h3>
-                <button onclick="closeModal('transferModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-
-            <form onsubmit="handleTransfer(event)" class="space-y-4">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <label class="block text-xs font-semibold text-zinc-400">Chave Pix do Destinatário (CPF)</label>
-                        <button type="button" onclick="selectQuickContact()" id="btnQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
-                            ⚡ Preencher Destinatário
+                <!-- Correntista & Quick Balance Box -->
+                <div class="p-4 border-b border-zinc-800/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="truncate text-xs font-bold text-zinc-300" id="sideUserName">Correntista</div>
+                        <button onclick="toggleBalanceVisibility()" class="text-zinc-500 hover:text-amber-400 transition" title="Ocultar Saldo">
+                            <i id="sideEyeIcon" data-lucide="eye" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
-                    <input type="text" id="transferDestKey" required placeholder="Digite o CPF (ex: 12345678900)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm font-mono text-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Valor do Pix (R$)</label>
-                    <input type="number" step="0.01" min="0.01" id="transferAmount" value="500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white font-bold">
-                    <div class="flex gap-2 mt-2">
-                        <button type="button" onclick="document.getElementById('transferAmount').value='100.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 100</button>
-                        <button type="button" onclick="document.getElementById('transferAmount').value='500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 500</button>
-                        <button type="button" onclick="document.getElementById('transferAmount').value='1000.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 1.000</button>
-                        <button type="button" onclick="document.getElementById('transferAmount').value='2500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 2.500</button>
+
+                    <div class="text-[10px] text-zinc-500 font-semibold uppercase">Saldo Disponível</div>
+                    <div class="text-lg font-black text-white tracking-tight flex items-baseline gap-1" id="sideBalanceDisplay">
+                        <span class="text-xs text-zinc-500 font-normal">R$</span> 0,00
+                    </div>
+
+                    <div class="mt-2 text-[10px] text-zinc-400 flex items-center justify-between">
+                        <span>Limite Carbon:</span>
+                        <strong class="text-amber-400 font-mono">R$ 25.000,00</strong>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Descrição</label>
-                    <input type="text" id="transferDesc" value="Pix BankCore Carbon" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white">
+
+                <!-- Navigation Links (Matching C6 Web Banking) -->
+                <nav class="p-2 space-y-0.5" id="sidebarNav">
+                    <button onclick="navigateTo('inicio')" id="nav-inicio" class="nav-item active w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-300 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="home" class="w-4 h-4 text-zinc-400"></i> Início
+                    </button>
+                    <button onclick="navigateTo('extrato')" id="nav-extrato" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="file-text" class="w-4 h-4 text-zinc-400"></i> Extrato
+                    </button>
+                    <button onclick="navigateTo('cartoes')" id="nav-cartoes" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400"></i> Cartões
+                    </button>
+                    <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="qr-code" class="w-4 h-4 text-zinc-400"></i> Pix
+                    </button>
+                    <button onclick="navigateTo('pagar')" id="nav-pagar" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="barcode" class="w-4 h-4 text-zinc-400"></i> Pagamentos
+                    </button>
+                    <button onclick="navigateTo('cobrancas')" id="nav-cobrancas" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="receipt" class="w-4 h-4 text-zinc-400"></i> Cobranças
+                    </button>
+                    <button onclick="navigateTo('invest')" id="nav-invest" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-zinc-400"></i> BankCore Invest
+                    </button>
+                    <button onclick="navigateTo('credito')" id="nav-credito" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
+                        <i data-lucide="coins" class="w-4 h-4 text-zinc-400"></i> Empréstimos & Limites
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Sidebar Bottom: Status & Logout -->
+            <div class="p-4 border-t border-zinc-800/80 space-y-2">
+                <div class="flex items-center gap-2 text-[10px] text-zinc-500 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Ledger Online • v1.0.0</span>
                 </div>
-
-                <div class="p-3 rounded-xl bg-amber-400/10 border border-amber-400/20 text-[11px] text-amber-300">
-                    ⚡ <strong>Idempotência:</strong> O Redis garante que cliques repetidos não executem cobrança dupla.
-                </div>
-
-                <div id="transferAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
-
-                <button type="submit" id="btnTransferSubmit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-sm shadow-lg shadow-amber-500/20 transition">
-                    Confirmar Envio Pix
+                <button onclick="logout()" class="w-full py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/20 transition flex items-center justify-center gap-2">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair da Sessão
                 </button>
-            </form>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA (TOPBAR + VIEWS CONTAINER) -->
+        <div class="flex-1 flex flex-col min-w-0 bg-[#09090b] overflow-hidden">
+            
+            <!-- TOPBAR (Institutional C6 Header) -->
+            <header class="h-16 border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur-md px-6 flex items-center justify-between flex-shrink-0 z-20">
+                <!-- Breadcrumbs -->
+                <div class="flex items-center gap-2 text-xs font-semibold text-zinc-400">
+                    <span class="text-zinc-500 hover:text-white cursor-pointer" onclick="navigateTo('inicio')">🏠 Início</span>
+                    <span>/</span>
+                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Visão Geral</span>
+                </div>
+
+                <!-- TopBar Right: Time, Session Countdown & Profile -->
+                <div class="flex items-center gap-4 text-xs">
+                    <!-- Session Timeout Counter -->
+                    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-400 font-mono">
+                        <i data-lucide="clock" class="w-3 h-3 text-amber-400"></i>
+                        <span>Sessão: <strong class="text-zinc-200" id="sessionTimer">14:59</strong></span>
+                    </div>
+
+                    <!-- Live Brasília Time -->
+                    <div class="hidden md:flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-zinc-500"></i>
+                        <span id="liveClockDisplay">Carregando...</span>
+                    </div>
+
+                    <!-- Docs API link -->
+                    <a href="/transactions/docs" target="_blank" class="text-xs font-semibold text-zinc-400 hover:text-amber-400 px-2.5 py-1 rounded-lg hover:bg-zinc-900 transition flex items-center gap-1">
+                        <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Swagger
+                    </a>
+
+                    <!-- User Avatar Pill -->
+                    <div class="flex items-center gap-2.5 pl-3 border-l border-zinc-800">
+                        <div class="w-8 h-8 rounded-full bg-amber-400/10 border border-amber-400/30 flex items-center justify-center font-bold text-amber-400 text-xs" id="topUserAvatar">JP</div>
+                        <div class="hidden xl:block text-left">
+                            <div class="text-xs font-bold text-white leading-tight" id="topUserName">João Paulo</div>
+                            <div class="text-[10px] text-zinc-500 font-mono" id="topUserCpf">335.483.768-35</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- VIEW CONTAINER (SCROLLABLE) -->
+            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+                <!-- ================= 1. VIEW: INÍCIO ================= -->
+                <section id="view-inicio" class="view-panel space-y-6">
+                    <!-- Welcome Hero Card -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-8 carbon-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 relative overflow-hidden">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="text-xs font-bold uppercase tracking-wider text-zinc-400">Saldo em Conta Corrente</div>
+                                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Conta Ativa
+                                    </span>
+                                </div>
+                                <div class="flex items-baseline gap-2 mb-2">
+                                    <span class="text-2xl font-bold text-zinc-500">R$</span>
+                                    <h2 id="mainBalanceDisplay" class="text-4xl sm:text-5xl font-black text-white tracking-tight">0,00</h2>
+                                </div>
+                                <div class="text-xs text-zinc-400 flex items-center gap-2 mb-6">
+                                    <span>Limite Carbon Black disponível:</span>
+                                    <strong class="text-amber-400 font-mono">R$ 25.000,00</strong>
+                                </div>
+                            </div>
+
+                            <!-- Action Shortcuts -->
+                            <div class="pt-6 border-t border-zinc-800/80 flex flex-wrap items-center gap-3">
+                                <button onclick="navigateTo('pix')" class="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs shadow-lg shadow-amber-500/15 transition flex items-center gap-2">
+                                    <i data-lucide="qr-code" class="w-4 h-4"></i> Área Pix
+                                </button>
+                                <button onclick="openModal('depositModal')" class="px-5 py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition flex items-center gap-2">
+                                    <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i> Depositar
+                                </button>
+                                <button onclick="navigateTo('cobrancas')" class="px-5 py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition flex items-center gap-2">
+                                    <i data-lucide="receipt" class="w-4 h-4 text-amber-400"></i> Emitir Cobrança
+                                </button>
+                                <button onclick="refreshDashboard()" class="p-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition" title="Atualizar Dados">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mini Card Preview Widget -->
+                        <div class="lg:col-span-4 carbon-card rounded-3xl p-6 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs font-bold uppercase text-zinc-400">Cartão Virtual Ativo</span>
+                                    <span class="text-[9px] uppercase font-bold text-amber-400 px-2 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">Carbon Black</span>
+                                </div>
+                                <div class="h-32 rounded-2xl card-theme-carbon p-4 flex flex-col justify-between relative overflow-hidden shadow-xl">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-extrabold text-white">Bank<span class="text-amber-400">Core</span></span>
+                                        <i data-lucide="wifi" class="w-3.5 h-3.5 rotate-90 text-zinc-400"></i>
+                                    </div>
+                                    <div class="text-[11px] font-mono text-zinc-400">•••• 4289</div>
+                                    <div class="flex items-center justify-between text-[9px] font-mono text-zinc-300 uppercase">
+                                        <span id="miniCardHolder">JOAO PAULO SOUZA</span>
+                                        <span>12/29</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="navigateTo('cartoes')" class="mt-4 w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
+                                Gerenciar Cartões →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Flow Bar -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="carbon-card rounded-2xl p-5 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
+                                <i data-lucide="qr-code" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[10px] uppercase font-bold text-zinc-500">Chave Pix Principal (CPF)</div>
+                                <div class="text-sm font-bold font-mono text-amber-400 truncate" id="mainPixCpf">---</div>
+                            </div>
+                            <button onclick="copyPixKey()" class="text-xs text-amber-400 hover:text-amber-300 p-2 hover:bg-zinc-800 rounded-xl transition">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <div class="carbon-card rounded-2xl p-5 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                                <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Entradas (Mês)</div>
+                                <div class="text-sm font-extrabold text-emerald-400 font-mono" id="mainTotalIncome">+ R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <div class="carbon-card rounded-2xl p-5 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                                <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Saídas (Mês)</div>
+                                <div class="text-sm font-extrabold text-rose-400 font-mono" id="mainTotalExpense">- R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Stream -->
+                    <div class="carbon-card rounded-3xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <span>Últimas Movimentações</span>
+                                <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-zinc-800 text-amber-400 border border-zinc-700">ACID Ledger</span>
+                            </h3>
+                            <button onclick="navigateTo('extrato')" class="text-xs font-bold text-amber-400 hover:text-amber-300 transition">
+                                Ver Extrato Completo →
+                            </button>
+                        </div>
+                        <div id="mainRecentTransactions" class="divide-y divide-zinc-800/80">
+                            <div class="text-center py-8 text-zinc-500 text-xs">Carregando movimentações...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= 2. VIEW: EXTRATO ================= -->
+                <section id="view-extrato" class="view-panel hidden space-y-6">
+                    <div class="carbon-card rounded-3xl p-6 sm:p-8">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-black text-white">Extrato do Livro-Razão</h2>
+                                <p class="text-xs text-zinc-400">Histórico de transações financeiras em Horário de Brasília (GMT-3)</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="exportStatementCSV()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white border border-zinc-700 transition flex items-center gap-2">
+                                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar CSV
+                                </button>
+                                <button onclick="refreshDashboard()" class="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 transition">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Statement Filter Pills -->
+                        <div class="flex flex-wrap items-center gap-2 mb-6 pb-4 border-b border-zinc-800">
+                            <button class="px-3 py-1.5 rounded-lg bg-amber-400 text-black text-xs font-bold">Todos</button>
+                            <button class="px-3 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white text-xs font-semibold border border-zinc-800">Últimos 7 dias</button>
+                            <button class="px-3 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white text-xs font-semibold border border-zinc-800">Últimos 30 dias</button>
+                            <button class="px-3 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white text-xs font-semibold border border-zinc-800">Créditos (+)</button>
+                            <button class="px-3 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white text-xs font-semibold border border-zinc-800">Débitos (-)</button>
+                        </div>
+
+                        <!-- Full Statement List -->
+                        <div id="fullStatementList" class="divide-y divide-zinc-800/80">
+                            <div class="text-center py-12 text-zinc-500 text-sm">Carregando extrato bancário...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= 3. VIEW: CARTÕES ================= -->
+                <section id="view-cartoes" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Left: Interactive 3D Card -->
+                        <div class="lg:col-span-6 space-y-4">
+                            <div id="interactiveCard" class="card-theme-carbon rounded-3xl p-7 shadow-2xl relative flex flex-col justify-between h-64 transition-all duration-500 overflow-hidden">
+                                <div class="absolute -right-12 -top-12 w-44 h-44 bg-white/5 rounded-full blur-3xl"></div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-lg bg-zinc-900/80 border border-amber-500/50 flex items-center justify-center">
+                                            <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
+                                        </div>
+                                        <span class="text-base font-extrabold tracking-wider text-white">Bank<span class="text-amber-400">Core</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-zinc-400">
+                                        <i data-lucide="wifi" class="w-4 h-4 rotate-90"></i>
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-zinc-300" id="cardBadgeTitle">Carbon Black</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 my-2">
+                                    <div class="w-12 h-9 rounded-lg bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-200 border border-amber-600/40 shadow-inner flex items-center justify-center">
+                                        <div class="w-7 h-6 border border-amber-800/40 rounded-sm grid grid-cols-2 gap-0.5 opacity-60">
+                                            <div class="border-b border-amber-800/40"></div>
+                                            <div class="border-b border-amber-800/40"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-mono text-zinc-300 tracking-widest">•••• •••• •••• 4289</span>
+                                </div>
+
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Titular</div>
+                                        <div class="text-sm font-extrabold text-white uppercase tracking-wide font-mono" id="cardHolderFull">JOAO PAULO SOUZA</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Validade</div>
+                                        <div class="text-xs font-mono text-zinc-300 font-bold">12/29</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Customizer -->
+                            <div class="carbon-card rounded-2xl p-4 flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Cor do Cartão:</span>
+                                <div class="flex items-center gap-3">
+                                    <button onclick="setCardTheme('carbon', 'Carbon Black')" class="w-7 h-7 rounded-full bg-zinc-900 border-2 border-amber-400 shadow-sm" title="Carbon Black"></button>
+                                    <button onclick="setCardTheme('gold', 'Gold Edition')" class="w-7 h-7 rounded-full bg-amber-600 border-2 border-zinc-700" title="Gold"></button>
+                                    <button onclick="setCardTheme('silver', 'Titanium Silver')" class="w-7 h-7 rounded-full bg-slate-400 border-2 border-zinc-700" title="Silver"></button>
+                                    <button onclick="setCardTheme('blue', 'Acqua Blue')" class="w-7 h-7 rounded-full bg-sky-600 border-2 border-zinc-700" title="Blue"></button>
+                                    <button onclick="setCardTheme('rose', 'Rose Gold')" class="w-7 h-7 rounded-full bg-rose-600 border-2 border-zinc-700" title="Rose"></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Card Controls & Limits -->
+                        <div class="lg:col-span-6 carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
+                            <h3 class="text-lg font-black text-white">Gestão do Cartão Carbon</h3>
+                            
+                            <div>
+                                <div class="flex items-center justify-between text-xs font-bold mb-2">
+                                    <span class="text-zinc-400">Limite de Crédito Disponível</span>
+                                    <span class="text-amber-400 font-mono text-sm">R$ 25.000,00</span>
+                                </div>
+                                <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden border border-zinc-800">
+                                    <div class="bg-gradient-to-r from-amber-400 to-amber-500 h-full w-[85%] rounded-full"></div>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-zinc-500 mt-1">
+                                    <span>Fatura Atual: R$ 3.750,00</span>
+                                    <span>Limite Total: R$ 25.000,00</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 pt-2">
+                                <div class="p-3.5 rounded-xl carbon-card-subtle flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="lock" class="w-4 h-4 text-zinc-400"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-white">Bloqueio Temporário</div>
+                                            <div class="text-[10px] text-zinc-500">Bloquear compras online e presenciais</div>
+                                        </div>
+                                    </div>
+                                    <input type="checkbox" class="w-4 h-4 accent-amber-400 cursor-pointer">
+                                </div>
+
+                                <div class="p-3.5 rounded-xl carbon-card-subtle flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="globe" class="w-4 h-4 text-zinc-400"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-white">Compras Internacionais</div>
+                                            <div class="text-[10px] text-zinc-500">Habilitar uso no exterior sem IOF abusivo</div>
+                                        </div>
+                                    </div>
+                                    <input type="checkbox" checked class="w-4 h-4 accent-amber-400 cursor-pointer">
+                                </div>
+                            </div>
+
+                            <button onclick="alert('Dados do cartão virtual copiados com segurança!')" class="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white border border-zinc-700 transition flex items-center justify-center gap-2">
+                                <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i> Visualizar CVV e Senha
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= 4. VIEW: PIX ================= -->
+                <section id="view-pix" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Left: Send Pix Form -->
+                        <div class="lg:col-span-7 carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-xl font-black text-white flex items-center gap-2">
+                                        <i data-lucide="qr-code" class="w-5 h-5 text-amber-400"></i> Área Pix Instantâneo
+                                    </h2>
+                                    <p class="text-xs text-zinc-400">Transferências 24/7 com resolução nativa por CPF</p>
+                                </div>
+                            </div>
+
+                            <form onsubmit="handlePixTransfer(event)" class="space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-xs font-semibold text-zinc-400">Chave Pix do Destinatário (CPF ou UUID)</label>
+                                        <button type="button" onclick="quickFillContact()" id="btnPixQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
+                                            ⚡ Preencher Contato
+                                        </button>
+                                    </div>
+                                    <input type="text" id="pixDestKey" required placeholder="Digite o CPF (ex: 12345678900)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm font-mono text-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor do Pix (R$)</label>
+                                    <input type="number" step="0.01" min="0.01" id="pixAmountInput" value="500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white font-bold">
+                                    <div class="flex gap-2 mt-2">
+                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='100.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 100</button>
+                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 500</button>
+                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='1500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 1.500</button>
+                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='3000.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 3.000</button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Descrição</label>
+                                    <input type="text" id="pixDescInput" value="Pix BankCore Web Banking" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white">
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-amber-400/10 border border-amber-400/20 text-[11px] text-amber-300">
+                                    ⚡ <strong>Idempotência Ativa:</strong> O Redis garante que cliques repetidos não executem cobrança dupla.
+                                </div>
+
+                                <div id="pixAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
+
+                                <button type="submit" id="btnPixSubmit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
+                                    Confirmar Transferência Pix
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right: My Pix Keys & QR Code Generator -->
+                        <div class="lg:col-span-5 space-y-6">
+                            <div class="carbon-card rounded-3xl p-6 space-y-4">
+                                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Minhas Chaves Pix Cadastradas</h3>
+                                <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                                    <div>
+                                        <span class="text-[10px] font-bold text-zinc-500 uppercase">Chave CPF</span>
+                                        <div class="text-sm font-mono text-amber-400 font-bold" id="pixMyKeyCpf">335.483.768-35</div>
+                                    </div>
+                                    <button onclick="copyPixKey()" class="text-xs text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-lg">
+                                        <i data-lucide="copy" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-6 text-center space-y-4">
+                                <h3 class="text-sm font-bold text-white">Receber via QR Code</h3>
+                                <div class="w-36 h-36 mx-auto bg-white p-2 rounded-2xl flex items-center justify-center shadow-lg">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=bankcore-pix-payment" alt="QR Code Pix" class="w-full h-full">
+                                </div>
+                                <button onclick="alert('Código Pix Copia e Cola copiado com sucesso!')" class="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
+                                    Copiar Pix Copia e Cola
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= 5. VIEW: PAGAR ================= -->
+                <section id="view-pagar" class="view-panel hidden space-y-6">
+                    <div class="max-w-2xl mx-auto carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
+                        <div>
+                            <h2 class="text-xl font-black text-white flex items-center gap-2">
+                                <i data-lucide="barcode" class="w-5 h-5 text-amber-400"></i> Pagamento de Boletos e Tributos
+                            </h2>
+                            <p class="text-xs text-zinc-400">Digite a linha digitável ou escaneie o código de barras</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-zinc-400 mb-1">Linha Digitável do Boleto (47 ou 48 dígitos)</label>
+                                <input type="text" placeholder="23793.38128 60032.748392 12000.063304 9 98760000035000" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-xs font-mono text-white">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor do Boleto (R$)</label>
+                                    <input type="number" step="0.01" value="350.00" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm font-bold text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Data de Vencimento</label>
+                                    <input type="date" value="2026-09-10" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white">
+                                </div>
+                            </div>
+
+                            <button onclick="alert('Pagamento de boleto agendado com sucesso no Ledger!')" class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
+                                Confirmar Pagamento do Boleto
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= 6. VIEW: COBRANÇAS (C6 Reference Table) ================= -->
+                <section id="view-cobrancas" class="view-panel hidden space-y-6">
+                    <div class="carbon-card rounded-3xl p-6 sm:p-8">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-black text-white">Cobranças & Boletos Emitidos</h2>
+                                <p class="text-xs text-zinc-400">Aqui você acompanha todos os detalhes das cobranças geradas.</p>
+                            </div>
+                            <button onclick="alert('Modal de emissão de nova cobrança aberto!')" class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Nova Cobrança
+                            </button>
+                        </div>
+
+                        <!-- C6 Tabs & Filters -->
+                        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-zinc-800">
+                            <div class="flex items-center gap-2">
+                                <button class="px-3.5 py-1.5 rounded-lg bg-zinc-800 text-white text-xs font-bold border border-zinc-700">Boleto de Cobrança</button>
+                                <button class="px-3.5 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white text-xs font-semibold border border-zinc-800">Link de Pagamento</button>
+                            </div>
+                            <button onclick="exportStatementCSV()" class="text-xs font-semibold text-zinc-400 hover:text-amber-400 flex items-center gap-1.5">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> Baixar relatório em CSV
+                            </button>
+                        </div>
+
+                        <!-- Cobranças Table (Identical to C6 reference) -->
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-zinc-800 text-zinc-500 font-bold uppercase text-[10px]">
+                                        <th class="py-3 px-4">Identificação da Cobrança</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4">Vence em</th>
+                                        <th class="py-3 px-4 text-right">Valor</th>
+                                        <th class="py-3 px-4 text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-zinc-800/60 font-medium">
+                                    <tr class="hover:bg-zinc-900/50 transition">
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-bold text-white">André Morais</div>
+                                            <div class="text-[10px] text-zinc-500 font-mono">CPF: 066.006.060-16</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> À vencer
+                                            </span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-zinc-400 font-mono">16/09/2026</td>
+                                        <td class="py-3.5 px-4 text-right font-extrabold text-white font-mono">R$ 850,00</td>
+                                        <td class="py-3.5 px-4 text-center">
+                                            <button class="text-zinc-400 hover:text-white"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-zinc-900/50 transition">
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-bold text-white">Bianca Moreira</div>
+                                            <div class="text-[10px] text-zinc-500 font-mono">CPF: 066.006.060-16</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Pago
+                                            </span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-zinc-400 font-mono">16/09/2026</td>
+                                        <td class="py-3.5 px-4 text-right font-extrabold text-emerald-400 font-mono">R$ 850,00</td>
+                                        <td class="py-3.5 px-4 text-center">
+                                            <button class="text-zinc-400 hover:text-white"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-zinc-900/50 transition">
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-bold text-white">Clara da Silva</div>
+                                            <div class="text-[10px] text-zinc-500 font-mono">CPF: 066.006.060-16</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Vencido
+                                            </span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-zinc-400 font-mono">16/09/2026</td>
+                                        <td class="py-3.5 px-4 text-right font-extrabold text-zinc-400 font-mono">R$ 850,00</td>
+                                        <td class="py-3.5 px-4 text-center">
+                                            <button class="text-zinc-400 hover:text-white"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= 7. VIEW: INVESTIMENTOS ================= -->
+                <section id="view-invest" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-8 carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-xl font-black text-white flex items-center gap-2">
+                                        <i data-lucide="trending-up" class="w-5 h-5 text-amber-400"></i> BankCore Invest
+                                    </h2>
+                                    <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20">105% do CDI</span>
+                                </div>
+                                <p class="text-xs text-zinc-400">Rentabilidade diária com proteção do FGC até R$ 250.000,00</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+                                    <div class="text-[10px] uppercase font-bold text-zinc-500">Patrimônio Investido</div>
+                                    <div class="text-2xl font-black text-emerald-400 font-mono mt-1">R$ 45.890,20</div>
+                                    <div class="text-[10px] text-emerald-400 mt-1 flex items-center gap-1">
+                                        <i data-lucide="arrow-up-right" class="w-3 h-3"></i> +1.12% este mês
+                                    </div>
+                                </div>
+
+                                <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+                                    <div class="text-[10px] uppercase font-bold text-zinc-500">Rendimento Previsto (12m)</div>
+                                    <div class="text-2xl font-black text-white font-mono mt-1">R$ 5.240,00</div>
+                                    <div class="text-[10px] text-zinc-500 mt-1">Taxa CDI anual: 10.75%</div>
+                                </div>
+                            </div>
+
+                            <!-- Simulator -->
+                            <div class="p-5 rounded-2xl carbon-card-subtle space-y-3">
+                                <div class="text-xs font-bold text-white">Simular Aplicação em CDB Liquidez Diária</div>
+                                <div class="flex gap-3">
+                                    <input type="number" id="investSimAmount" value="10000" class="flex-1 px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white">
+                                    <button onclick="simulateInvest()" class="px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase">Simular</button>
+                                </div>
+                                <div id="investResult" class="text-xs text-zinc-400">Em 1 ano, R$ 10.000,00 rendem aproximadamente <strong class="text-amber-400">R$ 1.128,75</strong> líquido!</div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-4 carbon-card rounded-3xl p-6 space-y-4">
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Produtos Disponíveis</h3>
+                            <div class="space-y-3">
+                                <div class="p-3.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 transition cursor-pointer">
+                                    <div class="flex justify-between text-xs font-bold text-white">
+                                        <span>CDB Carbon Black</span>
+                                        <span class="text-amber-400">105% CDI</span>
+                                    </div>
+                                    <div class="text-[10px] text-zinc-500 mt-1">Liquidez Diária • Mínimo R$ 100</div>
+                                </div>
+
+                                <div class="p-3.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 transition cursor-pointer">
+                                    <div class="flex justify-between text-xs font-bold text-white">
+                                        <span>LCI Sustentável</span>
+                                        <span class="text-emerald-400">95% CDI Isento</span>
+                                    </div>
+                                    <div class="text-[10px] text-zinc-500 mt-1">Isento de IR • Vencimento 1 ano</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= 8. VIEW: CRÉDITO ================= -->
+                <section id="view-credito" class="view-panel hidden space-y-6">
+                    <div class="max-w-3xl mx-auto carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
+                        <div>
+                            <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Crédito Pré-Aprovado</span>
+                            <h2 class="text-2xl font-black text-white mt-2">Linha de Empréstimo Carbon</h2>
+                            <p class="text-xs text-zinc-400">Taxas exclusivas a partir de 0,99% a.m. para correntistas BankCore</p>
+                        </div>
+
+                        <div class="p-6 rounded-2xl bg-zinc-900 border border-amber-500/30 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-zinc-400">Valor Máximo Pré-Aprovado</div>
+                                <div class="text-3xl font-black text-amber-400 font-mono mt-1">R$ 25.000,00</div>
+                            </div>
+                            <div class="text-right text-xs text-zinc-400">
+                                <div>Carência: <strong>90 dias</strong></div>
+                                <div>Prazo: <strong>até 48x</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor desejado para contratação (R$)</label>
+                                <input type="range" min="1000" max="25000" step="500" value="15000" id="loanRange" oninput="updateLoanDisplay(this.value)" class="w-full accent-amber-400 cursor-pointer">
+                                <div class="flex justify-between text-xs font-mono text-zinc-400 mt-1">
+                                    <span>R$ 1.000</span>
+                                    <span class="text-amber-400 font-bold text-base" id="loanDisplayVal">R$ 15.000,00</span>
+                                    <span>R$ 25.000</span>
+                                </div>
+                            </div>
+
+                            <button onclick="alert('Proposta de crédito de R$ 15.000 enviada para análise imediata!')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
+                                Contratar Crédito em 1-Clique
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </main>
         </div>
     </div>
 
@@ -368,32 +845,30 @@
         </div>
     </div>
 
+    <!-- CORE SPA JAVASCRIPT LOGIC -->
     <script>
         let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
         let currentAccount = null;
         let isBalanceHidden = false;
+        let sessionSeconds = 899; // 14:59
 
         function formatCPF(v) {
-            v = v.replace(/\D/g, "");
-            if (v.length === 11) {
-                return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-            }
+            if (!v) return '---';
+            v = String(v).replace(/\D/g, "");
+            if (v.length === 11) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
             return v;
         }
 
         function initApp() {
             lucide.createIcons();
+            startLiveClock();
+            startSessionTimer();
+
             if (currentAuthUser) {
-                showDashboard();
+                showApp();
             } else {
                 showAuth();
             }
-        }
-
-        function fillDemo(taxId, password) {
-            document.getElementById('loginTaxId').value = taxId;
-            document.getElementById('loginPassword').value = password;
-            switchAuthTab('login');
         }
 
         function switchAuthTab(tab) {
@@ -405,26 +880,65 @@
             hideAlert('authAlert');
         }
 
-        function showAuth() {
-            document.getElementById('authView').classList.remove('hidden');
-            document.getElementById('dashboardView').classList.add('hidden');
-            document.getElementById('btnLogout').classList.add('hidden');
+        function fillDemo(taxId, password) {
+            document.getElementById('loginTaxId').value = taxId;
+            document.getElementById('loginPassword').value = password;
+            switchAuthTab('login');
         }
 
-        async function showDashboard() {
+        function showAuth() {
+            document.getElementById('authView').classList.remove('hidden');
+            document.getElementById('appView').classList.add('hidden');
+        }
+
+        async function showApp() {
             document.getElementById('authView').classList.add('hidden');
-            document.getElementById('dashboardView').classList.remove('hidden');
-            document.getElementById('btnLogout').classList.remove('hidden');
-            
+            document.getElementById('appView').classList.remove('hidden');
+
             const fullName = currentAuthUser.full_name || 'Correntista';
-            document.getElementById('cardHolderName').innerText = fullName;
-            document.getElementById('pixCpfDisplay').innerText = formatCPF(currentAuthUser.tax_id || '');
+            const cpfFormatted = formatCPF(currentAuthUser.tax_id);
+
+            // Populate user displays across topbar and sidebar
+            document.getElementById('sideUserName').innerText = fullName;
+            document.getElementById('topUserName').innerText = fullName;
+            document.getElementById('topUserCpf').innerText = cpfFormatted;
+            document.getElementById('topUserAvatar').innerText = fullName.split(' ').map(n=>n[0]).slice(0,2).join('');
+            document.getElementById('mainPixCpf').innerText = cpfFormatted;
+            document.getElementById('pixMyKeyCpf').innerText = cpfFormatted;
+            document.getElementById('cardHolderFull').innerText = fullName;
+            document.getElementById('miniCardHolder').innerText = fullName;
 
             const isJoao = currentAuthUser.tax_id === '33548376835';
-            document.getElementById('btnQuickContact').innerText = isJoao ? '⚡ Enviar para Maria Silva' : '⚡ Enviar para João Paulo';
+            document.getElementById('btnPixQuickContact').innerText = isJoao ? '⚡ Enviar para Maria Silva' : '⚡ Enviar para João Paulo';
 
             await loadOrCreateAccount();
             await loadStatement();
+            navigateTo('inicio');
+            lucide.createIcons();
+        }
+
+        // SPA View Router
+        function navigateTo(viewName) {
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const target = document.getElementById('view-' + viewName);
+            const navBtn = document.getElementById('nav-' + viewName);
+
+            if (target) target.classList.remove('hidden');
+            if (navBtn) navBtn.classList.add('active');
+
+            const breadcrumbMap = {
+                'inicio': 'Visão Geral',
+                'extrato': 'Extrato',
+                'cartoes': 'Cartões',
+                'pix': 'Área Pix',
+                'pagar': 'Pagamento de Boletos',
+                'cobrancas': 'Cobranças & Boletos',
+                'invest': 'Investimentos',
+                'credito': 'Empréstimos & Crédito'
+            };
+            document.getElementById('topBreadcrumb').innerText = breadcrumbMap[viewName] || viewName;
             lucide.createIcons();
         }
 
@@ -458,7 +972,7 @@
 
                 localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
                 hideAlert('authAlert');
-                showDashboard();
+                showApp();
             } catch (err) {
                 showAlert('authAlert', err.message, 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
             }
@@ -510,12 +1024,16 @@
 
         function updateAccountUI() {
             if (!currentAccount) return;
-            document.getElementById('balanceDisplay').innerText = isBalanceHidden ? '••••••' : currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            const formatted = currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            document.getElementById('sideBalanceDisplay').innerHTML = isBalanceHidden ? '••••••' : `<span class="text-xs text-zinc-500 font-normal">R$</span> ${formatted}`;
+            document.getElementById('mainBalanceDisplay').innerText = isBalanceHidden ? '••••••' : formatted;
         }
 
         async function loadStatement() {
             if (!currentAccount) return;
-            const container = document.getElementById('statementContainer');
+            const mainContainer = document.getElementById('mainRecentTransactions');
+            const fullContainer = document.getElementById('fullStatementList');
+
             try {
                 const res = await fetch(`/accounts/${currentAccount.id}/statement`);
                 if (!res.ok) throw new Error('Erro ao carregar extrato');
@@ -525,13 +1043,15 @@
                 let totalExpense = 0;
 
                 if (txs.length === 0) {
-                    container.innerHTML = '<div class="text-center py-8 text-zinc-500 text-sm">Nenhuma movimentação registrada no Livro-Razão ainda.</div>';
-                    document.getElementById('totalIncomeDisplay').innerText = '+ R$ 0,00';
-                    document.getElementById('totalExpenseDisplay').innerText = '- R$ 0,00';
+                    const emptyMsg = '<div class="text-center py-8 text-zinc-500 text-xs">Nenhuma movimentação registrada no Livro-Razão ainda.</div>';
+                    mainContainer.innerHTML = emptyMsg;
+                    fullContainer.innerHTML = emptyMsg;
+                    document.getElementById('mainTotalIncome').innerText = '+ R$ 0,00';
+                    document.getElementById('mainTotalExpense').innerText = '- R$ 0,00';
                     return;
                 }
 
-                container.innerHTML = txs.map(tx => {
+                const renderTx = (tx) => {
                     const isCredit = tx.direction === 'CREDIT';
                     const rawDate = tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z';
                     const formattedDate = new Date(rawDate).toLocaleString('pt-BR', { 
@@ -552,32 +1072,72 @@
                     }
 
                     return `
-                        <div class="py-4 flex items-center justify-between">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-10 h-10 rounded-xl ${isCredit ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'} flex items-center justify-center">
+                        <div class="py-3.5 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl ${isCredit ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'} flex items-center justify-center">
                                     <i data-lucide="${isCredit ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4"></i>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-white">${title}</div>
-                                    <div class="text-[11px] text-zinc-500 font-mono">${formattedDate} • ID: ${tx.idempotency_key.substring(0, 10)}...</div>
+                                    <div class="text-xs font-bold text-white">${title}</div>
+                                    <div class="text-[10px] text-zinc-500 font-mono">${formattedDate} • ID: ${tx.idempotency_key.substring(0, 10)}...</div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-sm font-extrabold ${isCredit ? 'text-emerald-400' : 'text-zinc-200'}">
+                                <div class="text-xs font-extrabold ${isCredit ? 'text-emerald-400' : 'text-zinc-200'}">
                                     ${isCredit ? '+' : '-'} R$ ${tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                 </div>
-                                <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">${tx.status}</span>
+                                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">${tx.status}</span>
                             </div>
                         </div>
                     `;
-                }).join('');
+                };
 
-                document.getElementById('totalIncomeDisplay').innerText = '+ R$ ' + totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                document.getElementById('totalExpenseDisplay').innerText = '- R$ ' + totalExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                mainContainer.innerHTML = txs.slice(0, 3).map(renderTx).join('');
+                fullContainer.innerHTML = txs.map(renderTx).join('');
+
+                document.getElementById('mainTotalIncome').innerText = '+ R$ ' + totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                document.getElementById('mainTotalExpense').innerText = '- R$ ' + totalExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
                 lucide.createIcons();
             } catch (err) {
-                container.innerHTML = `<div class="text-center py-6 text-rose-400 text-xs">${err.message}</div>`;
+                mainContainer.innerHTML = `<div class="text-center py-4 text-rose-400 text-xs">${err.message}</div>`;
+            }
+        }
+
+        async function handlePixTransfer(e) {
+            e.preventDefault();
+            const destination_key = document.getElementById('pixDestKey').value.trim();
+            const amount_reais = parseFloat(document.getElementById('pixAmountInput').value);
+            const description = document.getElementById('pixDescInput').value.trim() || 'Pix BankCore Web';
+            const idempotency_key = 'pix_' + Date.now() + '_' + Math.random().toString(36).substring(7);
+
+            try {
+                showAlert('pixAlert', 'Executando Pix com isolamento ACID...', 'bg-amber-400/20 text-amber-300');
+                const res = await fetch('/transactions/pix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        source_account_id: currentAccount.id,
+                        destination_key: destination_key,
+                        amount_reais: amount_reais,
+                        idempotency_key: idempotency_key,
+                        description: description
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Erro na transferência Pix.');
+                }
+
+                showAlert('pixAlert', 'Pix enviado com sucesso!', 'bg-emerald-500/20 text-emerald-300');
+                setTimeout(async () => {
+                    hideAlert('pixAlert');
+                    await refreshDashboard();
+                    navigateTo('extrato');
+                }, 1000);
+            } catch (err) {
+                showAlert('pixAlert', err.message, 'bg-rose-500/20 text-rose-300');
             }
         }
 
@@ -610,50 +1170,28 @@
             }
         }
 
-        async function handleTransfer(e) {
-            e.preventDefault();
-            const destination_key = document.getElementById('transferDestKey').value.trim();
-            const amount_reais = parseFloat(document.getElementById('transferAmount').value);
-            const description = document.getElementById('transferDesc').value.trim() || 'Pix BankCore Carbon';
-            const idempotency_key = 'pix_' + Date.now() + '_' + Math.random().toString(36).substring(7);
-
-            try {
-                showAlert('transferAlert', 'Executando Pix com isolamento ACID...', 'bg-amber-400/20 text-amber-300');
-                const res = await fetch('/transactions/pix', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        source_account_id: currentAccount.id,
-                        destination_key: destination_key,
-                        amount_reais: amount_reais,
-                        idempotency_key: idempotency_key,
-                        description: description
-                    })
-                });
-
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.detail || 'Erro na transferência Pix.');
-                }
-
-                showAlert('transferAlert', 'Pix enviado com sucesso!', 'bg-emerald-500/20 text-emerald-300');
-                setTimeout(async () => {
-                    closeModal('transferModal');
-                    await refreshDashboard();
-                }, 800);
-            } catch (err) {
-                showAlert('transferAlert', err.message, 'bg-rose-500/20 text-rose-300');
-            }
-        }
-
-        function selectQuickContact() {
+        function quickFillContact() {
             const isJoao = currentAuthUser.tax_id === '33548376835';
-            document.getElementById('transferDestKey').value = isJoao ? '12345678900' : '33548376835';
+            document.getElementById('pixDestKey').value = isJoao ? '12345678900' : '33548376835';
         }
 
-        function setCardTheme(theme) {
-            const card = document.getElementById('virtualCard');
-            card.className = `card-theme-${theme} rounded-3xl p-6 sm:p-7 shadow-2xl relative flex flex-col justify-between h-56 transition-all duration-500 overflow-hidden`;
+        function setCardTheme(theme, title) {
+            document.getElementById('interactiveCard').className = `card-theme-${theme} rounded-3xl p-7 shadow-2xl relative flex flex-col justify-between h-64 transition-all duration-500 overflow-hidden`;
+            document.getElementById('cardBadgeTitle').innerText = title;
+        }
+
+        function updateLoanDisplay(val) {
+            document.getElementById('loanDisplayVal').innerText = 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        function simulateInvest() {
+            const val = parseFloat(document.getElementById('investSimAmount').value) || 0;
+            const yieldVal = (val * 0.112875).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            document.getElementById('investResult').innerHTML = `Em 1 ano, R$ ${val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} rendem aproximadamente <strong class="text-amber-400">R$ ${yieldVal}</strong> líquido!`;
+        }
+
+        function exportStatementCSV() {
+            alert('Relatório CSV de transações gerado e baixado com sucesso!');
         }
 
         function refreshDashboard() {
@@ -674,9 +1212,37 @@
 
         function toggleBalanceVisibility() {
             isBalanceHidden = !isBalanceHidden;
-            document.getElementById('eyeIcon').setAttribute('data-lucide', isBalanceHidden ? 'eye-off' : 'eye');
+            const iconName = isBalanceHidden ? 'eye-off' : 'eye';
+            document.getElementById('sideEyeIcon').setAttribute('data-lucide', iconName);
             updateAccountUI();
             lucide.createIcons();
+        }
+
+        function startLiveClock() {
+            function update() {
+                const now = new Date();
+                const str = now.toLocaleString('pt-BR', { 
+                    timeZone: 'America/Sao_Paulo',
+                    weekday: 'short', day: '2-digit', month: 'short',
+                    hour: '2-digit', minute: '2-digit'
+                });
+                const el = document.getElementById('liveClockDisplay');
+                if (el) el.innerText = str.charAt(0).toUpperCase() + str.slice(1);
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        function startSessionTimer() {
+            setInterval(() => {
+                if (sessionSeconds > 0) {
+                    sessionSeconds--;
+                    const min = String(Math.floor(sessionSeconds / 60)).padStart(2, '0');
+                    const sec = String(sessionSeconds % 60).padStart(2, '0');
+                    const el = document.getElementById('sessionTimer');
+                    if (el) el.innerText = `${min}:${sec}`;
+                }
+            }, 1000);
         }
 
         function logout() {
@@ -686,17 +1252,8 @@
             showAuth();
         }
 
-        function openModal(id) { 
-            hideAlert('transferAlert');
-            hideAlert('depositAlert');
-            document.getElementById(id).classList.remove('hidden'); 
-        }
-        
-        function closeModal(id) { 
-            hideAlert('transferAlert');
-            hideAlert('depositAlert');
-            document.getElementById(id).classList.add('hidden'); 
-        }
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function showAlert(id, msg, cls) {
             const el = document.getElementById(id);
@@ -707,10 +1264,7 @@
 
         function hideAlert(id) { 
             const el = document.getElementById(id);
-            if (el) {
-                el.classList.add('hidden');
-                el.innerText = '';
-            }
+            if (el) el.classList.add('hidden'); 
         }
 
         window.onload = initApp;
