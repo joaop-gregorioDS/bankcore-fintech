@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bankcore-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bankadmin
+      POSTGRES_PASSWORD: bankcore_secret_password_2026
+      POSTGRES_DB: bankcore_auth
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bankcore_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: bankcore-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - bankcore_net
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: bankcore-auth-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://bankadmin:bankcore_secret_password_2026@postgres:5432/bankcore_auth
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: super_secret_jwt_key_bankcore_production_2026
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - bankcore_net
+      - web_gateway
+
+  transactions-service:
+    build: ./services/transactions-service
+    container_name: bankcore-transactions-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://bankadmin:bankcore_secret_password_2026@postgres:5432/bankcore_transactions
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - bankcore_net
+      - web_gateway
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  bankcore_net:
+    driver: bridge
+  web_gateway:
+    external: true
