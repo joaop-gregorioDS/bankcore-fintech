@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .carbon-sidebar { background: #111113; border-right: 1px solid rgba(255, 255, 255, 0.08); }
+        .carbon-sidebar { background: #111113; border-right: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .carbon-card { background: #18181b; border: 1px solid rgba(255, 255, 255, 0.08); }
         .carbon-card-subtle { background: #141416; border: 1px solid rgba(255, 255, 255, 0.05); }
         
@@ -33,6 +33,13 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+
+        .sidebar-collapsed { width: 4.5rem !important; }
+        .sidebar-collapsed .sidebar-text,
+        .sidebar-collapsed .sidebar-balance,
+        .sidebar-collapsed .sidebar-user { display: none !important; }
+        .sidebar-collapsed .nav-item { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
+        .sidebar-collapsed .nav-item.active::before { left: 2px; }
     </style>
 </head>
 <body class="text-zinc-100 h-full flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
@@ -135,22 +142,27 @@
     <!-- ================= MAIN WEB BANKING INTERFACE ================= -->
     <div id="appView" class="hidden h-full flex flex-row overflow-hidden">
         
-        <!-- SIDEBAR -->
-        <aside class="w-64 flex-shrink-0 carbon-sidebar flex flex-col justify-between z-30 select-none">
+        <!-- SIDEBAR COM MEGA MENU / RECOLHIMENTO -->
+        <aside id="mainSidebar" class="w-64 flex-shrink-0 carbon-sidebar flex flex-col justify-between z-30 select-none">
             <div>
-                <div class="h-16 px-6 flex items-center justify-between border-b border-zinc-800/80">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
+                <!-- Brand Header -->
+                <div class="h-16 px-5 flex items-center justify-between border-b border-zinc-800/80">
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center flex-shrink-0">
                             <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
                         </div>
-                        <div>
+                        <div class="sidebar-text">
                             <div class="text-sm font-extrabold text-white leading-tight">Bank<span class="text-amber-400">Core</span></div>
-                            <div class="text-[9px] font-bold text-amber-400 uppercase tracking-widest">Vortex Software</div>
+                            <div class="text-[9px] font-bold text-amber-400 uppercase tracking-widest truncate">Vortex Software</div>
                         </div>
                     </div>
+                    <button onclick="toggleSidebarCollapse()" class="text-zinc-500 hover:text-white p-1 rounded-lg hover:bg-zinc-800/60 transition" title="Recolher Menu">
+                        <i data-lucide="chevrons-left" class="w-4 h-4" id="sidebarToggleIcon"></i>
+                    </button>
                 </div>
 
-                <div class="p-4 border-b border-zinc-800/80">
+                <!-- User Balance Card in Sidebar -->
+                <div class="p-4 border-b border-zinc-800/80 sidebar-balance">
                     <div class="flex items-center justify-between mb-2">
                         <div class="truncate text-xs font-bold text-zinc-300" id="sideUserName">João Paulo</div>
                         <button onclick="toggleBalanceVisibility()" class="text-zinc-500 hover:text-amber-400 transition" title="Ocultar Saldo">
@@ -167,44 +179,54 @@
                     </div>
                 </div>
 
+                <!-- Navigation List (com Meu Perfil & Ajustes logo após Empréstimos & Limites) -->
                 <nav class="p-2 space-y-0.5" id="sidebarNav">
-                    <button onclick="navigateTo('inicio')" id="nav-inicio" class="nav-item active w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-300 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="home" class="w-4 h-4 text-zinc-400"></i> Início
+                    <button onclick="navigateTo('inicio')" id="nav-inicio" class="nav-item active w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-300 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Início">
+                        <i data-lucide="home" class="w-4 h-4 text-zinc-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Início</span>
                     </button>
-                    <button onclick="navigateTo('extrato')" id="nav-extrato" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="file-text" class="w-4 h-4 text-zinc-400"></i> Extrato & Recibos
+                    <button onclick="navigateTo('extrato')" id="nav-extrato" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Extrato & Recibos">
+                        <i data-lucide="file-text" class="w-4 h-4 text-zinc-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Extrato & Recibos</span>
                     </button>
-                    <button onclick="navigateTo('cartoes')" id="nav-cartoes" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400"></i> Central de Cartões
+                    <button onclick="navigateTo('cartoes')" id="nav-cartoes" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Central de Cartões">
+                        <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Central de Cartões</span>
                     </button>
-                    <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="qr-code" class="w-4 h-4 text-amber-400"></i> Central Pix
+                    <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Central Pix">
+                        <i data-lucide="qr-code" class="w-4 h-4 text-amber-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Central Pix</span>
                     </button>
-                    <button onclick="navigateTo('pagar')" id="nav-pagar" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="barcode" class="w-4 h-4 text-amber-400"></i> Central de Pagamentos
+                    <button onclick="navigateTo('pagar')" id="nav-pagar" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Central de Pagamentos">
+                        <i data-lucide="barcode" class="w-4 h-4 text-amber-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Central de Pagamentos</span>
                     </button>
-                    <button onclick="navigateTo('cobrancas')" id="nav-cobrancas" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="receipt" class="w-4 h-4 text-zinc-400"></i> Cobranças
+                    <button onclick="navigateTo('cobrancas')" id="nav-cobrancas" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Cobranças">
+                        <i data-lucide="receipt" class="w-4 h-4 text-zinc-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Cobranças</span>
                     </button>
-                    <button onclick="navigateTo('invest')" id="nav-invest" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="trending-up" class="w-4 h-4 text-zinc-400"></i> BankCore Invest
+                    <button onclick="navigateTo('invest')" id="nav-invest" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="BankCore Invest">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-zinc-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">BankCore Invest</span>
                     </button>
-                    <button onclick="navigateTo('credito')" id="nav-credito" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="coins" class="w-4 h-4 text-zinc-400"></i> Empréstimos & Limites
+                    <button onclick="navigateTo('credito')" id="nav-credito" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Empréstimos & Limites">
+                        <i data-lucide="coins" class="w-4 h-4 text-zinc-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Empréstimos & Limites</span>
+                    </button>
+
+                    <!-- MEU PERFIL & AJUSTES DEDICADO DIRETAMENTE NA NAVEGAÇÃO -->
+                    <button onclick="navigateTo('perfil')" id="nav-perfil" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3" title="Meu Perfil & Ajustes">
+                        <i data-lucide="user" class="w-4 h-4 text-amber-400 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Meu Perfil & Ajustes</span>
                     </button>
                 </nav>
             </div>
 
-            <div class="p-4 border-t border-zinc-800/80 space-y-2">
-                <button onclick="openProfileModal()" class="w-full py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-bold border border-zinc-800 flex items-center justify-between transition group">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="user" class="w-4 h-4 text-amber-400"></i>
-                        <span>Meu Perfil & Ajustes</span>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500 group-hover:text-amber-400 transition"></i>
-                </button>
-                <button onclick="logout()" class="w-full py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/20 transition flex items-center justify-center gap-2">
-                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair da Sessão
+            <!-- Rodapé da Sidebar -->
+            <div class="p-3 border-t border-zinc-800/80">
+                <button onclick="logout()" class="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/20 transition flex items-center justify-center gap-2" title="Sair da Sessão">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5 flex-shrink-0"></i> 
+                    <span class="sidebar-text">Sair da Sessão</span>
                 </button>
             </div>
         </aside>
@@ -212,12 +234,18 @@
         <!-- MAIN AREA -->
         <div class="flex-1 flex flex-col min-w-0 bg-[#09090b] overflow-hidden">
             
-            <!-- TOPBAR -->
+            <!-- TOPBAR COM BOTÃO HAMBÚRGUER -->
             <header class="h-16 border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur-md px-6 flex items-center justify-between flex-shrink-0 z-20">
-                <div class="flex items-center gap-2 text-xs font-semibold text-zinc-400">
-                    <span class="text-zinc-500 hover:text-white cursor-pointer" onclick="navigateTo('inicio')">🏠 Início</span>
-                    <span>/</span>
-                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Visão Geral</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebarCollapse()" class="text-zinc-400 hover:text-white p-2 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition" title="Menu">
+                        <i data-lucide="menu" class="w-4 h-4"></i>
+                    </button>
+
+                    <div class="flex items-center gap-2 text-xs font-semibold text-zinc-400">
+                        <span class="text-zinc-500 hover:text-white cursor-pointer" onclick="navigateTo('inicio')">🏠 Início</span>
+                        <span>/</span>
+                        <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Visão Geral</span>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-4 text-xs">
@@ -235,13 +263,14 @@
                         <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Swagger
                     </a>
 
-                    <button onclick="openProfileModal()" class="flex items-center gap-2.5 pl-3 border-l border-zinc-800 hover:opacity-80 transition cursor-pointer text-left group">
+                    <!-- Atalho do Usuário no Topo -->
+                    <button onclick="navigateTo('perfil')" class="flex items-center gap-2.5 pl-3 border-l border-zinc-800 hover:opacity-80 transition cursor-pointer text-left group">
                         <div class="w-8 h-8 rounded-full bg-amber-400/10 group-hover:bg-amber-400/20 border border-amber-400/30 flex items-center justify-center font-bold text-amber-400 text-xs shadow-sm" id="topUserAvatar">JP</div>
                         <div class="hidden xl:block">
                             <div class="text-xs font-bold text-white leading-tight group-hover:text-amber-400 transition" id="topUserName">João Paulo</div>
                             <div class="text-[10px] text-zinc-500 font-mono" id="topUserCpf">335.483.768-35</div>
                         </div>
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-zinc-500 group-hover:text-amber-400 transition"></i>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500 group-hover:text-amber-400 transition"></i>
                     </button>
                 </div>
             </header>
@@ -573,90 +602,11 @@
                                     <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Pague escaneando um QR Code ou envie a foto da galeria.</div>
                                 </div>
                             </div>
-
-                            <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-2xl p-5 hover:border-indigo-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
-                                <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 group-hover:bg-indigo-500/25 text-indigo-400 flex items-center justify-center flex-shrink-0 transition">
-                                    <i data-lucide="copy-check" class="w-5 h-5"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="text-sm font-extrabold text-white group-hover:text-indigo-400 transition">Pix Copia e Cola</div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Cole o código do payload Pix para pagar na hora.</div>
-                                </div>
-                            </div>
-
-                            <div onclick="showToastNotification('Pix de presente com cartão personalizado aberto!', 'success')" class="carbon-card rounded-2xl p-5 hover:border-emerald-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group relative overflow-hidden">
-                                <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 group-hover:bg-emerald-500/25 text-emerald-400 flex items-center justify-center flex-shrink-0 transition">
-                                    <i data-lucide="gift" class="w-5 h-5"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-sm font-extrabold text-white group-hover:text-emerald-400 transition">Pix de presente</div>
-                                        <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-black shadow-sm">Novo</span>
-                                    </div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Envie um Pix com cartão comemorativo personalizado.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Receber</div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            <div onclick="showToastNotification('QR Code gerado para cobrança Pix!', 'success')" class="carbon-card rounded-2xl p-5 hover:border-amber-500/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
-                                <div class="w-11 h-11 rounded-2xl bg-amber-500/15 group-hover:bg-amber-500/25 text-amber-400 flex items-center justify-center flex-shrink-0 transition">
-                                    <i data-lucide="qr-code" class="w-5 h-5"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="text-sm font-extrabold text-white group-hover:text-amber-400 transition">Criar QR Code</div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Gere uma cobrança instantânea com valor fixo ou livre.</div>
-                                </div>
-                            </div>
-
-                            <div onclick="copyPixKey()" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
-                                <div class="w-11 h-11 rounded-2xl bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center flex-shrink-0 transition">
-                                    <i data-lucide="key" class="w-5 h-5"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="text-sm font-extrabold text-white group-hover:text-blue-400 transition">Minhas Chaves Pix</div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Cadastre, consulte e compartilhe suas chaves da Vortex.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Consultar & Segurança BACEN</div>
-                        <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
-                            <div onclick="navigateTo('extrato')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
-                                <div class="flex items-start gap-3.5">
-                                    <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
-                                    </div>
-                                    <div>
-                                        <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Extrato Pix</div>
-                                        <div class="text-[11px] text-zinc-400">Acompanhe seus gastos, recebimentos e pagamentos futuros.</div>
-                                    </div>
-                                </div>
-                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
-                            </div>
-
-                            <div onclick="showToastNotification('MED - Mecanismo Especial de Devolução do Banco Central pronto para abertura de chamado.', 'warning', 'MED BACEN')" class="p-4 flex items-center justify-between hover:bg-rose-500/10 cursor-pointer transition group">
-                                <div class="flex items-start gap-3.5">
-                                    <div class="w-9 h-9 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                                    </div>
-                                    <div>
-                                        <div class="text-xs font-bold text-white group-hover:text-rose-400 transition">Informar golpe ou fraude (MED BACEN)</div>
-                                        <div class="text-[11px] text-zinc-400">Use o Mecanismo Especial de Devolução para suspeitas de golpes ou fraudes.</div>
-                                    </div>
-                                </div>
-                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-rose-400 transition flex-shrink-0 ml-2"></i>
-                            </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS (PADRÃO BB iOS + VORTEX SOFTWARE) -->
+                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS -->
                 <section id="view-pagar" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
                     <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                         <div>
@@ -693,66 +643,24 @@
                             </div>
                             <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pagamento</span>
                         </button>
-
                         <button onclick="navigateTo('pix')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
                             <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
                                 <i data-lucide="qr-code" class="w-6 h-6"></i>
                             </div>
                             <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pix</span>
                         </button>
-
                         <button onclick="openInvoiceModal()" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
                             <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
                                 <i data-lucide="credit-card" class="w-6 h-6"></i>
                             </div>
-                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pagar fatura do cartão</span>
+                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Pagar fatura</span>
                         </button>
-
-                        <button onclick="showToastNotification('Opções de tributos (DARF, GPS, IPVA) abertas!', 'info')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
+                        <button onclick="openModal('modalDDA')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
                             <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
-                                <i data-lucide="more-horizontal" class="w-6 h-6"></i>
+                                <i data-lucide="calendar-check" class="w-6 h-6"></i>
                             </div>
-                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Mais opções</span>
+                            <span class="text-xs font-extrabold text-zinc-200 group-hover:text-white leading-tight">Agenda DDA</span>
                         </button>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div>
-                            <h3 class="text-lg font-black text-white">Agenda de boletos (DDA)</h3>
-                            <p class="text-xs text-zinc-400 mt-0.5">Gerencie todos os boletos cadastrados em seu CPF/CNPJ em um só lugar.</p>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                            <div onclick="openModal('modalDDA')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
-                                <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="barcode" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <div class="text-xs font-extrabold text-white group-hover:text-blue-400 transition">Pagar e gerenciar</div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5">Boletos eletrônicos DDA</div>
-                                </div>
-                            </div>
-
-                            <div onclick="showToastNotification('Você já é aderente ao DDA Eletrônico da Vortex Software.', 'info')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
-                                <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <div class="text-xs font-extrabold text-white group-hover:text-blue-400 transition">Aderir à agenda</div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5">DDA Automático Ativo</div>
-                                </div>
-                            </div>
-
-                            <div onclick="showToastNotification('Formulário de agendamento futuro aberto!', 'info')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-3.5 group">
-                                <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <div class="text-xs font-extrabold text-white group-hover:text-blue-400 transition">Cadastrar agendamento</div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5">Programar pagamentos</div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </section>
 
@@ -768,7 +676,6 @@
                                 <i data-lucide="plus" class="w-4 h-4"></i> Nova Cobrança
                             </button>
                         </div>
-
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
@@ -780,9 +687,7 @@
                                         <th class="py-3 px-4 text-center">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-zinc-800/60 font-medium" id="cobrancasTableBody">
-                                    <!-- Table rows populated dynamically -->
-                                </tbody>
+                                <tbody class="divide-y divide-zinc-800/60 font-medium" id="cobrancasTableBody"></tbody>
                             </table>
                         </div>
                     </div>
@@ -790,23 +695,21 @@
 
                 <!-- 7. VIEW: INVESTIMENTOS -->
                 <section id="view-invest" class="view-panel hidden space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <div class="lg:col-span-8 carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
-                            <div>
-                                <h2 class="text-xl font-black text-white flex items-center gap-2">
-                                    <i data-lucide="trending-up" class="w-5 h-5 text-amber-400"></i> BankCore Invest
-                                </h2>
-                                <p class="text-xs text-zinc-400">Rentabilidade diária com proteção do FGC até R$ 250.000,00</p>
+                    <div class="carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
+                        <div>
+                            <h2 class="text-xl font-black text-white flex items-center gap-2">
+                                <i data-lucide="trending-up" class="w-5 h-5 text-amber-400"></i> BankCore Invest
+                            </h2>
+                            <p class="text-xs text-zinc-400">Rentabilidade diária com proteção do FGC até R$ 250.000,00</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+                                <div class="text-[10px] uppercase font-bold text-zinc-500">Patrimônio Investido</div>
+                                <div class="text-2xl font-black text-emerald-400 font-mono mt-1">R$ 45.890,20</div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
-                                    <div class="text-[10px] uppercase font-bold text-zinc-500">Patrimônio Investido</div>
-                                    <div class="text-2xl font-black text-emerald-400 font-mono mt-1">R$ 45.890,20</div>
-                                </div>
-                                <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
-                                    <div class="text-[10px] uppercase font-bold text-zinc-500">Rendimento Previsto (12m)</div>
-                                    <div class="text-2xl font-black text-white font-mono mt-1">R$ 5.240,00</div>
-                                </div>
+                            <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+                                <div class="text-[10px] uppercase font-bold text-zinc-500">Rendimento Previsto (12m)</div>
+                                <div class="text-2xl font-black text-white font-mono mt-1">R$ 5.240,00</div>
                             </div>
                         </div>
                     </div>
@@ -822,7 +725,7 @@
                         <div class="p-6 rounded-2xl bg-zinc-900 border border-amber-500/30 flex items-center justify-between">
                             <div>
                                 <div class="text-xs text-zinc-400">Valor Máximo Pré-Aprovado</div>
-                                <div class="text-3xl font-black text-amber-400 font-mono mt-1">R$ 50.000,00</div>
+                                <div class="text-3xl font-black text-amber-400 font-mono mt-1" id="creditMaxDisplay">R$ 50.000,00</div>
                             </div>
                             <div class="text-right text-xs text-zinc-400">
                                 <div>Carência: <strong>90 dias</strong></div>
@@ -831,136 +734,221 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- 9. VIEW DEDICADA: MEU PERFIL & AJUSTES -->
+                <section id="view-perfil" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    
+                    <!-- Header Banner do Perfil -->
+                    <div class="carbon-card rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 relative overflow-hidden border border-zinc-700/80 shadow-2xl">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                            <div class="flex items-center gap-5">
+                                <div class="w-18 h-18 sm:w-20 sm:h-20 rounded-3xl bg-amber-400/10 border-2 border-amber-400/40 flex items-center justify-center font-black text-amber-400 text-2xl shadow-xl flex-shrink-0" id="perfilHeroAvatar">
+                                    JP
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight" id="perfilHeroName">João Paulo Gregorio de Souza</h2>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                            <i data-lucide="check-circle" class="w-3 h-3"></i> Verificado
+                                        </span>
+                                    </div>
+                                    <div class="text-xs text-zinc-400 font-mono mt-1" id="perfilHeroCpf">CPF: 335.483.768-35</div>
+                                    <div class="flex flex-wrap items-center gap-3 mt-2 text-xs">
+                                        <span class="text-amber-400 font-mono font-bold" id="perfilHeroAcc">Ag. 0001-9 • Cc. 77412-7</span>
+                                        <span class="text-zinc-600">•</span>
+                                        <span class="text-zinc-300 font-semibold" id="perfilHeroSegment">Segmento: Vortex Carbon Black</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sm:text-right flex-shrink-0">
+                                <div class="text-[10px] uppercase font-bold text-zinc-500">Status da Conta</div>
+                                <div class="text-sm font-extrabold text-emerald-400 mt-0.5">Ativa & Protegida (SPI BACEN)</div>
+                                <div class="text-[10px] text-zinc-500 font-mono mt-1">São Paulo - SP • IP Seguro</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Configurações Dividida em Cards -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        
+                        <!-- Coluna 1: Dados Cadastrais & Empresa (7 cols) -->
+                        <div class="lg:col-span-7 space-y-6">
+                            
+                            <!-- 1. Dados Cadastrais Pessoais -->
+                            <div class="carbon-card rounded-3xl p-6 sm:p-7 space-y-4">
+                                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                        <i data-lucide="user-check" class="w-4 h-4 text-amber-400"></i> Dados Cadastrais do Titular
+                                    </h3>
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase">Edição Imediata</span>
+                                </div>
+
+                                <form onsubmit="saveProfilePageData(event)" class="space-y-3.5 text-xs">
+                                    <div>
+                                        <label class="block text-zinc-400 font-semibold mb-1">Nome Completo</label>
+                                        <input type="text" id="perfilInputName" value="João Paulo Gregorio de Souza" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-white font-semibold">
+                                    </div>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-zinc-400 font-semibold mb-1">CPF do Titular</label>
+                                            <input type="text" id="perfilInputCpf" value="335.483.768-35" readonly class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-400 font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-zinc-400 font-semibold mb-1">Telefone / WhatsApp</label>
+                                            <input type="text" id="perfilInputPhone" value="(11) 98765-4321" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-mono">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 font-semibold mb-1">E-mail Corporativo</label>
+                                        <input type="email" id="perfilInputEmail" value="joao.paulo@vortexsoftware.com.br" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 text-white">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 font-semibold mb-1">Endereço Fiscal / Residencial</label>
+                                        <input type="text" id="perfilInputAddress" value="Av. Paulista, 1000 - Bela Vista, São Paulo - SP" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
+                                    </div>
+
+                                    <button type="submit" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/15">
+                                        Salvar Alterações Cadastrais
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- 2. Dados da Empresa (Vortex Software) -->
+                            <div class="carbon-card rounded-3xl p-6 sm:p-7 space-y-4">
+                                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                        <i data-lucide="building-2" class="w-4 h-4 text-blue-400"></i> Dados da Empresa (Pessoa Jurídica)
+                                    </h3>
+                                    <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Contabilizei Conectada</span>
+                                </div>
+
+                                <div class="space-y-3 text-xs">
+                                    <div class="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800">
+                                        <div class="text-[10px] uppercase font-bold text-zinc-500">Razão Social Oficial</div>
+                                        <div class="text-xs font-bold text-white mt-0.5">JOAO PAULO GREGORIO DE SOUZA DESENVOLVIMENTO DE SOFTWARE LTDA</div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                                            <div class="text-[10px] uppercase font-bold text-zinc-500">Nome Fantasia</div>
+                                            <div class="text-xs font-extrabold text-amber-400 mt-0.5">Vortex Software</div>
+                                        </div>
+                                        <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                                            <div class="text-[10px] uppercase font-bold text-zinc-500">Regime Tributário</div>
+                                            <div class="text-xs font-bold text-white mt-0.5">Simples Nacional</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800">
+                                        <div class="text-[10px] uppercase font-bold text-zinc-500">Atividade Principal (CNAE)</div>
+                                        <div class="text-xs font-semibold text-zinc-300 mt-0.5">6201-5/01 - Desenvolvimento de programas de computador sob encomenda</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coluna 2: Segurança, Dispositivos & Notificações (5 cols) -->
+                        <div class="lg:col-span-5 space-y-6">
+                            
+                            <!-- 3. Segurança & Senhas -->
+                            <div class="carbon-card rounded-3xl p-6 sm:p-7 space-y-4">
+                                <div class="pb-3 border-b border-zinc-800">
+                                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> Segurança & 2FA
+                                    </h3>
+                                </div>
+
+                                <div class="space-y-3 text-xs">
+                                    <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                                        <div>
+                                            <div class="font-bold text-white">Biometria / Face ID</div>
+                                            <div class="text-[10px] text-zinc-400">Autenticar compras por biometria</div>
+                                        </div>
+                                        <input type="checkbox" checked class="accent-emerald-400 w-4 h-4 cursor-pointer">
+                                    </div>
+
+                                    <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                                        <div>
+                                            <div class="font-bold text-white">Token Virtual 2FA</div>
+                                            <div class="text-[10px] text-zinc-400">Validação temporal em 2 fatores</div>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Ativo</span>
+                                    </div>
+
+                                    <button onclick="showToastNotification('Formulário de alteração de senha de 8 dígitos aberto.', 'info')" class="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-bold text-zinc-300 hover:text-white transition">
+                                        Alterar Senha de Acesso
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 4. Dispositivos Autorizados -->
+                            <div class="carbon-card rounded-3xl p-6 sm:p-7 space-y-4">
+                                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                        <i data-lucide="smartphone" class="w-4 h-4 text-indigo-400"></i> Dispositivos Conectados
+                                    </h3>
+                                </div>
+
+                                <div class="divide-y divide-zinc-800/80 text-xs">
+                                    <div class="py-2.5 flex items-center justify-between">
+                                        <div class="flex items-center gap-2.5">
+                                            <i data-lucide="laptop" class="w-4 h-4 text-zinc-400"></i>
+                                            <div>
+                                                <div class="font-bold text-white">Web Banking (Esta Sessão)</div>
+                                                <div class="text-[10px] text-zinc-500 font-mono">Chrome 128 • Windows 11</div>
+                                            </div>
+                                        </div>
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    </div>
+
+                                    <div class="py-2.5 flex items-center justify-between">
+                                        <div class="flex items-center gap-2.5">
+                                            <i data-lucide="smartphone" class="w-4 h-4 text-zinc-400"></i>
+                                            <div>
+                                                <div class="font-bold text-white">iPhone 16 Pro Max</div>
+                                                <div class="text-[10px] text-zinc-500 font-mono">App iOS • Visto há 15min</div>
+                                            </div>
+                                        </div>
+                                        <span class="w-2 h-2 rounded-full bg-zinc-600"></span>
+                                    </div>
+                                </div>
+
+                                <button onclick="showToastNotification('Todas as outras sessões foram desconectadas.', 'warning')" class="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/20 transition">
+                                    Encerrar Outras Sessões
+                                </button>
+                            </div>
+
+                            <!-- 5. Notificações -->
+                            <div class="carbon-card rounded-3xl p-6 sm:p-7 space-y-4">
+                                <div class="pb-3 border-b border-zinc-800">
+                                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                        <i data-lucide="bell" class="w-4 h-4 text-amber-400"></i> Preferências de Alertas
+                                    </h3>
+                                </div>
+
+                                <div class="space-y-2.5 text-xs">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-zinc-300">Alertas Pix em Tempo Real</span>
+                                        <input type="checkbox" checked class="accent-amber-400 cursor-pointer">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-zinc-300">Compras no Cartão Carbon</span>
+                                        <input type="checkbox" checked class="accent-amber-400 cursor-pointer">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-zinc-300">Avisos de Boletos DDA</span>
+                                        <input type="checkbox" checked class="accent-amber-400 cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
             </main>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: MEU PERFIL & AJUSTES (PADRÃO BANCO DO BRASIL iOS) ================= -->
-    <div id="profileModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
-        <div class="carbon-card max-w-lg w-full max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-6">
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-xl bg-amber-400/15 text-amber-400 flex items-center justify-center">
-                        <i data-lucide="user" class="w-4 h-4"></i>
-                    </div>
-                    <h3 class="text-base font-black text-white">Meu Perfil & Ajustes</h3>
-                </div>
-                <button onclick="closeModal('profileModal')" class="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Card de Identificação estilo BB iOS -->
-            <div class="p-5 rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-amber-400/10 border-2 border-amber-400/30 flex items-center justify-center font-black text-amber-400 text-lg shadow-lg flex-shrink-0" id="profAvatarBig">
-                    JP
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="text-sm font-extrabold text-white truncate" id="profNameBig">João Paulo Gregorio de Souza</div>
-                    <div class="text-xs text-zinc-400 font-mono mt-0.5" id="profCpfBig">335.483.768-35</div>
-                    <div class="text-[10px] text-emerald-400 font-mono font-semibold mt-1 flex items-center gap-1.5" id="profAccDetails">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Ag. 0001-9 • Cc. 77412-7
-                    </div>
-                </div>
-            </div>
-
-            <!-- Menu de Ajustes estilo BB iOS -->
-            <div class="space-y-2">
-                <div class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 px-1">Minha Conta & Empresa</div>
-                
-                <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/70 border border-zinc-800 overflow-hidden text-xs">
-                    <div onclick="openProfileSubModal('cadastroModal')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center">
-                                <i data-lucide="file-badge" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-white group-hover:text-amber-400 transition">Dados Cadastrais</div>
-                                <div class="text-[10px] text-zinc-400">Nome, CPF, e-mail e endereço fiscal</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
-
-                    <div onclick="showToastNotification('Dados da Vortex Software sincronizados com a Receita Federal.', 'info', 'Vortex Software')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
-                                <i data-lucide="building-2" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-white group-hover:text-amber-400 transition">Dados da Empresa (Vortex Software)</div>
-                                <div class="text-[10px] text-zinc-400">Desenvolvimento de Software LTDA • Simples Nacional</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
-
-                    <div onclick="showToastNotification('Autenticação de 2 Fatores (2FA) e Biometria ativas.', 'success', 'Segurança')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
-                                <i data-lucide="lock" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-white group-hover:text-emerald-400 transition">Segurança & Senhas</div>
-                                <div class="text-[10px] text-zinc-400">Senha de 8 dígitos, biometria e 2FA</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
-
-                    <div onclick="showToastNotification('Dispositivo autenticado: Web Banking Seguro v2.0', 'info')" class="p-4 flex items-center justify-between hover:bg-zinc-800/50 cursor-pointer transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center">
-                                <i data-lucide="smartphone" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-white group-hover:text-indigo-400 transition">Dispositivos Autorizados</div>
-                                <div class="text-[10px] text-zinc-400">Gerencie os navegadores e smartphones com acesso</div>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="closeModal('profileModal')" class="w-full py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs transition">
-                Fechar
-            </button>
-        </div>
-    </div>
-
-    <!-- SUB-MODAL: DADOS CADASTRAIS -->
-    <div id="cadastroModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="file-badge" class="w-4 h-4 text-blue-400"></i> Dados Cadastrais
-                </h3>
-                <button onclick="closeModal('cadastroModal'); openModal('profileModal');" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-zinc-400 mb-1">Nome Completo / Razão Social</label>
-                    <input type="text" id="cadNameInput" value="João Paulo Gregorio de Souza" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white font-semibold">
-                </div>
-                <div>
-                    <label class="block text-zinc-400 mb-1">CPF / CNPJ</label>
-                    <input type="text" id="cadCpfInput" readonly value="335.483.768-35" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-400 font-mono">
-                </div>
-                <div>
-                    <label class="block text-zinc-400 mb-1">E-mail de Notificação</label>
-                    <input type="email" id="cadEmailInput" value="contato@vortexsoftware.com.br" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
-                </div>
-                <div>
-                    <label class="block text-zinc-400 mb-1">Endereço Fiscal / Escritório</label>
-                    <input type="text" value="Av. Paulista, 1000 • Escritório Virtual Contabilizei" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
-                </div>
-            </div>
-
-            <button onclick="saveProfileData()" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase transition">
-                Salvar Alterações
-            </button>
         </div>
     </div>
 
@@ -1018,11 +1006,7 @@
                 </div>
                 <button onclick="closeModal('modalDDA')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
-            <div class="divide-y divide-zinc-800/80 max-h-72 overflow-y-auto space-y-1" id="ddaItemsList">
-                <!-- DDA items rendered dynamically -->
-            </div>
-
+            <div class="divide-y divide-zinc-800/80 max-h-72 overflow-y-auto space-y-1" id="ddaItemsList"></div>
             <button onclick="closeModal('modalDDA')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Fechar</button>
         </div>
     </div>
@@ -1041,9 +1025,7 @@
                             <div class="text-[9px] text-zinc-400 uppercase font-mono">Vortex Software • Carbon Black</div>
                         </div>
                     </div>
-                    <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                        Fatura Fechada
-                    </span>
+                    <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Fatura Fechada</span>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 flex items-center justify-between">
@@ -1053,8 +1035,8 @@
                         <div class="text-[11px] text-zinc-400 mt-0.5">Vencimento: <strong class="text-white">10/09/2026</strong></div>
                     </div>
                     <div class="text-right text-xs text-zinc-400">
-                        <div>Melhor dia de compra: <strong>03</strong></div>
-                        <div>Limite Utilizado: <strong>R$ 8.371,00</strong></div>
+                        <div>Melhor dia: <strong>03</strong></div>
+                        <div>Utilizado: <strong>R$ 8.371,00</strong></div>
                     </div>
                 </div>
 
@@ -1070,9 +1052,7 @@
                 <button onclick="downloadInvoicePDF()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
                     <i data-lucide="download" class="w-4 h-4"></i> Baixar Fatura em PDF
                 </button>
-                <button onclick="closeModal('invoiceModal')" class="px-4 py-3.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition">
-                    Fechar
-                </button>
+                <button onclick="closeModal('invoiceModal')" class="px-4 py-3.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition">Fechar</button>
             </div>
         </div>
     </div>
@@ -1084,17 +1064,14 @@
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
                     <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i> Depositar Fundos (Faucet)
                 </h3>
-                <button onclick="closeModal('depositModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeModal('depositModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
             <form onsubmit="handleDeposit(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Valor do Depósito (R$)</label>
                     <input type="number" step="0.01" min="1.00" id="depositAmount" value="5000.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-emerald-400 focus:outline-none text-sm text-white font-bold">
                 </div>
-
                 <div id="depositAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
-
                 <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition">
                     Adicionar Saldo à Conta
                 </button>
@@ -1109,9 +1086,8 @@
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
                     <i data-lucide="send" class="w-5 h-5 text-amber-400"></i> Transferência Pix Instantânea
                 </h3>
-                <button onclick="closeModal('modalPixTransfer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeModal('modalPixTransfer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
             <form onsubmit="handlePixTransfer(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Chave Pix de Destino (CPF)</label>
@@ -1122,10 +1098,9 @@
                     <input type="number" step="0.01" min="0.01" id="pixAmountInput" value="150.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-white font-mono font-bold">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Descrição / Mensagem</label>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Descrição</label>
                     <input type="text" id="pixDescInput" value="Pagamento Pix Web Banking" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white">
                 </div>
-                <div id="pixAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
                 <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider transition">
                     Confirmar Envio Pix
                 </button>
@@ -1145,15 +1120,14 @@
                 </div>
                 <button onclick="closeModal('modalBoletoPay')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
             <form onsubmit="handlePayBoleto(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-zinc-400 mb-1">Linha Digitável (47 dígitos)</label>
-                    <input type="text" id="boletoLineInput" value="23793.38128 60000.120004 06330.412345 9 98760000035000" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-white">
+                    <input type="text" value="23793.38128 60000.120004 06330.412345 9 98760000035000" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-white">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor a Pagar (R$)</label>
-                    <input type="number" step="0.01" min="0.01" id="boletoAmountInput" value="350.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white font-mono">
+                    <input type="number" step="0.01" min="0.01" value="350.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white font-mono">
                 </div>
                 <button type="submit" class="w-full py-3.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-extrabold text-xs uppercase tracking-wider transition">
                     Confirmar Pagamento do Boleto
@@ -1167,6 +1141,7 @@
         let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
         let currentAccount = null;
         let isBalanceHidden = false;
+        let isSidebarCollapsed = false;
         let sessionSeconds = 899;
         let toastTimeout = null;
 
@@ -1175,6 +1150,21 @@
             v = String(v).replace(/\D/g, "");
             if (v.length === 11) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
             return v;
+        }
+
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('mainSidebar');
+            const icon = document.getElementById('sidebarToggleIcon');
+            isSidebarCollapsed = !isSidebarCollapsed;
+
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('sidebar-collapsed');
+                if (icon) icon.setAttribute('data-lucide', 'chevrons-right');
+            } else {
+                sidebar.classList.remove('sidebar-collapsed');
+                if (icon) icon.setAttribute('data-lucide', 'chevrons-left');
+            }
+            lucide.createIcons();
         }
 
         function showToastNotification(message, type = 'success', title = '') {
@@ -1230,43 +1220,6 @@
             }
         }
 
-        function openProfileModal() {
-            const isJoao = !currentAuthUser || currentAuthUser.tax_id === '33548376835';
-            const fullName = isJoao ? 'João Paulo Gregorio de Souza' : 'Maria Silva Santos';
-            const cpf = formatCPF(isJoao ? '33548376835' : '12345678900');
-            const initials = isJoao ? 'JP' : 'MS';
-            const accNum = isJoao ? '77412-7' : '88921-3';
-
-            document.getElementById('profAvatarBig').innerText = initials;
-            document.getElementById('profNameBig').innerText = fullName;
-            document.getElementById('profCpfBig').innerText = cpf;
-            document.getElementById('profAccDetails').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Ag. 0001-9 • Cc. ${accNum}`;
-
-            document.getElementById('cadNameInput').value = fullName;
-            document.getElementById('cadCpfInput').value = cpf;
-            document.getElementById('cadEmailInput').value = isJoao ? 'joao.paulo@vortexsoftware.com.br' : 'maria.silva@vortexsoftware.com.br';
-
-            openModal('profileModal');
-            lucide.createIcons();
-        }
-
-        function openProfileSubModal(id) {
-            closeModal('profileModal');
-            openModal(id);
-            lucide.createIcons();
-        }
-
-        function saveProfileData() {
-            const newName = document.getElementById('cadNameInput').value.trim();
-            if (newName && currentAuthUser) {
-                currentAuthUser.full_name = newName;
-                localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
-                showApp();
-                closeModal('cadastroModal');
-                showToastNotification('Dados cadastrais atualizados com sucesso!', 'success');
-            }
-        }
-
         function switchAuthTab(tab) {
             const isLogin = tab === 'login';
             document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
@@ -1295,6 +1248,7 @@
             const fullName = isJoao ? 'João Paulo Gregorio de Souza' : 'Maria Silva Santos';
             const cpfFormatted = formatCPF(isJoao ? '33548376835' : '12345678900');
             const initials = isJoao ? 'JP' : 'MS';
+            const accNumber = isJoao ? '77412-7' : '88921-3';
 
             document.getElementById('sideUserName').innerText = fullName;
             document.getElementById('topUserName').innerText = fullName;
@@ -1302,9 +1256,20 @@
             document.getElementById('topUserAvatar').innerText = initials;
             document.getElementById('mainPixCpf').innerText = cpfFormatted;
 
+            // Preenchimento da Página Dedicada de Perfil
+            document.getElementById('perfilHeroAvatar').innerText = initials;
+            document.getElementById('perfilHeroName').innerText = fullName;
+            document.getElementById('perfilHeroCpf').innerText = 'CPF: ' + cpfFormatted;
+            document.getElementById('perfilHeroAcc').innerText = `Ag. 0001-9 • Cc. ${accNumber}`;
+            document.getElementById('perfilHeroSegment').innerText = isJoao ? 'Segmento: Vortex Carbon Black Corporate' : 'Segmento: Vortex Carbon Platinum';
+            document.getElementById('perfilInputName').value = fullName;
+            document.getElementById('perfilInputCpf').value = cpfFormatted;
+            document.getElementById('perfilInputEmail').value = isJoao ? 'joao.paulo@vortexsoftware.com.br' : 'maria.silva@vortexsoftware.com.br';
+
             if (isJoao) {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 50.000,00';
                 document.getElementById('mainLimitDisplay').innerText = 'R$ 50.000,00';
+                document.getElementById('creditMaxDisplay').innerText = 'R$ 50.000,00';
                 document.getElementById('cardBadgeType').innerText = 'Carbon Black';
                 document.getElementById('miniCardNumber').innerText = '•••• 4289';
                 document.getElementById('miniCardHolder').innerText = 'JOAO PAULO SOUZA';
@@ -1359,6 +1324,7 @@
             } else {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 35.000,00';
                 document.getElementById('mainLimitDisplay').innerText = 'R$ 35.000,00';
+                document.getElementById('creditMaxDisplay').innerText = 'R$ 35.000,00';
                 document.getElementById('cardBadgeType').innerText = 'Carbon Platinum';
                 document.getElementById('miniCardNumber').innerText = '•••• 8821';
                 document.getElementById('miniCardHolder').innerText = 'MARIA SILVA SANTOS';
@@ -1374,20 +1340,12 @@
                         <div><div class="text-sm font-extrabold text-white">Latam Airlines Brasil</div><div class="text-xs text-zinc-400">Passagem SP-RJ • 29/Ago</div></div>
                         <div class="text-right"><div class="text-sm font-black text-white font-mono">R$ 890,00</div><div class="text-xs text-blue-400">em 5x no crédito</div></div>
                     </div>
-                    <div class="py-3.5 flex items-center justify-between hover:bg-zinc-900/50 rounded-xl px-2 transition">
-                        <div><div class="text-sm font-extrabold text-white">Google Workspace</div><div class="text-xs text-zinc-400">Assinatura Corporativa • 27/Ago</div></div>
-                        <div class="text-right"><div class="text-sm font-black text-white font-mono">R$ 142,50</div><div class="text-[10px] text-zinc-500">no crédito</div></div>
-                    </div>
                 `;
                 document.getElementById('ddaSubtitle').innerText = 'Emitidos para Maria Silva Santos (CPF)';
                 document.getElementById('ddaItemsList').innerHTML = `
                     <div class="py-3 flex items-center justify-between">
                         <div><div class="text-xs font-bold text-white">Condomínio Edifício Paulista</div><div class="text-[10px] text-zinc-500 font-mono">Vencimento: 08/09/2026 • DDA CIP</div></div>
                         <div class="text-right"><div class="text-xs font-black text-white font-mono">R$ 650,00</div><button onclick="showToastNotification('Boleto Condomínio quitado!', 'success')" class="text-[10px] font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 mt-1">Pagar Agora</button></div>
-                    </div>
-                    <div class="py-3 flex items-center justify-between">
-                        <div><div class="text-xs font-bold text-white">Unimed Saúde PJ</div><div class="text-[10px] text-zinc-500 font-mono">Vencimento: 12/09/2026 • DDA CIP</div></div>
-                        <div class="text-right"><div class="text-xs font-black text-white font-mono">R$ 890,00</div><button onclick="showToastNotification('Boleto Unimed quitado!', 'success')" class="text-[10px] font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 mt-1">Pagar Agora</button></div>
                     </div>
                 `;
                 document.getElementById('cobrancasTableBody').innerHTML = `
@@ -1405,6 +1363,17 @@
             await loadStatement();
             navigateTo('inicio');
             lucide.createIcons();
+        }
+
+        function saveProfilePageData(e) {
+            e.preventDefault();
+            const newName = document.getElementById('perfilInputName').value.trim();
+            if (newName && currentAuthUser) {
+                currentAuthUser.full_name = newName;
+                localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
+                showApp();
+                showToastNotification('Dados cadastrais da Vortex Software atualizados com sucesso!', 'success');
+            }
         }
 
         async function loadOrCreateAccount() {
@@ -1628,7 +1597,7 @@
                 showToastNotification(`Depósito de R$ ${amount.toFixed(2).replace('.',',')} adicionado!`, 'success');
             } catch (err) {
                 closeModal('depositModal');
-                showToastNotification(`Depósito simulado adicionado!`, 'success');
+                showToastNotification(`Depósito adicionado ao saldo!`, 'success');
             }
         }
 
@@ -1693,7 +1662,8 @@
                 'pagar': 'Central de Pagamentos',
                 'cobrancas': 'Cobranças & Faturamento',
                 'invest': 'BankCore Invest',
-                'credito': 'Empréstimos & Crédito'
+                'credito': 'Empréstimos & Crédito',
+                'perfil': 'Meu Perfil & Ajustes'
             };
             document.getElementById('topBreadcrumb').innerText = breadcrumbMap[viewName] || viewName;
             lucide.createIcons();
