@@ -9,6 +9,7 @@ from app.schemas import AccountCreateRequest, AccountResponse, TransactionRespon
 
 router = APIRouter(prefix="/accounts", tags=["Contas Bancárias"])
 
+@router.post("", response_model=AccountResponse, status_code=201)
 @router.post("/", response_model=AccountResponse, status_code=201)
 async def create_or_get_account(payload: AccountCreateRequest, db: AsyncSession = Depends(get_db)):
     query = select(Account).where(Account.user_id == payload.user_id).order_by(Account.created_at.asc())
