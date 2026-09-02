@@ -19,7 +19,7 @@
 </head>
 <body class="text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Header / Navbar C6 Style -->
+    <!-- Header / Navbar -->
     <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -93,7 +93,6 @@
                     <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-zinc-400 hover:text-white">Abrir Conta Carbon</button>
                 </div>
 
-                <!-- Login Form -->
                 <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 mb-1.5">CPF do Correntista</label>
@@ -109,7 +108,6 @@
                     </button>
                 </form>
 
-                <!-- Register Form -->
                 <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Nome Completo</label>
@@ -143,7 +141,7 @@
             <!-- Top Row: Balance + Virtual Card -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <!-- Left: Balance & Quick Actions (7 Cols) -->
+                <!-- Left: Balance & Quick Actions -->
                 <div class="lg:col-span-7 carbon-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950">
                     <div>
                         <div class="flex items-center justify-between mb-4">
@@ -169,7 +167,7 @@
                         </div>
                     </div>
 
-                    <!-- Quick Actions Pills C6 -->
+                    <!-- Quick Actions Pills -->
                     <div class="pt-6 border-t border-zinc-800/80">
                         <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3">Ações Rápidas</div>
                         <div class="flex flex-wrap items-center gap-3">
@@ -186,14 +184,11 @@
                     </div>
                 </div>
 
-                <!-- Right: Interactive Virtual Credit Card (5 Cols) -->
+                <!-- Right: Interactive Virtual Credit Card -->
                 <div class="lg:col-span-5 flex flex-col justify-between gap-4">
-                    
-                    <!-- 3D-Like Physical Card -->
                     <div id="virtualCard" class="card-theme-carbon rounded-3xl p-6 sm:p-7 shadow-2xl relative flex flex-col justify-between h-56 transition-all duration-500 overflow-hidden">
                         <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
 
-                        <!-- Card Header -->
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 rounded-lg bg-zinc-900/80 border border-amber-500/50 flex items-center justify-center">
@@ -207,7 +202,6 @@
                             </div>
                         </div>
 
-                        <!-- Chip -->
                         <div class="flex items-center gap-3 my-2">
                             <div class="w-10 h-8 rounded-lg bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-200 border border-amber-600/40 shadow-inner flex items-center justify-center">
                                 <div class="w-6 h-5 border border-amber-800/40 rounded-sm grid grid-cols-2 gap-0.5 opacity-60">
@@ -218,7 +212,6 @@
                             <span class="text-xs font-mono text-zinc-400 tracking-widest">•••• 4289</span>
                         </div>
 
-                        <!-- Card Footer -->
                         <div class="flex items-end justify-between">
                             <div>
                                 <div class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Titular do Cartão</div>
@@ -253,7 +246,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[10px] uppercase font-bold text-zinc-500">Chave Pix (Account UUID)</div>
-                        <div class="text-xs font-mono text-zinc-300 truncate" id="accountIdFull">---</div>
+                        <div class="text-xs font-mono text-zinc-300 truncate select-all" id="accountIdFull">---</div>
                     </div>
                     <button onclick="copyPixKey()" class="text-xs font-bold text-amber-400 hover:text-amber-300 p-2 hover:bg-zinc-800 rounded-xl transition">
                         <i data-lucide="copy" class="w-4 h-4"></i>
@@ -265,7 +258,7 @@
                         <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Entradas</div>
+                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Entradas (Créditos)</div>
                         <div class="text-sm font-extrabold text-emerald-400 font-mono" id="totalIncomeDisplay">+ R$ 0,00</div>
                     </div>
                 </div>
@@ -275,7 +268,7 @@
                         <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Saídas</div>
+                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Saídas (Débitos)</div>
                         <div class="text-sm font-extrabold text-rose-400 font-mono" id="totalExpenseDisplay">- R$ 0,00</div>
                     </div>
                 </div>
@@ -317,8 +310,8 @@
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
                         <label class="block text-xs font-semibold text-zinc-400">UUID da Conta Destino</label>
-                        <button type="button" onclick="selectQuickContact()" id="btnQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-                            ⚡ Preencher Contato
+                        <button type="button" onclick="selectQuickContact()" id="btnQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
+                            ⚡ Preencher Destinatário
                         </button>
                     </div>
                     <input type="text" id="transferDestId" required placeholder="Cole o UUID da conta destino" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-xs font-mono text-white">
@@ -377,6 +370,20 @@
     </div>
 
     <script>
+        // Contas Oficiais Demo cadastradas
+        const DEMO_ACCOUNTS = {
+            JOAO: {
+                tax_id: '33548376835',
+                name: 'JOÃO PAULO GREGORIO DE SOUZA',
+                account_id: 'da6ce33e-36a7-4f39-89bb-d8ba42334309'
+            },
+            MARIA: {
+                tax_id: '12345678900',
+                name: 'MARIA SILVA SANTOS',
+                account_id: 'ac7d8886-06d5-4e84-8be0-cb9b9cc63f34'
+            }
+        };
+
         let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
         let currentAccount = null;
         let isBalanceHidden = false;
@@ -419,7 +426,7 @@
             const fullName = currentAuthUser.full_name || 'Correntista';
             document.getElementById('cardHolderName').innerText = fullName;
 
-            const isJoao = currentAuthUser.tax_id === '33548376835';
+            const isJoao = currentAuthUser.tax_id === DEMO_ACCOUNTS.JOAO.tax_id;
             document.getElementById('btnQuickContact').innerText = isJoao ? '⚡ Enviar para Maria Silva' : '⚡ Enviar para João Paulo';
 
             await loadOrCreateAccount();
@@ -492,16 +499,6 @@
 
         async function loadOrCreateAccount() {
             try {
-                let storedAccId = localStorage.getItem(`bankcore_acc_${currentAuthUser.id}`);
-                if (storedAccId) {
-                    const res = await fetch(`/accounts/${storedAccId}`);
-                    if (res.ok) {
-                        currentAccount = await res.json();
-                        updateAccountUI();
-                        return;
-                    }
-                }
-
                 const res = await fetch('/accounts/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -510,7 +507,6 @@
 
                 if (res.ok) {
                     currentAccount = await res.json();
-                    localStorage.setItem(`bankcore_acc_${currentAuthUser.id}`, currentAccount.id);
                     updateAccountUI();
                 }
             } catch (err) {
@@ -543,12 +539,10 @@
                 }
 
                 container.innerHTML = txs.map(tx => {
-                    // Identificação precisa de Entrada vs Saída
                     const isDeposit = tx.transaction_type === 'DEPOSIT';
-                    const isReceivedPix = tx.transaction_type === 'TRANSFER' && tx.destination_account_id === currentAccount.id;
+                    const isReceivedPix = tx.transaction_type === 'TRANSFER' && String(tx.destination_account_id).toLowerCase() === String(currentAccount.id).toLowerCase();
                     const isCredit = isDeposit || isReceivedPix;
 
-                    // Formatação do Horário Real de Brasília (GMT-3)
                     const rawDate = tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z';
                     const formattedDate = new Date(rawDate).toLocaleString('pt-BR', { 
                         timeZone: 'America/Sao_Paulo',
@@ -635,6 +629,12 @@
             const description = document.getElementById('transferDesc').value.trim() || 'Pix BankCore Carbon';
             const idempotency_key = 'pix_' + Date.now() + '_' + Math.random().toString(36).substring(7);
 
+            // Bloqueio de auto-transferência
+            if (destination_account_id.toLowerCase() === currentAccount.id.toLowerCase()) {
+                showAlert('transferAlert', 'Não é possível fazer Pix para a sua própria conta.', 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
+                return;
+            }
+
             try {
                 showAlert('transferAlert', 'Executando Pix com isolamento ACID...', 'bg-amber-400/20 text-amber-300');
                 const res = await fetch('/transactions/transfer', {
@@ -664,28 +664,14 @@
             }
         }
 
-        async function selectQuickContact() {
-            try {
-                const targetCpf = currentAuthUser.tax_id === '33548376835' ? '12345678900' : '33548376835';
-                const resLogin = await fetch('/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tax_id: targetCpf, password: 'teste123456' })
-                });
-
-                if (resLogin.ok) {
-                    const d = await resLogin.json();
-                    const p = JSON.parse(atob(d.access_token.split('.')[1]));
-                    const resAcc = await fetch('/accounts/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ user_id: p.sub })
-                    });
-                    const accData = await resAcc.json();
-                    document.getElementById('transferDestId').value = accData.id;
-                }
-            } catch (e) {
-                console.error(e);
+        function selectQuickContact() {
+            const isJoao = currentAuthUser.tax_id === DEMO_ACCOUNTS.JOAO.tax_id;
+            if (isJoao) {
+                // Se o João estiver logado, preenche o UUID da Maria
+                document.getElementById('transferDestId').value = DEMO_ACCOUNTS.MARIA.account_id;
+            } else {
+                // Se a Maria estiver logada, preenche o UUID do João
+                document.getElementById('transferDestId').value = DEMO_ACCOUNTS.JOAO.account_id;
             }
         }
 
