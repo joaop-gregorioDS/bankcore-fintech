@@ -153,14 +153,14 @@
 
                 <div class="p-4 border-b border-zinc-800/80">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="truncate text-xs font-bold text-zinc-300" id="sideUserName">Correntista</div>
+                        <div class="truncate text-xs font-bold text-zinc-300" id="sideUserName">João Paulo</div>
                         <button onclick="toggleBalanceVisibility()" class="text-zinc-500 hover:text-amber-400 transition" title="Ocultar Saldo">
                             <i id="sideEyeIcon" data-lucide="eye" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                     <div class="text-[10px] text-zinc-500 font-semibold uppercase">Saldo Disponível</div>
                     <div class="text-lg font-black text-white tracking-tight flex items-baseline gap-1" id="sideBalanceDisplay">
-                        <span class="text-xs text-zinc-500 font-normal">R$</span> 0,00
+                        <span class="text-xs text-zinc-500 font-normal">R$</span> 10.000,00
                     </div>
                     <div class="mt-2 text-[10px] text-zinc-400 flex items-center justify-between">
                         <span>Limite Carbon:</span>
@@ -179,7 +179,7 @@
                         <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400"></i> Central de Cartões
                     </button>
                     <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="qr-code" class="w-4 h-4 text-zinc-400"></i> Central Pix
+                        <i data-lucide="qr-code" class="w-4 h-4 text-amber-400"></i> Central Pix
                     </button>
                     <button onclick="navigateTo('pagar')" id="nav-pagar" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
                         <i data-lucide="barcode" class="w-4 h-4 text-amber-400"></i> Central de Pagamentos
@@ -218,7 +218,7 @@
                 <div class="flex items-center gap-2 text-xs font-semibold text-zinc-400">
                     <span class="text-zinc-500 hover:text-white cursor-pointer" onclick="navigateTo('inicio')">🏠 Início</span>
                     <span>/</span>
-                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Central de Pagamentos</span>
+                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Visão Geral</span>
                 </div>
 
                 <div class="flex items-center gap-4 text-xs">
@@ -263,7 +263,7 @@
                                 </div>
                                 <div class="flex items-baseline gap-2 mb-2">
                                     <span class="text-2xl font-bold text-zinc-500">R$</span>
-                                    <h2 id="mainBalanceDisplay" class="text-4xl sm:text-5xl font-black text-white tracking-tight">0,00</h2>
+                                    <h2 id="mainBalanceDisplay" class="text-4xl sm:text-5xl font-black text-white tracking-tight">10.000,00</h2>
                                 </div>
                                 <div class="text-xs text-zinc-400 flex items-center gap-2 mb-6">
                                     <span>Limite Carbon Black disponível:</span>
@@ -318,7 +318,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="text-[10px] uppercase font-bold text-zinc-500">Chave Pix Principal (CPF)</div>
-                                <div class="text-sm font-bold font-mono text-amber-400 truncate" id="mainPixCpf">---</div>
+                                <div class="text-sm font-bold font-mono text-amber-400 truncate" id="mainPixCpf">335.483.768-35</div>
                             </div>
                             <button onclick="copyPixKey()" class="text-xs text-amber-400 hover:text-amber-300 p-2 hover:bg-zinc-800 rounded-xl transition">
                                 <i data-lucide="copy" class="w-4 h-4"></i>
@@ -331,7 +331,7 @@
                             </div>
                             <div>
                                 <div class="text-[10px] uppercase font-bold text-zinc-500">Total de Entradas (Mês)</div>
-                                <div class="text-sm font-extrabold text-emerald-400 font-mono" id="mainTotalIncome">+ R$ 0,00</div>
+                                <div class="text-sm font-extrabold text-emerald-400 font-mono" id="mainTotalIncome">+ R$ 10.000,00</div>
                             </div>
                         </div>
 
@@ -357,7 +357,7 @@
                             </button>
                         </div>
                         <div id="mainRecentTransactions" class="divide-y divide-zinc-800/80">
-                            <div class="text-center py-8 text-zinc-500 text-xs">Carregando movimentações...</div>
+                            <!-- Transactions rendered dynamically -->
                         </div>
                     </div>
                 </section>
@@ -388,7 +388,7 @@
                         </div>
 
                         <div id="fullStatementList" class="divide-y divide-zinc-800/80">
-                            <div class="text-center py-12 text-zinc-500 text-sm">Carregando extrato bancário...</div>
+                            <!-- Statement list rendered dynamically -->
                         </div>
                     </div>
                 </section>
@@ -822,7 +822,6 @@
                 <!-- 5. VIEW: CENTRAL DE PAGAMENTOS (PADRÃO BB iOS + VORTEX SOFTWARE) -->
                 <section id="view-pagar" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
                     
-                    <!-- Header Section -->
                     <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                         <div>
                             <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
@@ -838,7 +837,6 @@
                         </button>
                     </div>
 
-                    <!-- Top Card: Saldo vs Agendamentos (BB iOS Style) -->
                     <div class="carbon-card rounded-3xl p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-6 bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950">
                         <div>
                             <div class="text-xs font-semibold text-zinc-400">Saldo disponível</div>
@@ -852,7 +850,6 @@
                         </div>
                     </div>
 
-                    <!-- Grid de 4 Ações Rápidas Circulares (BB iOS Style) -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
                         <button onclick="openModal('modalBoletoPay')" class="p-4 rounded-2xl carbon-card hover:bg-zinc-800/60 border border-zinc-800 flex flex-col items-center text-center gap-2.5 group transition">
                             <div class="w-13 h-13 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center p-3 transition">
@@ -883,7 +880,6 @@
                         </button>
                     </div>
 
-                    <!-- 1. GRUPO: AGENDA DE BOLETOS (DDA) -->
                     <div class="space-y-3">
                         <div>
                             <h3 class="text-lg font-black text-white">Agenda de boletos</h3>
@@ -923,7 +919,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. GRUPO: DÉBITO AUTOMÁTICO -->
                     <div class="space-y-3">
                         <div>
                             <h3 class="text-lg font-black text-white">Débito automático</h3>
@@ -963,7 +958,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. GRUPO: GERENCIAR PAGAMENTOS -->
                     <div class="space-y-3">
                         <h3 class="text-lg font-black text-white">Gerenciar pagamentos</h3>
                         <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
@@ -1132,8 +1126,6 @@
             </main>
         </div>
     </div>
-
-    <!-- ================= MODAIS DA CENTRAL DE PAGAMENTOS ================= -->
 
     <!-- MODAL: PAGAR BOLETO -->
     <div id="modalBoletoPay" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
@@ -1357,17 +1349,108 @@
         </div>
     </div>
 
+    <!-- MODAL: FATURA DO CARTÃO EM PDF -->
+    <div id="invoiceModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+        <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
+            <div id="invoicePrintableArea" class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 space-y-5 text-white">
+                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
+                            <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-extrabold text-white leading-tight">Bank<span class="text-amber-400">Core</span> Card</div>
+                            <div class="text-[9px] text-zinc-400 uppercase font-mono">Vortex Software • Carbon Black</div>
+                        </div>
+                    </div>
+                    <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        Fatura Fechada
+                    </span>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-zinc-500">Total da Fatura</div>
+                        <div class="text-2xl font-black text-amber-400 font-mono">R$ 2.296,07</div>
+                        <div class="text-[11px] text-zinc-400 mt-0.5">Vencimento: <strong class="text-white">10/09/2026</strong></div>
+                    </div>
+                    <div class="text-right text-xs text-zinc-400">
+                        <div>Melhor dia de compra: <strong>03</strong></div>
+                        <div>Limite Utilizado: <strong>R$ 8.371,00</strong></div>
+                    </div>
+                </div>
+
+                <div class="divide-y divide-zinc-800/60 text-xs">
+                    <div class="py-2 flex justify-between">
+                        <div>
+                            <div class="font-bold text-white">Pg *qb Quero</div>
+                            <div class="text-[10px] text-zinc-500">30/Ago • 6x de R$ 37,48</div>
+                        </div>
+                        <div class="font-bold text-white font-mono">R$ 224,90</div>
+                    </div>
+                    <div class="py-2 flex justify-between">
+                        <div>
+                            <div class="font-bold text-white">Mp*aliexpress</div>
+                            <div class="text-[10px] text-zinc-500">28/Ago • À vista</div>
+                        </div>
+                        <div class="font-bold text-white font-mono">R$ 1.302,18</div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-zinc-800 space-y-1.5">
+                    <div class="text-[9px] uppercase font-bold text-zinc-500">Linha Digitável para Pagamento</div>
+                    <div class="text-[10px] font-mono text-zinc-300 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 break-all select-all">
+                        00190.00009 02891.234567 89000.000018 1 98760000229607
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                <button onclick="downloadInvoicePDF()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Baixar Fatura em PDF
+                </button>
+                <button onclick="closeModal('invoiceModal')" class="px-4 py-3.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DEPOSITAR FUNDOS -->
+    <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-8 relative border border-zinc-700 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i> Depositar Fundos (Faucet)
+                </h3>
+                <button onclick="closeModal('depositModal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form onsubmit="handleDeposit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Valor do Depósito (R$)</label>
+                    <input type="number" step="0.01" min="1.00" id="depositAmount" value="5000.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-emerald-400 focus:outline-none text-sm text-white font-bold">
+                </div>
+
+                <div id="depositAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
+
+                <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition">
+                    Adicionar Saldo à Conta
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- SPA LOGIC -->
     <script>
         let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
         let currentAccount = null;
         let isBalanceHidden = false;
-        let isCardBlocked = false;
         let sessionSeconds = 899;
         let toastTimeout = null;
 
         function formatCPF(v) {
-            if (!v) return '---';
+            if (!v) return '335.483.768-35';
             v = String(v).replace(/\D/g, "");
             if (v.length === 11) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
             return v;
@@ -1414,197 +1497,6 @@
             }, 4000);
         }
 
-        function fillBoletoPreset(desc, amount) {
-            document.getElementById('boletoDescInput').value = desc;
-            document.getElementById('boletoAmountInput').value = amount;
-            document.getElementById('boletoLineInput').value = '23793.' + Math.floor(10000+Math.random()*90000) + ' ' + Math.floor(10000+Math.random()*90000) + '.' + Math.floor(100000+Math.random()*900000) + ' 12000.063304 9 ' + Math.floor(10000000000000+Math.random()*90000000000000);
-        }
-
-        async function handlePayBoleto(e) {
-            e.preventDefault();
-            const amount = parseFloat(document.getElementById('boletoAmountInput').value);
-            const desc = document.getElementById('boletoDescInput').value;
-
-            if (!currentAccount || currentAccount.balance_reais < amount) {
-                showToastNotification('Saldo em conta insuficiente para liquidar este boleto.', 'error');
-                return;
-            }
-
-            try {
-                const res = await fetch('/transactions/deposit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        account_id: currentAccount.id,
-                        amount_reais: -amount,
-                        idempotency_key: 'bol_' + Date.now()
-                    })
-                });
-
-                closeModal('modalBoletoPay');
-                showToastNotification(`Boleto de R$ ${amount.toFixed(2).replace('.',',')} (${desc}) pago com sucesso!`, 'success');
-                await refreshDashboard();
-            } catch (err) {
-                closeModal('modalBoletoPay');
-                showToastNotification('Boleto pago com sucesso!', 'success');
-            }
-        }
-
-        async function payDdaItem(beneficiario, valor) {
-            if (!currentAccount || currentAccount.balance_reais < valor) {
-                showToastNotification('Saldo em conta insuficiente para liquidar este DDA.', 'error');
-                return;
-            }
-
-            try {
-                await fetch('/transactions/deposit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        account_id: currentAccount.id,
-                        amount_reais: -valor,
-                        idempotency_key: 'dda_' + Date.now()
-                    })
-                });
-
-                closeModal('modalDDA');
-                showToastNotification(`Boleto DDA de ${beneficiario} (R$ ${valor.toFixed(2).replace('.',',')}) quitado com sucesso!`, 'success');
-                await refreshDashboard();
-            } catch (err) {
-                closeModal('modalDDA');
-                showToastNotification('Boleto DDA quitado!', 'success');
-            }
-        }
-
-        function exportStatementCSV() {
-            if (!window._currentTransactions || window._currentTransactions.length === 0) {
-                showToastNotification('Nenhuma movimentação no extrato para exportar.', 'warning');
-                return;
-            }
-
-            const now = new Date().toLocaleString('pt-BR', { 
-                timeZone: 'America/Sao_Paulo',
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-
-            let csv = "\uFEFF";
-            csv += `RELATÓRIO CONTÁBIL OFICIAL - BANKCORE | VORTEX SOFTWARE\n`;
-            csv += `Titular da Conta;${currentAuthUser.full_name || 'Correntista'}\n`;
-            csv += `CPF / CNPJ;${formatCPF(currentAuthUser.tax_id)}\n`;
-            csv += `Conta Corrente;${currentAccount ? currentAccount.account_number : '---'}\n`;
-            csv += `Saldo Atual;R$ ${currentAccount ? currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}\n`;
-            csv += `Emissão;${now} (Horário Oficial de Brasília)\n`;
-            csv += `Motor Contábil;ACID Ledger Protocol v1.0.0 • SPI Banco Central\n\n`;
-
-            csv += `Data;Hora (GMT-3);Identificação da Transação;Tipo;Operação;Valor (R$);Status;Código de Autenticação / Protocolo E2E\n`;
-
-            window._currentTransactions.forEach(tx => {
-                const isCredit = tx.direction === 'CREDIT';
-                const rawDate = tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z';
-                const d = new Date(rawDate);
-                const dateStr = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-                const timeStr = d.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-
-                let title = tx.description || tx.transaction_type;
-                if (tx.transaction_type === 'TRANSFER') {
-                    title = isCredit ? 'Pix Recebido' : 'Pix Enviado';
-                }
-
-                const operacao = isCredit ? 'CRÉDITO (+)' : 'DÉBITO (-)';
-                const valorFormatado = (isCredit ? '' : '-') + tx.amount_reais.toFixed(2).replace('.', ',');
-                const protocolo = 'E2E-' + tx.idempotency_key;
-
-                csv += `"${dateStr}";"${timeStr}";"${title}";"${tx.transaction_type}";"${operacao}";"${valorFormatado}";"${tx.status}";"${protocolo}"\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const filename = `Extrato_BankCore_Vortex_${Date.now()}.csv`;
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-
-            showToastNotification(`Arquivo contábil baixado: ${filename}`, 'success', 'Extrato CSV Gerado');
-        }
-
-        function openInvoiceModal() {
-            openModal('invoiceModal');
-            lucide.createIcons();
-        }
-
-        function downloadInvoicePDF() {
-            const element = document.getElementById('invoicePrintableArea');
-            const opt = {
-                margin:       10,
-                filename:     `Fatura_Cartao_BankCore_${Date.now()}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, backgroundColor: '#09090b' },
-                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-            showToastNotification('Fatura do cartão baixada em PDF!', 'success');
-        }
-
-        async function payInvoiceDirectly() {
-            const invoiceValue = 2296.07;
-            if (!currentAccount || currentAccount.balance_reais < invoiceValue) {
-                showToastNotification('Saldo em conta insuficiente para pagar a fatura.', 'error');
-                return;
-            }
-
-            try {
-                await fetch('/transactions/deposit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        account_id: currentAccount.id,
-                        amount_reais: -invoiceValue,
-                        idempotency_key: 'pay_inv_' + Date.now()
-                    })
-                });
-
-                closeModal('invoiceModal');
-                document.getElementById('cardInvoiceValue').innerText = 'R$ 0,00';
-                document.getElementById('cardLimitUsed').innerText = 'R$ 6.074,93';
-                document.getElementById('cardLimitAvailable').innerText = 'R$ 14.556,07';
-                showToastNotification('Fatura de R$ 2.296,07 paga com sucesso!', 'success');
-                await refreshDashboard();
-            } catch (err) {
-                closeModal('invoiceModal');
-                showToastNotification('Fatura quitada com sucesso via saldo!', 'success');
-            }
-        }
-
-        function generateVirtualCard() {
-            const num = '4289 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
-            const cvv = Math.floor(100 + Math.random() * 900);
-            showToastNotification(`Novo cartão virtual gerado: ${num} • CVV: ${cvv}`, 'success', 'Cartão Virtual Ativo');
-        }
-
-        function toggleCardBlock() {
-            isCardBlocked = !isCardBlocked;
-            const btn = document.getElementById('btnCardBlock');
-            const icon = document.getElementById('iconCardBlock');
-            const text = document.getElementById('textCardBlock');
-
-            if (isCardBlocked) {
-                icon.className = 'w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center transition';
-                icon.innerHTML = '<i data-lucide="lock" class="w-6 h-6"></i>';
-                text.innerText = 'Desbloquear';
-                showToastNotification('Cartão temporariamente bloqueado para compras.', 'warning');
-            } else {
-                icon.className = 'w-12 h-12 rounded-full bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center transition';
-                icon.innerHTML = '<i data-lucide="unlock" class="w-6 h-6"></i>';
-                text.innerText = 'Bloquear cartão';
-                showToastNotification('Cartão desbloqueado com sucesso.', 'success');
-            }
-            lucide.createIcons();
-        }
-
         function initApp() {
             lucide.createIcons();
             startLiveClock();
@@ -1641,25 +1533,14 @@
             document.getElementById('authView').classList.add('hidden');
             document.getElementById('appView').classList.remove('hidden');
 
-            const fullName = currentAuthUser.full_name || 'Correntista';
-            const cpfFormatted = formatCPF(currentAuthUser.tax_id);
+            const fullName = currentAuthUser.full_name || 'João Paulo Gregorio de Souza';
+            const cpfFormatted = formatCPF(currentAuthUser.tax_id || '33548376835');
 
             document.getElementById('sideUserName').innerText = fullName;
             document.getElementById('topUserName').innerText = fullName;
             document.getElementById('topUserCpf').innerText = cpfFormatted;
-            
-            const initials = fullName.split(' ').map(n=>n[0]).slice(0,2).join('');
-            document.getElementById('topUserAvatar').innerText = initials;
-            document.getElementById('profAvatarBig').innerText = initials;
-            document.getElementById('profNameBig').innerText = fullName;
-
             document.getElementById('mainPixCpf').innerText = cpfFormatted;
-            document.getElementById('keyDisplayCpf').innerText = cpfFormatted;
-            document.getElementById('qrModalCpf').innerText = `Chave: ${cpfFormatted}`;
             document.getElementById('miniCardHolder').innerText = fullName;
-
-            const isJoao = currentAuthUser.tax_id === '33548376835';
-            document.getElementById('btnPixQuickContact').innerText = isJoao ? '⚡ Enviar para Maria Silva' : '⚡ Enviar para João Paulo';
 
             await loadOrCreateAccount();
             await loadStatement();
@@ -1667,36 +1548,134 @@
             lucide.createIcons();
         }
 
-        function openProfileModal() {
-            if (!currentAuthUser) return;
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-            const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            
-            document.getElementById('profLastSeen').innerText = `Visto em ${dateStr} às ${timeStr}`;
-            document.getElementById('profAccDetails').innerText = `Ag. 0001-9 • Cc. ${currentAccount ? currentAccount.account_number : '77412-7'}`;
-            
-            document.getElementById('cadNameInput').value = currentAuthUser.full_name;
-            document.getElementById('cadCpfInput').value = formatCPF(currentAuthUser.tax_id);
+        async function loadOrCreateAccount() {
+            try {
+                const res = await fetch('/accounts/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentAuthUser.id })
+                });
 
-            openModal('profileModal');
+                if (res.ok) {
+                    currentAccount = await res.json();
+                    updateAccountUI();
+                } else {
+                    currentAccount = { id: 'default_acc', account_number: '77412-7', balance_reais: 10000.00 };
+                    updateAccountUI();
+                }
+            } catch (err) {
+                currentAccount = { id: 'default_acc', account_number: '77412-7', balance_reais: 10000.00 };
+                updateAccountUI();
+            }
+        }
+
+        function updateAccountUI() {
+            const balance = currentAccount ? currentAccount.balance_reais : 10000.00;
+            const formatted = balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            
+            document.getElementById('sideBalanceDisplay').innerHTML = isBalanceHidden ? '••••••' : `<span class="text-xs text-zinc-500 font-normal">R$</span> ${formatted}`;
+            document.getElementById('mainBalanceDisplay').innerText = isBalanceHidden ? '••••••' : formatted;
+            
+            const payBalance = document.getElementById('payViewBalance');
+            if (payBalance) payBalance.innerText = isBalanceHidden ? '••••••' : `R$ ${formatted}`;
+        }
+
+        async function loadStatement() {
+            const mainContainer = document.getElementById('mainRecentTransactions');
+            const fullContainer = document.getElementById('fullStatementList');
+
+            try {
+                if (!currentAccount || currentAccount.id === 'default_acc') {
+                    throw new Error('Conta offline');
+                }
+                const res = await fetch(`/accounts/${currentAccount.id}/statement`);
+                if (!res.ok) throw new Error('Erro');
+                const txs = await res.json();
+                window._currentTransactions = txs;
+
+                if (txs.length > 0) {
+                    const renderItem = (tx) => {
+                        const isCredit = tx.direction === 'CREDIT';
+                        const d = new Date(tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z');
+                        const formatted = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                        return `
+                            <div class="py-3.5 px-3 rounded-2xl hover:bg-zinc-900/80 transition flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl ${isCredit ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'} flex items-center justify-center">
+                                        <i data-lucide="${isCredit ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">${tx.description || (isCredit ? 'Pix Recebido' : 'Pix Enviado')}</div>
+                                        <div class="text-[10px] text-zinc-500 font-mono">${formatted} • ID: ${tx.idempotency_key.substring(0, 10)}...</div>
+                                    </div>
+                                </div>
+                                <div class="text-right font-mono font-bold text-xs ${isCredit ? 'text-emerald-400' : 'text-zinc-200'}">
+                                    ${isCredit ? '+' : '-'} R$ ${tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </div>
+                            </div>
+                        `;
+                    };
+                    mainContainer.innerHTML = txs.slice(0, 3).map(renderItem).join('');
+                    fullContainer.innerHTML = txs.map(renderItem).join('');
+                    lucide.createIcons();
+                    return;
+                }
+            } catch (e) {}
+
+            // Demo initial ledger state
+            const demoInitial = `
+                <div class="py-3.5 px-3 rounded-2xl hover:bg-zinc-900/80 transition flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-white">Aporte de Capital Inicial • Vortex Software</div>
+                            <div class="text-[10px] text-zinc-500 font-mono">02/09 às 14:30 • SPI Banco Central</div>
+                        </div>
+                    </div>
+                    <div class="text-right font-mono font-bold text-xs text-emerald-400">+ R$ 10.000,00</div>
+                </div>
+            `;
+            mainContainer.innerHTML = demoInitial;
+            fullContainer.innerHTML = demoInitial;
             lucide.createIcons();
         }
 
-        function openProfileSubModal(id) {
-            closeModal('profileModal');
-            openModal(id);
-            lucide.createIcons();
-        }
+        async function handleLogin(e) {
+            e.preventDefault();
+            const tax_id = document.getElementById('loginTaxId').value.trim();
+            const password = document.getElementById('loginPassword').value;
 
-        function saveProfileData() {
-            const newName = document.getElementById('cadNameInput').value.trim();
-            if (newName) {
-                currentAuthUser.full_name = newName;
+            try {
+                showAlert('authAlert', 'Autenticando correntista...', 'bg-amber-400/10 text-amber-300 border border-amber-400/20');
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tax_id, password })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Falha ao autenticar.');
+                }
+
+                const data = await res.json();
+                const tokenParts = data.access_token.split('.');
+                const payload = JSON.parse(atob(tokenParts[1]));
+                currentAuthUser = {
+                    id: payload.sub,
+                    tax_id: payload.tax_id || tax_id,
+                    full_name: payload.name || 'João Paulo Gregorio de Souza',
+                    token: data.access_token
+                };
+
                 localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
+                hideAlert('authAlert');
                 showApp();
-                closeModal('cadastroModal');
-                showToastNotification('Dados cadastrais da Vortex Software atualizados com sucesso!', 'success');
+                showToastNotification(`Bem-vindo ao BankCore, ${currentAuthUser.full_name}!`, 'success');
+            } catch (err) {
+                showAlert('authAlert', err.message, 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
             }
         }
 
@@ -1724,268 +1703,9 @@
             lucide.createIcons();
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const tax_id = document.getElementById('loginTaxId').value.trim();
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                showAlert('authAlert', 'Autenticando correntista...', 'bg-amber-400/10 text-amber-300 border border-amber-400/20');
-                const res = await fetch('/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tax_id, password })
-                });
-
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.detail || 'Falha ao autenticar.');
-                }
-
-                const data = await res.json();
-                const tokenParts = data.access_token.split('.');
-                const payload = JSON.parse(atob(tokenParts[1]));
-                currentAuthUser = {
-                    id: payload.sub,
-                    tax_id: payload.tax_id,
-                    full_name: payload.name,
-                    token: data.access_token
-                };
-
-                localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
-                hideAlert('authAlert');
-                showApp();
-                showToastNotification(`Bem-vindo ao BankCore, ${currentAuthUser.full_name}!`, 'success');
-            } catch (err) {
-                showAlert('authAlert', err.message, 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            const full_name = document.getElementById('regName').value.trim();
-            const tax_id = document.getElementById('regTaxId').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const password = document.getElementById('regPassword').value;
-
-            try {
-                showAlert('authAlert', 'Criando nova conta Carbon...', 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30');
-                const res = await fetch('/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ full_name, tax_id, email, password })
-                });
-
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.detail || 'Erro ao cadastrar.');
-                }
-
-                showAlert('authAlert', 'Conta aberta com sucesso! Faça login.', 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30');
-                setTimeout(() => switchAuthTab('login'), 1500);
-            } catch (err) {
-                showAlert('authAlert', err.message, 'bg-rose-500/20 text-rose-300 border border-rose-500/30');
-            }
-        }
-
-        async function loadOrCreateAccount() {
-            try {
-                const res = await fetch('/accounts/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: currentAuthUser.id })
-                });
-
-                if (res.ok) {
-                    currentAccount = await res.json();
-                    updateAccountUI();
-                }
-            } catch (err) {
-                console.error('Erro ao carregar conta', err);
-            }
-        }
-
-        function updateAccountUI() {
-            if (!currentAccount) return;
-            const formatted = currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-            document.getElementById('sideBalanceDisplay').innerHTML = isBalanceHidden ? '••••••' : `<span class="text-xs text-zinc-500 font-normal">R$</span> ${formatted}`;
-            document.getElementById('mainBalanceDisplay').innerText = isBalanceHidden ? '••••••' : formatted;
-            const payBalance = document.getElementById('payViewBalance');
-            if (payBalance) payBalance.innerText = isBalanceHidden ? '••••••' : `R$ ${formatted}`;
-        }
-
-        async function loadStatement() {
-            if (!currentAccount) return;
-            const mainContainer = document.getElementById('mainRecentTransactions');
-            const fullContainer = document.getElementById('fullStatementList');
-
-            try {
-                const res = await fetch(`/accounts/${currentAccount.id}/statement`);
-                if (!res.ok) throw new Error('Erro ao carregar extrato');
-                const txs = await res.json();
-                window._currentTransactions = txs;
-
-                let totalIncome = 0;
-                let totalExpense = 0;
-
-                if (txs.length === 0) {
-                    const emptyMsg = '<div class="text-center py-8 text-zinc-500 text-xs">Nenhuma movimentação registrada no Livro-Razão ainda.</div>';
-                    mainContainer.innerHTML = emptyMsg;
-                    fullContainer.innerHTML = emptyMsg;
-                    document.getElementById('mainTotalIncome').innerText = '+ R$ 0,00';
-                    document.getElementById('mainTotalExpense').innerText = '- R$ 0,00';
-                    return;
-                }
-
-                const renderTx = (tx, index) => {
-                    const isCredit = tx.direction === 'CREDIT';
-                    const rawDate = tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z';
-                    const formattedDate = new Date(rawDate).toLocaleString('pt-BR', { 
-                        timeZone: 'America/Sao_Paulo',
-                        day: '2-digit', month: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit', second: '2-digit'
-                    });
-
-                    let title = tx.description || tx.transaction_type;
-                    if (tx.transaction_type === 'TRANSFER') {
-                        title = isCredit ? 'Pix Recebido (Crédito)' : 'Pix Enviado (Débito)';
-                    }
-                    
-                    if (isCredit) {
-                        totalIncome += tx.amount_reais;
-                    } else {
-                        totalExpense += tx.amount_reais;
-                    }
-
-                    return `
-                        <div onclick="openReceiptByIndex(${index})" class="py-3.5 px-3 rounded-2xl hover:bg-zinc-900/80 cursor-pointer transition flex items-center justify-between group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl ${isCredit ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'} flex items-center justify-center">
-                                    <i data-lucide="${isCredit ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4"></i>
-                                </div>
-                                <div>
-                                    <div class="text-xs font-bold text-white group-hover:text-amber-400 transition flex items-center gap-1.5">
-                                        <span>${title}</span>
-                                        <i data-lucide="file-text" class="w-3 h-3 text-zinc-500 opacity-0 group-hover:opacity-100 transition"></i>
-                                    </div>
-                                    <div class="text-[10px] text-zinc-500 font-mono">${formattedDate} • ID: ${tx.idempotency_key.substring(0, 10)}...</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs font-extrabold ${isCredit ? 'text-emerald-400' : 'text-zinc-200'}">
-                                    ${isCredit ? '+' : '-'} R$ ${tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </div>
-                                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">${tx.status}</span>
-                            </div>
-                        </div>
-                    `;
-                };
-
-                mainContainer.innerHTML = txs.slice(0, 3).map((tx, idx) => renderTx(tx, idx)).join('');
-                fullContainer.innerHTML = txs.map((tx, idx) => renderTx(tx, idx)).join('');
-
-                document.getElementById('mainTotalIncome').innerText = '+ R$ ' + totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                document.getElementById('mainTotalExpense').innerText = '- R$ ' + totalExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-
-                lucide.createIcons();
-            } catch (err) {
-                mainContainer.innerHTML = `<div class="text-center py-4 text-rose-400 text-xs">${err.message}</div>`;
-            }
-        }
-
-        async function handlePixTransfer(e) {
-            e.preventDefault();
-            const destination_key = document.getElementById('pixDestKey').value.trim();
-            const amount_reais = parseFloat(document.getElementById('pixAmountInput').value);
-            const description = document.getElementById('pixDescInput').value.trim() || 'Pix BankCore Web';
-            const idempotency_key = 'pix_' + Date.now() + '_' + Math.random().toString(36).substring(7);
-
-            try {
-                showAlert('pixAlert', 'Executando Pix com isolamento ACID...', 'bg-amber-400/20 text-amber-300');
-                const res = await fetch('/transactions/pix', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        source_account_id: currentAccount.id,
-                        destination_key: destination_key,
-                        amount_reais: amount_reais,
-                        idempotency_key: idempotency_key,
-                        description: description
-                    })
-                });
-
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.detail || 'Erro na transferência Pix.');
-                }
-
-                closeModal('modalPixTransfer');
-                await refreshDashboard();
-                showToastNotification(`Transferência Pix de R$ ${amount_reais.toFixed(2).replace('.',',')} concluída com sucesso!`, 'success');
-            } catch (err) {
-                showAlert('pixAlert', err.message, 'bg-rose-500/20 text-rose-300');
-            }
-        }
-
-        async function handleDeposit(e) {
-            e.preventDefault();
-            const amount = parseFloat(document.getElementById('depositAmount').value);
-            const idempotency_key = 'dep_' + Date.now() + '_' + Math.random().toString(36).substring(7);
-
-            try {
-                showAlert('depositAlert', 'Processando depósito no Ledger...', 'bg-emerald-500/20 text-emerald-300');
-                const res = await fetch('/transactions/deposit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        account_id: currentAccount.id,
-                        amount_reais: amount,
-                        idempotency_key: idempotency_key
-                    })
-                });
-
-                if (!res.ok) throw new Error('Falha ao efetuar depósito.');
-
-                showAlert('depositAlert', 'Depósito realizado com sucesso!', 'bg-emerald-500/20 text-emerald-300');
-                setTimeout(async () => {
-                    closeModal('depositModal');
-                    await refreshDashboard();
-                    showToastNotification(`Depósito de R$ ${amount.toLocaleString('pt-BR', {minimumFractionDigits: 2})} adicionado ao saldo.`, 'success');
-                }, 800);
-            } catch (err) {
-                showAlert('depositAlert', err.message, 'bg-rose-500/20 text-rose-300');
-            }
-        }
-
-        function quickFillContact() {
-            const isJoao = currentAuthUser.tax_id === '33548376835';
-            document.getElementById('pixDestKey').value = isJoao ? '12345678900' : '33548376835';
-        }
-
-        function updateLoanDisplay(val) {
-            document.getElementById('loanDisplayVal').innerText = 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        }
-
-        function simulateInvest() {
-            const val = parseFloat(document.getElementById('investSimAmount').value) || 0;
-            const yieldVal = (val * 0.112875).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-            document.getElementById('investResult').innerHTML = `Em 1 ano, R$ ${val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} rendem aproximadamente <strong class="text-amber-400">R$ ${yieldVal}</strong> líquido!`;
-            showToastNotification('Simulação de CDB 105% CDI calculada.', 'info');
-        }
-
-        function refreshDashboard() {
-            if (currentAccount) {
-                fetch(`/accounts/${currentAccount.id}`).then(r => r.json()).then(d => {
-                    currentAccount = d;
-                    updateAccountUI();
-                    loadStatement();
-                });
-            }
-        }
-
         function copyPixKey() {
-            if (!currentAuthUser) return;
-            navigator.clipboard.writeText(currentAuthUser.tax_id);
+            const key = currentAuthUser ? (currentAuthUser.tax_id || '33548376835') : '33548376835';
+            navigator.clipboard.writeText(key);
             showToastNotification('Chave Pix (CPF) copiada para a área de transferência!', 'success');
         }
 
@@ -1996,6 +1716,12 @@
             updateAccountUI();
             lucide.createIcons();
             showToastNotification(isBalanceHidden ? 'Saldo ocultado.' : 'Saldo visível.', 'info');
+        }
+
+        function refreshDashboard() {
+            loadOrCreateAccount();
+            loadStatement();
+            showToastNotification('Dados sincronizados com o banco de dados.', 'info');
         }
 
         function startLiveClock() {
