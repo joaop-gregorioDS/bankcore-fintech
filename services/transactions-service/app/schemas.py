@@ -17,9 +17,16 @@ class DepositRequest(BaseModel):
     amount_reais: float = Field(..., gt=0)
     idempotency_key: str
 
+class TransferRequest(BaseModel):
+    source_account_id: UUID
+    destination_account_id: UUID
+    amount_reais: float = Field(..., gt=0)
+    idempotency_key: str
+    description: str | None = None
+
 class PixTransferRequest(BaseModel):
     source_account_id: UUID
-    destination_key: str  # Pode ser CPF (11 dígitos) ou UUID
+    destination_key: str
     amount_reais: float = Field(..., gt=0)
     idempotency_key: str
     description: str | None = None
