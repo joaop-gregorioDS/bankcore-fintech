@@ -27,6 +27,8 @@ services:
     build: ./services/auth-service
     container_name: bankcore-auth-service
     restart: unless-stopped
+    volumes:
+      - ./services/auth-service/app:/app/app
     environment:
       DATABASE_URL: postgresql+asyncpg://bankadmin:bankcore_secret_password_2026@postgres:5432/bankcore_auth
       REDIS_URL: redis://redis:6379/0
@@ -44,6 +46,8 @@ services:
     build: ./services/transactions-service
     container_name: bankcore-transactions-service
     restart: unless-stopped
+    volumes:
+      - ./services/transactions-service/app:/app/app
     environment:
       DATABASE_URL: postgresql+asyncpg://bankadmin:bankcore_secret_password_2026@postgres:5432/bankcore_transactions
       REDIS_URL: redis://redis:6379/0
