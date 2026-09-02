@@ -554,6 +554,57 @@
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+                        <button onclick="openInvoiceModal()" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="receipt" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Pagar fatura</span>
+                        </button>
+                        <button onclick="showToastNotification('Adicionado com sucesso ao Apple Wallet!', 'success')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="wallet" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Carteiras digitais</span>
+                        </button>
+                        <button onclick="generateVirtualCard()" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Cartões virtuais</span>
+                        </button>
+                        <button onclick="showToastNotification('Upgrade para Vortex Black Infinite liberado.', 'success')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Upgrade de cartão</span>
+                        </button>
+                        <button onclick="showToastNotification('Central de Adicionais aberta.', 'info')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="user-plus" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Adicionais</span>
+                        </button>
+                        <button onclick="toggleCardBlock()" id="btnCardBlock" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="lock" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Bloquear</span>
+                        </button>
+                        <button onclick="showToastNotification('Simulador de parcelamento de compras aberto.', 'info')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="calculator" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Parcelar compra</span>
+                        </button>
+                        <button onclick="showToastNotification('Mais opções de compras internacionais e segurança.', 'info')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Ver mais</span>
+                        </button>
+                    </div>
+
                     <div class="carbon-card rounded-3xl p-7 space-y-4">
                         <div class="flex items-center justify-between pb-3 border-b border-inherit">
                             <h2 class="text-xl font-black">Últimos lançamentos</h2>
@@ -563,7 +614,7 @@
                     </div>
                 </section>
 
-                <!-- 4. VIEW: CENTRAL PIX -->
+                <!-- 4. VIEW: CENTRAL PIX COMPLETA (PADRÃO BB iOS) -->
                 <section id="view-pix" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
@@ -573,15 +624,21 @@
                                 </div>
                                 <span>Central Pix</span>
                             </h2>
-                            <p class="text-xs opacity-70 mt-1">Transferências, pagamentos instantâneos e gestão de chaves do Banco Central</p>
+                            <p class="text-xs opacity-70 mt-1">Transferências instantâneas, cobranças e gestão de limites do Banco Central</p>
                         </div>
+                        <button onclick="showToastNotification('Central de Ajuda Pix disponível 24h via SPI BACEN.', 'info')" class="w-10 h-10 rounded-2xl carbon-card hover:border-amber-500/50 flex items-center justify-center transition" title="Ajuda Pix">
+                            <i data-lucide="help-circle" class="w-5 h-5 opacity-70"></i>
+                        </button>
                     </div>
 
+                    <!-- Módulo 1: Pagar -->
                     <div class="space-y-4">
                         <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Pagar</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-3xl p-6 hover:border-amber-500/50 cursor-pointer transition flex items-start gap-4 group">
-                                <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center flex-shrink-0 transition">
+                            
+                            <!-- 1. Fazer um Pix -->
+                            <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-3xl p-6 hover:border-amber-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="send" class="w-6 h-6"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
@@ -590,8 +647,9 @@
                                 </div>
                             </div>
 
-                            <div onclick="showToastNotification('Leitor de QR Code Pix ativo pela câmera!', 'info')" class="carbon-card rounded-3xl p-6 hover:border-blue-500/50 cursor-pointer transition flex items-start gap-4 group">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 transition">
+                            <!-- 2. Ler QR Code -->
+                            <div onclick="showToastNotification('Leitor de QR Code Pix ativo pela câmera!', 'info')" class="carbon-card rounded-3xl p-6 hover:border-blue-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 transition">
                                     <i data-lucide="scan-line" class="w-6 h-6"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
@@ -599,11 +657,114 @@
                                     <div class="text-xs opacity-70 mt-1 leading-snug">Pague escaneando um QR Code ou envie a foto da galeria.</div>
                                 </div>
                             </div>
+
+                            <!-- 3. Pix Copia e Cola -->
+                            <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-3xl p-6 hover:border-indigo-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="copy-check" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-extrabold group-hover:text-indigo-500 transition">Pix Copia e Cola</div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Cole o código do payload Pix para pagar na hora.</div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Pix de Presente -->
+                            <div onclick="showToastNotification('Módulo Pix de Presente aberto com temas personalizados!', 'success')" class="carbon-card rounded-3xl p-6 hover:border-emerald-500/50 cursor-pointer transition flex items-start gap-4.5 group relative overflow-hidden">
+                                <div class="w-13 h-13 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="gift" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-base font-extrabold group-hover:text-emerald-500 transition">Pix de presente</div>
+                                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-black shadow-sm">Novo</span>
+                                    </div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Envie um Pix com cartão comemorativo personalizado.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo 2: Receber -->
+                    <div class="space-y-4">
+                        <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Receber</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            
+                            <!-- 5. Criar QR Code -->
+                            <div onclick="showToastNotification('QR Code gerado para cobrança instantânea!', 'success')" class="carbon-card rounded-3xl p-6 hover:border-amber-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="qr-code" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-extrabold group-hover:text-amber-500 transition">Criar QR Code</div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Gere uma cobrança instantânea com valor fixo ou livre.</div>
+                                </div>
+                            </div>
+
+                            <!-- 6. Minhas Chaves Pix -->
+                            <div onclick="copyPixKey()" class="carbon-card rounded-3xl p-6 hover:border-blue-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="key" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-extrabold group-hover:text-blue-500 transition">Minhas Chaves Pix</div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Cadastre, consulte e compartilhe suas chaves da Vortex.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo 3: Consultar & Segurança BACEN -->
+                    <div class="space-y-4">
+                        <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Consultar & Segurança BACEN</div>
+                        <div class="divide-y divide-inherit rounded-3xl carbon-card overflow-hidden">
+                            
+                            <!-- Extrato Pix -->
+                            <div onclick="navigateTo('extrato')" class="p-5 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition group">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold group-hover:text-amber-500 transition">Extrato Pix</div>
+                                        <div class="text-xs opacity-70 mt-0.5">Acompanhe seus gastos, recebimentos e comprovantes de liquidação.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:opacity-100 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <!-- Meus Limites Pix -->
+                            <div onclick="showToastNotification('Gestão de limites Pix diurno/noturno aberta!', 'info')" class="p-5 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition group">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold group-hover:text-emerald-500 transition">Meus Limites Pix</div>
+                                        <div class="text-xs opacity-70 mt-0.5">Ajuste os limites para horário comercial e limite noturno de segurança.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:opacity-100 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <!-- MED BACEN -->
+                            <div onclick="showToastNotification('MED - Mecanismo Especial de Devolução do Banco Central pronto para abertura de chamado.', 'warning', 'MED BACEN')" class="p-5 flex items-center justify-between hover:bg-rose-500/10 cursor-pointer transition group">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-inherit group-hover:text-rose-500 transition">Informar golpe ou fraude (MED BACEN)</div>
+                                        <div class="text-xs opacity-70 mt-0.5">Use o Mecanismo Especial de Devolução para estorno em suspeitas de golpes.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:text-rose-500 transition flex-shrink-0 ml-2"></i>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS -->
+                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS (PADRÃO BB iOS) -->
                 <section id="view-pagar" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
@@ -1055,7 +1216,7 @@
                 <h3 class="text-lg font-black flex items-center gap-2">
                     <i data-lucide="send" class="w-5 h-5 text-amber-500"></i> Transferência Pix Instantânea
                 </h3>
-                <button onclick="closeModal('modalPixTransfer')"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeModal('modalPixTransfer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <form onsubmit="handlePixTransfer(event)" class="space-y-4">
                 <div>
@@ -1637,6 +1798,15 @@
             const amount = parseFloat(document.getElementById('boletoAmountInput').value);
             closeModal('modalBoletoPay');
             showToastNotification(`Boleto de R$ ${amount.toFixed(2).replace('.',',')} pago com sucesso!`, 'success');
+        }
+
+        function generateVirtualCard() {
+            const num = '4289 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
+            showToastNotification(`Novo cartão virtual gerado: ${num}`, 'success', 'Cartão Virtual Ativo');
+        }
+
+        function toggleCardBlock() {
+            showToastNotification('Cartão virtual bloqueado/desbloqueado com sucesso.', 'info');
         }
 
         function navigateTo(viewName) {
