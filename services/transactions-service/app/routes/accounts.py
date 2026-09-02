@@ -10,7 +10,21 @@ from app.schemas import AccountCreateRequest, AccountResponse, TransactionRespon
 router = APIRouter(prefix="/accounts", tags=["Contas Bancárias"])
 
 @router.post("/", response_model=AccountResponse, status_code=201)
-async def create_account(payload: AccountCreateRequest, db: AsyncSession = Depends(get_db)):
+async def create_or_get_account(payload: AccountCreateRequest, db: AsyncSession = Depends(get_db)):
+    # 1. Se o usuário já tiver conta criada, retorna a conta existente (Single Account per User)
+    query = select(Account).where(Account.user_id == payload.user_id).order_by(Account.created_at.asc())
+    result = await db.execute(query)
+    existing = result.scalars().first()
+    if existing:
+        return AccountResponse(
+            id=existing.id,
+            user_id=existing.user_id,
+            account_number=existing.account_number,
+            balance_reais=existing.balance_cents / 100.0,
+            is_active=existing.is_active
+        )
+
+    # 2. Criar nova conta apenas se não existir
     acc_num = f"{random.randint(10000, 99999)}-{random.randint(0, 9)}"
     acc = Account(user_id=payload.user_id, account_number=acc_num, balance_cents=0)
     db.add(acc)
