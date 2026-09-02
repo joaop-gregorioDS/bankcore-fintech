@@ -14,7 +14,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- Header / Navbar -->
+    <!-- Header -->
     <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -43,10 +43,10 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
+    <!-- Main Content -->
     <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
 
-        <!-- ================= AUTH VIEW (Login / Register / Demo) ================= -->
+        <!-- AUTH VIEW -->
         <section id="authView" class="max-w-lg mx-auto my-6 sm:my-10 space-y-6">
             
             <!-- Demo Quick Access Card -->
@@ -80,7 +80,6 @@
 
             <!-- Auth Form Card -->
             <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-                <!-- Tabs -->
                 <div class="flex rounded-xl bg-slate-900/90 p-1 mb-6 border border-slate-800">
                     <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg transition bg-indigo-600 text-white">Acessar Conta</button>
                     <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white">Abrir Nova Conta</button>
@@ -130,12 +129,9 @@
             </div>
         </section>
 
-        <!-- ================= DASHBOARD VIEW ================= -->
+        <!-- DASHBOARD VIEW -->
         <section id="dashboardView" class="hidden space-y-8">
-            
-            <!-- Cards Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
                 <!-- Main Balance Card -->
                 <div class="lg:col-span-2 glass-card rounded-2xl p-6 sm:p-8 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/50">
                     <div class="flex items-center justify-between mb-4">
@@ -214,7 +210,7 @@
         </section>
     </main>
 
-    <!-- ================= MODAL: FAZER PIX ================= -->
+    <!-- MODAL: FAZER PIX COM CONTATOS RÁPIDOS -->
     <div id="transferModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="glass-card max-w-md w-full rounded-2xl p-6 sm:p-8 relative">
             <div class="flex items-center justify-between mb-6">
@@ -226,12 +222,23 @@
 
             <form onsubmit="handleTransfer(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">UUID da Conta Destino (Chave Pix)</label>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-400">UUID da Conta Destino</label>
+                        <button type="button" onclick="selectQuickContact()" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                            ⚡ Enviar para Maria Silva
+                        </button>
+                    </div>
                     <input type="text" id="transferDestId" required placeholder="Cole o UUID da conta destino" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none text-xs font-mono text-white">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5">Valor do Pix (R$)</label>
-                    <input type="number" step="0.01" min="0.01" id="transferAmount" required placeholder="0,00" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none text-sm text-white">
+                    <input type="number" step="0.01" min="0.01" id="transferAmount" value="2500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none text-sm text-white font-bold">
+                    <div class="flex gap-2 mt-2">
+                        <button type="button" onclick="document.getElementById('transferAmount').value='100.00'" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded border border-slate-700 font-semibold">R$ 100</button>
+                        <button type="button" onclick="document.getElementById('transferAmount').value='500.00'" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded border border-slate-700 font-semibold">R$ 500</button>
+                        <button type="button" onclick="document.getElementById('transferAmount').value='1000.00'" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded border border-slate-700 font-semibold">R$ 1.000</button>
+                        <button type="button" onclick="document.getElementById('transferAmount').value='2500.00'" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded border border-slate-700 font-semibold">R$ 2.500</button>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5">Descrição</label>
@@ -239,7 +246,7 @@
                 </div>
 
                 <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300">
-                    ⚡ <strong>Idempotency Lock:</strong> O Redis protege contra cobranças duplicadas em tempo real.
+                    ⚡ <strong>Idempotency Lock:</strong> O Redis garante que cliques repetidos não cobrem duas vezes.
                 </div>
 
                 <div id="transferAlert" class="text-xs p-3 rounded-xl hidden text-center"></div>
@@ -251,7 +258,7 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: DEPOSITAR FUNDOS ================= -->
+    <!-- MODAL: DEPOSITAR FUNDOS -->
     <div id="depositModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="glass-card max-w-md w-full rounded-2xl p-6 sm:p-8 relative">
             <div class="flex items-center justify-between mb-6">
@@ -264,7 +271,7 @@
             <form onsubmit="handleDeposit(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5">Valor do Depósito (R$)</label>
-                    <input type="number" step="0.01" min="1.00" id="depositAmount" value="500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-emerald-500 focus:outline-none text-sm text-white">
+                    <input type="number" step="0.01" min="1.00" id="depositAmount" value="5000.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-emerald-500 focus:outline-none text-sm text-white font-bold">
                 </div>
 
                 <div id="depositAlert" class="text-xs p-3 rounded-xl hidden text-center"></div>
@@ -435,7 +442,7 @@
                 }
 
                 container.innerHTML = txs.map(tx => {
-                    const isCredit = tx.transaction_type === 'DEPOSIT' || tx.destination_account_id === currentAccount.id;
+                    const isCredit = tx.transaction_type === 'DEPOSIT' || tx.destination_account_id === currentAccount.id && tx.source_account_id !== currentAccount.id;
                     const formattedDate = new Date(tx.created_at).toLocaleString('pt-BR');
                     return `
                         <div class="py-4 flex items-center justify-between">
@@ -528,6 +535,36 @@
             }
         }
 
+        async function selectQuickContact() {
+            // Se estiver logado como João Paulo, preenche com a conta da Maria
+            // Se estiver logado como Maria, preenche com a conta do João Paulo
+            if (currentAuthUser.tax_id === '33548376835') {
+                // Obter ou criar conta da Maria
+                try {
+                    const resLogin = await fetch('/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tax_id: '12345678900', password: 'teste123456' })
+                    });
+                    if (resLogin.ok) {
+                        const d = await resLogin.json();
+                        const p = JSON.parse(atob(d.access_token.split('.')[1]));
+                        const resAcc = await fetch('/accounts/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: p.sub })
+                        });
+                        const accData = await resAcc.json();
+                        document.getElementById('transferDestId').value = accData.id;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                document.getElementById('transferDestId').value = 'd36ce33e-36a7-4f39-89b6-d8ba42314389';
+            }
+        }
+
         async function refreshDashboard() {
             if (currentAccount) {
                 const res = await fetch(`/accounts/${currentAccount.id}`);
@@ -540,7 +577,7 @@
         function copyPixKey() {
             if (!currentAccount) return;
             navigator.clipboard.writeText(currentAccount.id);
-            alert('Chave Pix (UUID da Conta) copiada para a área de transferência!');
+            alert('Chave Pix copiada para a área de transferência!');
         }
 
         function toggleBalanceVisibility() {
