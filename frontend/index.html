@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankCore | Internet Banking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="landmark" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-bold text-white tracking-tight">Bank<span class="text-indigo-400">Core</span></span>
+                    <span class="hidden sm:inline-block text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 ml-2 border border-indigo-500/20">Fintech Engine</span>
+                </div>
+            </div>
+            
+            <div id="userHeaderArea" class="flex items-center gap-3">
+                <a href="/transactions/docs" target="_blank" class="text-xs text-slate-400 hover:text-indigo-400 flex items-center gap-1 transition">
+                    <i data-lucide="file-code" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">Swagger API</span>
+                </a>
+                <button id="btnLogout" onclick="logout()" class="hidden text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition flex items-center gap-1">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
+
+        <!-- ================= AUTH VIEW (Login / Register) ================= -->
+        <section id="authView" class="max-w-md mx-auto my-12">
+            <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                <div class="absolute -top-12 -right-12 w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl"></div>
+
+                <!-- Tabs -->
+                <div class="flex rounded-xl bg-slate-900/80 p-1 mb-6 border border-slate-800">
+                    <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg transition bg-indigo-600 text-white">Acessar Conta</button>
+                    <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white">Abrir Conta</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">CPF (somente números)</label>
+                        <input type="text" id="loginTaxId" required placeholder="Ex: 33548376835" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">Senha de Acesso</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-600">
+                    </div>
+                    <button type="submit" id="btnLoginSubmit" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 transition">
+                        Entrar no BankCore
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">Nome Completo</label>
+                        <input type="text" id="regName" required placeholder="João Paulo Souza" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">CPF (11 dígitos)</label>
+                        <input type="text" id="regTaxId" required placeholder="00000000000" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">E-mail</label>
+                        <input type="email" id="regEmail" required placeholder="joao@empresa.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">Senha (mínimo 8 caracteres)</label>
+                        <input type="password" id="regPassword" required minlength="8" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-600">
+                    </div>
+                    <button type="submit" id="btnRegisterSubmit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/25 transition">
+                        Criar Conta Corrente
+                    </button>
+                </form>
+
+                <div id="authAlert" class="mt-4 text-xs p-3 rounded-xl hidden text-center"></div>
+            </div>
+        </section>
+
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <section id="dashboardView" class="hidden space-y-8">
+            
+            <!-- Account Overview Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Main Balance Card -->
+                <div class="md:col-span-2 glass-card rounded-2xl p-6 sm:p-8 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Saldo Disponível</span>
+                            <button onclick="toggleBalanceVisibility()" class="text-slate-500 hover:text-slate-300">
+                                <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <span id="accountStatusBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Conta Ativa
+                        </span>
+                    </div>
+
+                    <div class="flex items-baseline gap-2 mb-6">
+                        <span class="text-lg font-bold text-slate-400">R$</span>
+                        <h2 id="balanceDisplay" class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">0,00</h2>
+                    </div>
+
+                    <!-- Quick Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button onclick="openModal('transferModal')" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4"></i> Fazer Pix
+                        </button>
+                        <button onclick="openModal('depositModal')" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm border border-slate-700 transition flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Depositar
+                        </button>
+                        <button onclick="refreshDashboard()" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 transition" title="Recarregar">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Account Meta Card -->
+                <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Dados da Conta</div>
+                        <div class="text-sm font-bold text-white mb-1" id="correntistaName">Carregando...</div>
+                        <div class="text-xs text-slate-400 font-mono mb-4" id="correntistaTaxId">CPF: ---</div>
+
+                        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 mb-3">
+                            <div class="text-[11px] text-slate-500 uppercase font-semibold">Conta Corrente</div>
+                            <div class="text-base font-bold text-indigo-400 font-mono" id="accountNumber">00000-0</div>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <div class="text-[11px] text-slate-500 uppercase font-semibold">Account UUID (Chave Pix)</div>
+                            <div class="text-[11px] text-slate-300 font-mono truncate select-all" id="accountIdFull">---</div>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-emerald-400/80 flex items-center gap-1.5 mt-4">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Integridade ACID Garantida
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statement / Ledger History -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Extrato do Livro-Razão (Ledger)</h3>
+                        <p class="text-xs text-slate-400">Histórico de transações financeiras imutáveis auditadas no PostgreSQL</p>
+                    </div>
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">Audit Trail</span>
+                </div>
+
+                <div id="statementContainer" class="divide-y divide-slate-800">
+                    <div class="text-center py-12 text-slate-500 text-sm">Carregando extrato...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= MODAL: FAZER PIX ================= -->
+    <div id="transferModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card max-w-md w-full rounded-2xl p-6 sm:p-8 relative">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5 text-indigo-400"></i> Nova Transferência Pix
+                </h3>
+                <button onclick="closeModal('transferModal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form onsubmit="handleTransfer(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">UUID da Conta Destino</label>
+                    <input type="text" id="transferDestId" required placeholder="Ex: 0f2dba40-cad0-45ab-..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none text-xs font-mono text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Valor do Pix (R$)</label>
+                    <input type="number" step="0.01" min="0.01" id="transferAmount" required placeholder="0,00" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Descrição (Opcional)</label>
+                    <input type="text" id="transferDesc" placeholder="Transferência Pix BankCore" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none text-sm text-white">
+                </div>
+
+                <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300">
+                    ⚡ <strong>Idempotência:</strong> Uma chave única será gerada para prevenir débitos duplicados.
+                </div>
+
+                <div id="transferAlert" class="text-xs p-3 rounded-xl hidden text-center"></div>
+
+                <button type="submit" id="btnTransferSubmit" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 transition">
+                    Confirmar Envio Pix
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: DEPOSITAR FUNDOS ================= -->
+    <div id="depositModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card max-w-md w-full rounded-2xl p-6 sm:p-8 relative">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i> Depositar Fundos (Faucet)
+                </h3>
+                <button onclick="closeModal('depositModal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form onsubmit="handleDeposit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Valor do Depósito (R$)</label>
+                    <input type="number" step="0.01" min="1.00" id="depositAmount" value="500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-emerald-500 focus:outline-none text-sm text-white">
+                </div>
+
+                <div id="depositAlert" class="text-xs p-3 rounded-xl hidden text-center"></div>
+
+                <button type="submit" id="btnDepositSubmit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/25 transition">
+                    Adicionar Saldo à Conta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
+        let currentAccount = null;
+        let isBalanceHidden = false;
+
+        function initApp() {
+            lucide.createIcons();
+            if (currentAuthUser) {
+                showDashboard();
+            } else {
+                showAuth();
+            }
+        }
+
+        function switchAuthTab(tab) {
+            const isLogin = tab === 'login';
+            document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+            document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+            document.getElementById('tabLogin').className = isLogin ? 'flex-1 py-2 text-xs font-bold rounded-lg transition bg-indigo-600 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white';
+            document.getElementById('tabRegister').className = !isLogin ? 'flex-1 py-2 text-xs font-bold rounded-lg transition bg-emerald-600 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white';
+            hideAlert('authAlert');
+        }
+
+        function showAuth() {
+            document.getElementById('authView').classList.remove('hidden');
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('btnLogout').classList.add('hidden');
+        }
+
+        async function showDashboard() {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('dashboardView').classList.remove('hidden');
+            document.getElementById('btnLogout').classList.remove('hidden');
+            document.getElementById('correntistaName').innerText = currentAuthUser.full_name || 'Correntista';
+            document.getElementById('correntistaTaxId').innerText = 'CPF: ' + (currentAuthUser.tax_id || '---');
+
+            await loadOrCreateAccount();
+            await loadStatement();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const tax_id = document.getElementById('loginTaxId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                showAlert('authAlert', 'Autenticando...', 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30');
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tax_id, password })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Falha ao autenticar.');
+                }
+
+                const data = await res.json();
+                
+                // Decode payload
+                const tokenParts = data.access_token.split('.');
+                const payload = JSON.parse(atob(tokenParts[1]));
+                currentAuthUser = {
+                    id: payload.sub,
+                    tax_id: payload.tax_id,
+                    full_name: payload.name,
+                    token: data.access_token
+                };
+
+                localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
+                hideAlert('authAlert');
+                showDashboard();
+            } catch (err) {
+                showAlert('authAlert', err.message, 'bg-red-500/20 text-red-300 border border-red-500/30');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const full_name = document.getElementById('regName').value.trim();
+            const tax_id = document.getElementById('regTaxId').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            try {
+                showAlert('authAlert', 'Criando conta no banco...', 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30');
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name, tax_id, email, password })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Erro ao registrar.');
+                }
+
+                showAlert('authAlert', 'Conta criada com sucesso! Faça login.', 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30');
+                setTimeout(() => switchAuthTab('login'), 1500);
+            } catch (err) {
+                showAlert('authAlert', err.message, 'bg-red-500/20 text-red-300 border border-red-500/30');
+            }
+        }
+
+        async function loadOrCreateAccount() {
+            try {
+                // Check if account ID stored in localStorage or create
+                let storedAccId = localStorage.getItem(`bankcore_acc_${currentAuthUser.id}`);
+                if (storedAccId) {
+                    const res = await fetch(`/accounts/${storedAccId}`);
+                    if (res.ok) {
+                        currentAccount = await res.json();
+                        updateAccountUI();
+                        return;
+                    }
+                }
+
+                // Create new account
+                const res = await fetch('/accounts/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentAuthUser.id })
+                });
+
+                if (res.ok) {
+                    currentAccount = await res.json();
+                    localStorage.setItem(`bankcore_acc_${currentAuthUser.id}`, currentAccount.id);
+                    updateAccountUI();
+                }
+            } catch (err) {
+                console.error('Erro ao carregar conta', err);
+            }
+        }
+
+        function updateAccountUI() {
+            if (!currentAccount) return;
+            document.getElementById('accountNumber').innerText = currentAccount.account_number;
+            document.getElementById('accountIdFull').innerText = currentAccount.id;
+            document.getElementById('balanceDisplay').innerText = isBalanceHidden ? '••••••' : currentAccount.balance_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        async function loadStatement() {
+            if (!currentAccount) return;
+            const container = document.getElementById('statementContainer');
+            try {
+                const res = await fetch(`/accounts/${currentAccount.id}/statement`);
+                if (!res.ok) throw new Error('Erro ao carregar extrato');
+                const txs = await res.json();
+
+                if (txs.length === 0) {
+                    container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">Nenhuma transação registrada ainda.</div>';
+                    return;
+                }
+
+                container.innerHTML = txs.map(tx => {
+                    const isCredit = tx.transaction_type === 'DEPOSIT';
+                    const formattedDate = new Date(tx.created_at).toLocaleString('pt-BR');
+                    return `
+                        <div class="py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-9 h-9 rounded-xl ${isCredit ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'} flex items-center justify-center">
+                                    <i data-lucide="${isCredit ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-white">${tx.description || tx.transaction_type}</div>
+                                    <div class="text-[11px] text-slate-500 font-mono">${formattedDate} • ID: ${tx.idempotency_key.substring(0, 12)}...</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold ${isCredit ? 'text-emerald-400' : 'text-slate-200'}">
+                                    ${isCredit ? '+' : '-'} R$ ${tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </div>
+                                <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400">${tx.status}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                lucide.createIcons();
+            } catch (err) {
+                container.innerHTML = `<div class="text-center py-6 text-red-400 text-xs">${err.message}</div>`;
+            }
+        }
+
+        async function handleDeposit(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            const idempotency_key = 'dep_' + Date.now() + '_' + Math.random().toString(36).substring(7);
+
+            try {
+                showAlert('depositAlert', 'Processando depósito...', 'bg-emerald-500/20 text-emerald-300');
+                const res = await fetch('/transactions/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account_id: currentAccount.id,
+                        amount_reais: amount,
+                        idempotency_key: idempotency_key
+                    })
+                });
+
+                if (!res.ok) throw new Error('Falha ao efetuar depósito.');
+
+                showAlert('depositAlert', 'Depósito realizado com sucesso!', 'bg-emerald-500/20 text-emerald-300');
+                setTimeout(async () => {
+                    closeModal('depositModal');
+                    await refreshDashboard();
+                }, 1000);
+            } catch (err) {
+                showAlert('depositAlert', err.message, 'bg-red-500/20 text-red-300');
+            }
+        }
+
+        async function handleTransfer(e) {
+            e.preventDefault();
+            const destination_account_id = document.getElementById('transferDestId').value.trim();
+            const amount_reais = parseFloat(document.getElementById('transferAmount').value);
+            const description = document.getElementById('transferDesc').value.trim() || 'Pix BankCore';
+            const idempotency_key = 'pix_' + Date.now() + '_' + Math.random().toString(36).substring(7);
+
+            try {
+                showAlert('transferAlert', 'Executando Pix com isolamento ACID...', 'bg-indigo-500/20 text-indigo-300');
+                const res = await fetch('/transactions/transfer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        source_account_id: currentAccount.id,
+                        destination_account_id: destination_account_id,
+                        amount_reais: amount_reais,
+                        idempotency_key: idempotency_key,
+                        description: description
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Erro na transferência Pix.');
+                }
+
+                showAlert('transferAlert', 'Pix enviado com sucesso!', 'bg-emerald-500/20 text-emerald-300');
+                setTimeout(async () => {
+                    closeModal('transferModal');
+                    await refreshDashboard();
+                }, 1000);
+            } catch (err) {
+                showAlert('transferAlert', err.message, 'bg-red-500/20 text-red-300');
+            }
+        }
+
+        async function refreshDashboard() {
+            if (currentAccount) {
+                const res = await fetch(`/accounts/${currentAccount.id}`);
+                if (res.ok) currentAccount = await res.json();
+                updateAccountUI();
+                await loadStatement();
+            }
+        }
+
+        function toggleBalanceVisibility() {
+            isBalanceHidden = !isBalanceHidden;
+            document.getElementById('eyeIcon').setAttribute('data-lucide', isBalanceHidden ? 'eye-off' : 'eye');
+            updateAccountUI();
+            lucide.createIcons();
+        }
+
+        function logout() {
+            localStorage.removeItem('bankcore_user');
+            currentAuthUser = null;
+            currentAccount = null;
+            showAuth();
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function showAlert(id, msg, cls) {
+            const el = document.getElementById(id);
+            el.className = `text-xs p-3 rounded-xl text-center ${cls}`;
+            el.innerText = msg;
+            el.classList.remove('hidden');
+        }
+        function hideAlert(id) { document.getElementById(id).classList.add('hidden'); }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
