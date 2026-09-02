@@ -1,22 +1,9 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
 from uuid import UUID
-from typing import Optional
+from datetime import datetime
 
 class AccountCreateRequest(BaseModel):
     user_id: UUID
-
-class DepositRequest(BaseModel):
-    account_id: UUID
-    amount_reais: float = Field(..., gt=0, description="Valor do depósito em Reais (ex: 150.50)")
-    idempotency_key: str = Field(..., description="Chave única da transação para evitar duplicidade")
-
-class TransferRequest(BaseModel):
-    source_account_id: UUID
-    destination_account_id: UUID
-    amount_reais: float = Field(..., gt=0, description="Valor da transferência em Reais")
-    idempotency_key: str = Field(..., description="Chave única de idempotência")
-    description: Optional[str] = "Transferência Pix BankCore"
 
 class AccountResponse(BaseModel):
     id: UUID
@@ -25,11 +12,25 @@ class AccountResponse(BaseModel):
     balance_reais: float
     is_active: bool
 
+class DepositRequest(BaseModel):
+    account_id: UUID
+    amount_reais: float = Field(..., gt=0)
+    idempotency_key: str
+
+class TransferRequest(BaseModel):
+    source_account_id: UUID
+    destination_account_id: UUID
+    amount_reais: float = Field(..., gt=0)
+    idempotency_key: str
+    description: str | None = None
+
 class TransactionResponse(BaseModel):
     transaction_id: UUID
     idempotency_key: str
+    source_account_id: UUID | None = None
+    destination_account_id: UUID | None = None
     amount_reais: float
     transaction_type: str
     status: str
     created_at: datetime
-    description: Optional[str]
+    description: str | None = None
