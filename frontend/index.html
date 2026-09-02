@@ -29,8 +29,6 @@
 
         .card-theme-carbon { background: linear-gradient(135deg, #1c1c1f 0%, #0d0d0f 100%); border: 1px solid rgba(255,255,255,0.12); }
         .card-theme-gold { background: linear-gradient(135deg, #2b2311 0%, #171206 100%); border: 1px solid rgba(245,166,35,0.4); }
-        .card-theme-silver { background: linear-gradient(135deg, #2a2e39 0%, #14161c 100%); border: 1px solid rgba(148,163,184,0.3); }
-        .card-theme-rose { background: linear-gradient(135deg, #2e1a22 0%, #140b0f 100%); border: 1px solid rgba(244,63,94,0.3); }
         .card-theme-blue { background: linear-gradient(135deg, #111d2e 0%, #070e17 100%); border: 1px solid rgba(56,189,248,0.3); }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -181,7 +179,7 @@
                         <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400"></i> Central de Cartões
                     </button>
                     <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
-                        <i data-lucide="qr-code" class="w-4 h-4 text-zinc-400"></i> Área Pix
+                        <i data-lucide="qr-code" class="w-4 h-4 text-amber-400"></i> Central Pix
                     </button>
                     <button onclick="navigateTo('pagar')" id="nav-pagar" class="nav-item w-full px-4 py-2.5 rounded-xl text-left text-xs font-semibold text-zinc-400 hover:bg-zinc-800/50 hover:text-white flex items-center gap-3">
                         <i data-lucide="barcode" class="w-4 h-4 text-zinc-400"></i> Pagamentos
@@ -220,7 +218,7 @@
                 <div class="flex items-center gap-2 text-xs font-semibold text-zinc-400">
                     <span class="text-zinc-500 hover:text-white cursor-pointer" onclick="navigateTo('inicio')">🏠 Início</span>
                     <span>/</span>
-                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Visão Geral</span>
+                    <span class="text-amber-400 font-bold capitalize" id="topBreadcrumb">Central Pix</span>
                 </div>
 
                 <div class="flex items-center gap-4 text-xs">
@@ -275,7 +273,7 @@
 
                             <div class="pt-6 border-t border-zinc-800/80 flex flex-wrap items-center gap-3">
                                 <button onclick="navigateTo('pix')" class="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs shadow-lg shadow-amber-500/15 transition flex items-center gap-2">
-                                    <i data-lucide="qr-code" class="w-4 h-4"></i> Área Pix
+                                    <i data-lucide="qr-code" class="w-4 h-4"></i> Central Pix
                                 </button>
                                 <button onclick="openModal('depositModal')" class="px-5 py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition flex items-center gap-2">
                                     <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i> Depositar
@@ -622,74 +620,223 @@
                     </div>
                 </section>
 
-                <!-- 4. VIEW: PIX -->
-                <section id="view-pix" class="view-panel hidden space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <div class="lg:col-span-7 carbon-card rounded-3xl p-6 sm:p-8 space-y-6">
-                            <div>
-                                <h2 class="text-xl font-black text-white flex items-center gap-2">
-                                    <i data-lucide="qr-code" class="w-5 h-5 text-amber-400"></i> Área Pix Instantâneo
-                                </h2>
-                                <p class="text-xs text-zinc-400">Transferências 24/7 com emissão de comprovante oficial</p>
-                            </div>
-
-                            <form onsubmit="handlePixTransfer(event)" class="space-y-4">
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <label class="block text-xs font-semibold text-zinc-400">Chave Pix do Destinatário (CPF)</label>
-                                        <button type="button" onclick="quickFillContact()" id="btnPixQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
-                                            ⚡ Preencher Contato
-                                        </button>
-                                    </div>
-                                    <input type="text" id="pixDestKey" required placeholder="Digite o CPF (ex: 12345678900)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm font-mono text-white">
+                <!-- 4. VIEW: CENTRAL PIX (PADRÃO BB iOS + VORTEX SOFTWARE) -->
+                <section id="view-pix" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
+                    
+                    <!-- Header Section -->
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                        <div>
+                            <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
+                                    <i data-lucide="qr-code" class="w-4 h-4"></i>
                                 </div>
-
-                                <div>
-                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor do Pix (R$)</label>
-                                    <input type="number" step="0.01" min="0.01" id="pixAmountInput" value="500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white font-bold">
-                                    <div class="flex gap-2 mt-2">
-                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='100.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 100</button>
-                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 500</button>
-                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='1500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 1.500</button>
-                                        <button type="button" onclick="document.getElementById('pixAmountInput').value='3000.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 3.000</button>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Descrição</label>
-                                    <input type="text" id="pixDescInput" value="Pix BankCore Web Banking" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white">
-                                </div>
-
-                                <div id="pixAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
-
-                                <button type="submit" id="btnPixSubmit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
-                                    Confirmar Transferência Pix
-                                </button>
-                            </form>
+                                <span>Central Pix</span>
+                            </h2>
+                            <p class="text-xs text-zinc-400 mt-0.5">Transferências, pagamentos instantâneos e gestão de chaves do Banco Central</p>
                         </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openModal('modalPixAjuda')" class="w-9 h-9 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 flex items-center justify-center transition" title="Ajuda Pix">
+                                <i data-lucide="help-circle" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
 
-                        <div class="lg:col-span-5 space-y-6">
-                            <div class="carbon-card rounded-3xl p-6 space-y-4">
-                                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Minhas Chaves Pix Cadastradas</h3>
-                                <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
-                                    <div>
-                                        <span class="text-[10px] font-bold text-zinc-500 uppercase">Chave CPF</span>
-                                        <div class="text-sm font-mono text-amber-400 font-bold" id="pixMyKeyCpf">335.483.768-35</div>
-                                    </div>
-                                    <button onclick="copyPixKey()" class="text-xs text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-lg">
-                                        <i data-lucide="copy" class="w-4 h-4"></i>
-                                    </button>
+                    <!-- 1. GRUPO: PAGAR (Cards 2x2 no estilo BB iOS) -->
+                    <div class="space-y-3">
+                        <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Pagar</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            
+                            <!-- Card: Fazer um Pix -->
+                            <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-2xl p-5 hover:border-amber-500/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
+                                <div class="w-11 h-11 rounded-2xl bg-amber-400/15 group-hover:bg-amber-400/25 text-amber-400 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-extrabold text-white group-hover:text-amber-400 transition">Fazer um Pix</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Transfira por chave CPF, e-mail, celular ou dados bancários.</div>
                                 </div>
                             </div>
 
-                            <div class="carbon-card rounded-3xl p-6 text-center space-y-4">
-                                <h3 class="text-sm font-bold text-white">Receber via QR Code</h3>
-                                <div class="w-36 h-36 mx-auto bg-white p-2 rounded-2xl flex items-center justify-center shadow-lg">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=bankcore-pix-payment" alt="QR Code Pix" class="w-full h-full">
+                            <!-- Card: Ler QR Code -->
+                            <div onclick="openModal('modalPixScan')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
+                                <div class="w-11 h-11 rounded-2xl bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="scan-line" class="w-5 h-5"></i>
                                 </div>
-                                <button onclick="showToastNotification('Código Pix Copia e Cola copiado para a área de transferência!', 'success')" class="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
-                                    Copiar Pix Copia e Cola
-                                </button>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-extrabold text-white group-hover:text-blue-400 transition">Ler QR Code</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Pague escaneando um QR Code ou envie a foto da galeria.</div>
+                                </div>
+                            </div>
+
+                            <!-- Card: Pix Copia e Cola -->
+                            <div onclick="openModal('modalPixCopiaCola')" class="carbon-card rounded-2xl p-5 hover:border-indigo-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
+                                <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 group-hover:bg-indigo-500/25 text-indigo-400 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="copy-check" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-extrabold text-white group-hover:text-indigo-400 transition">Pix Copia e Cola</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Cole o código do payload Pix para pagar na hora.</div>
+                                </div>
+                            </div>
+
+                            <!-- Card: Pix de presente (Tag Novo) -->
+                            <div onclick="openModal('modalPixPresente')" class="carbon-card rounded-2xl p-5 hover:border-emerald-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group relative overflow-hidden">
+                                <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 group-hover:bg-emerald-500/25 text-emerald-400 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="gift" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-sm font-extrabold text-white group-hover:text-emerald-400 transition">Pix de presente</div>
+                                        <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-black shadow-sm">Novo</span>
+                                    </div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Envie um Pix com cartão comemorativo personalizado.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. GRUPO: RECEBER (Cards 2x1) -->
+                    <div class="space-y-3">
+                        <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Receber</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            
+                            <!-- Card: Criar QR Code -->
+                            <div onclick="openModal('modalPixQrCode')" class="carbon-card rounded-2xl p-5 hover:border-amber-500/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
+                                <div class="w-11 h-11 rounded-2xl bg-amber-500/15 group-hover:bg-amber-500/25 text-amber-400 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="qr-code" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-extrabold text-white group-hover:text-amber-400 transition">Criar QR Code</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Gere uma cobrança instantânea com valor fixo ou livre.</div>
+                                </div>
+                            </div>
+
+                            <!-- Card: Minhas Chaves Pix -->
+                            <div onclick="openModal('modalPixChaves')" class="carbon-card rounded-2xl p-5 hover:border-blue-400/40 hover:bg-zinc-900/90 cursor-pointer transition flex items-start gap-4 group">
+                                <div class="w-11 h-11 rounded-2xl bg-blue-500/15 group-hover:bg-blue-500/25 text-blue-400 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="key" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-extrabold text-white group-hover:text-blue-400 transition">Minhas Chaves Pix</div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5 leading-snug">Cadastre, consulte e compartilhe suas chaves da Vortex.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. GRUPO: CONSULTAR (Lista Didática estilo BB iOS) -->
+                    <div class="space-y-3">
+                        <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Consultar</div>
+                        <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
+                            
+                            <!-- Extrato Pix -->
+                            <div onclick="navigateTo('extrato')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Extrato Pix</div>
+                                        <div class="text-[11px] text-zinc-400">Acompanhe seus gastos, recebimentos e pagamentos futuros.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <!-- Cobranças -->
+                            <div onclick="navigateTo('cobrancas')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Cobranças</div>
+                                        <div class="text-[11px] text-zinc-400">Consulte cobranças recebidas e criadas.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <!-- Pix Agendado -->
+                            <div onclick="openModal('modalPixAgendado')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Pix Agendado</div>
+                                        <div class="text-[11px] text-zinc-400">Consulte seus agendamentos recorrentes.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <!-- Informar Golpe ou Fraude (MED BACEN) -->
+                            <div onclick="openModal('modalPixFraude')" class="p-4 flex items-center justify-between hover:bg-rose-500/10 cursor-pointer transition group">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-rose-400 transition">Informar golpe ou fraude</div>
+                                        <div class="text-[11px] text-zinc-400">Use o Mecanismo Especial de Devolução para suspeitas de golpes ou fraudes.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-rose-400 transition flex-shrink-0 ml-2"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. GRUPO: GERENCIAR -->
+                    <div class="space-y-3">
+                        <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Gerenciar</div>
+                        <div class="divide-y divide-zinc-800/80 rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
+                            
+                            <!-- Pix Automático -->
+                            <div onclick="openModal('modalPixAutomatico')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Pix Automático</div>
+                                        <div class="text-[11px] text-zinc-400">Gerencie autorizações de pagamentos recorrentes.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <!-- Meus Limites Pix -->
+                            <div onclick="openModal('modalPixLimites')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="sliders" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Meus Limites Pix</div>
+                                        <div class="text-[11px] text-zinc-400">Ajuste conforme sua necessidade e segurança diurna e noturna.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. GRUPO: AJUDA -->
+                    <div class="space-y-3">
+                        <div class="text-xs font-black uppercase tracking-wider text-zinc-400 px-1">Ajuda</div>
+                        <div class="rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
+                            <div onclick="openModal('modalPixAjuda')" class="p-4 flex items-center justify-between hover:bg-zinc-800/40 cursor-pointer transition group">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="message-square" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Fale com a Vortex Software</div>
+                                        <div class="text-[11px] text-zinc-400">Tire suas dúvidas e saiba mais sobre o Pix.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition flex-shrink-0 ml-2"></i>
                             </div>
                         </div>
                     </div>
@@ -864,12 +1011,306 @@
         </div>
     </div>
 
+    <!-- ================= SUB-MODAIS DA CENTRAL PIX ================= -->
+
+    <!-- MODAL: FAZER UM PIX -->
+    <div id="modalPixTransfer" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-base font-black text-white">Fazer um Pix</h3>
+                </div>
+                <button onclick="closeModal('modalPixTransfer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <form onsubmit="handlePixTransfer(event)" class="space-y-4">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-zinc-400">Chave Pix (CPF / CNPJ)</label>
+                        <button type="button" onclick="quickFillContact()" id="btnPixQuickContact" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
+                            ⚡ Preencher Contato
+                        </button>
+                    </div>
+                    <input type="text" id="pixDestKey" required placeholder="Digite o CPF (ex: 12345678900)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm font-mono text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor do Pix (R$)</label>
+                    <input type="number" step="0.01" min="0.01" id="pixAmountInput" value="500.00" required class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white font-bold">
+                    <div class="flex gap-2 mt-2">
+                        <button type="button" onclick="document.getElementById('pixAmountInput').value='50.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 50</button>
+                        <button type="button" onclick="document.getElementById('pixAmountInput').value='100.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 100</button>
+                        <button type="button" onclick="document.getElementById('pixAmountInput').value='500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 500</button>
+                        <button type="button" onclick="document.getElementById('pixAmountInput').value='1500.00'" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded border border-zinc-700 font-semibold text-zinc-300">R$ 1.500</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1">Mensagem ou Identificador</label>
+                    <input type="text" id="pixDescInput" value="Pix BankCore Web Banking" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 focus:border-amber-400 focus:outline-none text-sm text-white">
+                </div>
+
+                <div id="pixAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
+
+                <button type="submit" id="btnPixSubmit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
+                    Confirmar Envio do Pix
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: LER QR CODE -->
+    <div id="modalPixScan" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl text-center space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="scan-line" class="w-4 h-4 text-blue-400"></i> Scanner de QR Code Pix
+                </h3>
+                <button onclick="closeModal('modalPixScan')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="w-48 h-48 mx-auto rounded-2xl bg-zinc-900 border-2 border-dashed border-blue-400/40 flex flex-col items-center justify-center gap-3">
+                <i data-lucide="camera" class="w-8 h-8 text-blue-400 animate-pulse"></i>
+                <span class="text-[11px] text-zinc-400">Aponte a câmera para o QR Code</span>
+            </div>
+            <button onclick="closeModal('modalPixScan'); showToastNotification('QR Code simulado reconhecido com sucesso!', 'success');" class="w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-extrabold text-xs uppercase transition">
+                Simular Leitura Instantânea
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: PIX COPIA E COLA -->
+    <div id="modalPixCopiaCola" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="copy-check" class="w-4 h-4 text-indigo-400"></i> Pix Copia e Cola
+                </h3>
+                <button onclick="closeModal('modalPixCopiaCola')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1">Cole o código EMV / BR Code</label>
+                <textarea rows="4" placeholder="00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266141740005204000053039865802BR..." class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-white focus:outline-none focus:border-indigo-400"></textarea>
+            </div>
+            <button onclick="closeModal('modalPixCopiaCola'); showToastNotification('Código Pix verificado e pronto para pagamento!', 'success');" class="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold text-xs uppercase transition">
+                Validar e Pagar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: PIX DE PRESENTE -->
+    <div id="modalPixPresente" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="gift" class="w-4 h-4 text-emerald-400"></i> Enviar Pix de Presente 🎁
+                </h3>
+                <button onclick="closeModal('modalPixPresente')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <div class="p-3 rounded-xl bg-zinc-900 border border-amber-400/40 text-center cursor-pointer">
+                    <div class="text-lg">🎂</div>
+                    <div class="text-[10px] font-bold text-amber-400 mt-1">Aniversário</div>
+                </div>
+                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center cursor-pointer hover:border-zinc-700">
+                    <div class="text-lg">🎉</div>
+                    <div class="text-[10px] font-bold text-zinc-300 mt-1">Parabéns</div>
+                </div>
+                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center cursor-pointer hover:border-zinc-700">
+                    <div class="text-lg">💼</div>
+                    <div class="text-[10px] font-bold text-zinc-300 mt-1">Empresarial</div>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1">Valor do Presente (R$)</label>
+                <input type="number" value="250.00" class="w-full px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-bold text-white">
+            </div>
+            <button onclick="closeModal('modalPixPresente'); showToastNotification('Pix de presente com cartão comemorativo enviado!', 'success');" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase transition">
+                Enviar Presente
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: CRIAR QR CODE -->
+    <div id="modalPixQrCode" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl text-center space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-amber-400"></i> Criar QR Code de Recebimento
+                </h3>
+                <button onclick="closeModal('modalPixQrCode')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="w-40 h-40 mx-auto bg-white p-2 rounded-2xl flex items-center justify-center shadow-lg">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=bankcore-pix-payment" alt="QR Code Pix" class="w-full h-full">
+            </div>
+            <div class="text-xs text-zinc-400 font-mono" id="qrModalCpf">Chave: 335.483.768-35</div>
+            <div class="flex gap-2">
+                <button onclick="copyPixKey()" class="flex-1 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase transition">
+                    Copiar Código
+                </button>
+                <button onclick="closeModal('modalPixQrCode')" class="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: MINHAS CHAVES PIX -->
+    <div id="modalPixChaves" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="key" class="w-4 h-4 text-blue-400"></i> Minhas Chaves Pix Cadastradas
+                </h3>
+                <button onclick="closeModal('modalPixChaves')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+                <div class="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase">Chave Principal (CPF)</div>
+                        <div class="text-sm font-mono text-amber-400 font-bold" id="keyDisplayCpf">335.483.768-35</div>
+                    </div>
+                    <button onclick="copyPixKey()" class="text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-lg"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase">Chave Aleatória (EVP)</div>
+                        <div class="text-xs font-mono text-zinc-300">89fb5c45-d8eb-42db-9901-eaf9ecd72f5a</div>
+                    </div>
+                    <button onclick="showToastNotification('Chave EVP copiada!', 'success')" class="text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-lg"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+
+            <button onclick="showToastNotification('Formulário de registro de nova chave aberto.', 'info')" class="w-full py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 border border-zinc-800 transition">
+                + Cadastrar Nova Chave
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: PIX AGENDADO -->
+    <div id="modalPixAgendado" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="calendar-clock" class="w-4 h-4 text-amber-400"></i> Pix Agendados
+                </h3>
+                <button onclick="closeModal('modalPixAgendado')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs flex justify-between items-center">
+                <div>
+                    <div class="font-bold text-white">Contabilidade Mensal</div>
+                    <div class="text-[10px] text-zinc-500">Todo dia 10 • Próximo: 10/09/2026</div>
+                </div>
+                <div class="font-bold text-amber-400 font-mono">R$ 450,00</div>
+            </div>
+            <button onclick="closeModal('modalPixAgendado')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Fechar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: INFORMAR GOLPE OU FRAUDE (MED BACEN) -->
+    <div id="modalPixFraude" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-rose-400 flex items-center gap-2">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i> Mecanismo Especial de Devolução (MED)
+                </h3>
+                <button onclick="closeModal('modalPixFraude')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-xs text-zinc-400">Caso tenha sido vítima de golpe, engenharia social ou transação não autorizada, o Banco Central permite o bloqueio cautelar imediato dos recursos.</p>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1">ID da Transação / E2E</label>
+                <input type="text" placeholder="E2E-pix_17883..." class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-white">
+            </div>
+            <button onclick="closeModal('modalPixFraude'); showToastNotification('Notificação MED enviada ao Banco Central com bloqueio cautelar ativado!', 'success', 'Protocolo MED Gerado');" class="w-full py-3 rounded-xl bg-rose-500 hover:bg-rose-400 text-black font-extrabold text-xs uppercase transition">
+                Abrir Contestação no BACEN
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: PIX AUTOMÁTICO -->
+    <div id="modalPixAutomatico" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="refresh-cw" class="w-4 h-4 text-blue-400"></i> Pix Automático (Débito Recorrente)
+                </h3>
+                <button onclick="closeModal('modalPixAutomatico')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="space-y-2 text-xs">
+                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-white">Amazon AWS Servers</div>
+                        <div class="text-[10px] text-zinc-500">Débito automático ativo</div>
+                    </div>
+                    <span class="text-[9px] font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">Ativo</span>
+                </div>
+            </div>
+            <button onclick="closeModal('modalPixAutomatico')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Fechar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: MEUS LIMITES PIX -->
+    <div id="modalPixLimites" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i> Gestão de Limites Pix
+                </h3>
+                <button onclick="closeModal('modalPixLimites')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="space-y-4 text-xs">
+                <div>
+                    <div class="flex justify-between font-bold text-zinc-300 mb-1">
+                        <span>Limite Diurno (06h às 20h)</span>
+                        <span class="text-amber-400 font-mono">R$ 50.000,00</span>
+                    </div>
+                    <input type="range" min="1000" max="100000" step="5000" value="50000" class="w-full accent-amber-400">
+                </div>
+                <div>
+                    <div class="flex justify-between font-bold text-zinc-300 mb-1">
+                        <span>Limite Noturno (20h às 06h)</span>
+                        <span class="text-blue-400 font-mono">R$ 1.000,00</span>
+                    </div>
+                    <input type="range" min="500" max="10000" step="500" value="1000" class="w-full accent-blue-400">
+                </div>
+            </div>
+            <button onclick="closeModal('modalPixLimites'); showToastNotification('Novos limites Pix salvos conforme diretriz do BACEN.', 'success');" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase transition">
+                Salvar Limites
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: AJUDA PIX -->
+    <div id="modalPixAjuda" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="carbon-card max-w-md w-full rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-4 h-4 text-blue-400"></i> Suporte & Dúvidas do Pix
+                </h3>
+                <button onclick="closeModal('modalPixAjuda')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-zinc-300">
+                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                    <div class="font-bold text-white mb-1">O Pix tem custo para empresas PJ?</div>
+                    <div class="text-zinc-400 text-[11px]">No BankCore, transações Pix para contas Vortex Software são 100% gratuitas e ilimitadas.</div>
+                </div>
+                <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                    <div class="font-bold text-white mb-1">Qual o tempo de liquidação?</div>
+                    <div class="text-zinc-400 text-[11px]">Liquidação instantânea em menos de 2 segundos através do protocolo SPI do Banco Central.</div>
+                </div>
+            </div>
+            <button onclick="closeModal('modalPixAjuda')" class="w-full py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">Entendido</button>
+        </div>
+    </div>
+
     <!-- ================= MODAL: FATURA DO CARTÃO EM PDF ================= -->
     <div id="invoiceModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
         <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-5">
             
             <div id="invoicePrintableArea" class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 space-y-5 text-white">
-                
                 <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
@@ -958,7 +1399,6 @@
     <!-- ================= MODAL: MEU PERFIL (PADRÃO BB iOS) ================= -->
     <div id="profileModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
         <div class="carbon-card max-w-lg w-full max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-7 relative border border-zinc-700 shadow-2xl space-y-6">
-            
             <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
                 <div class="flex items-center gap-2">
                     <div class="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center">
@@ -1355,7 +1795,8 @@
             document.getElementById('profNameBig').innerText = fullName;
 
             document.getElementById('mainPixCpf').innerText = cpfFormatted;
-            document.getElementById('pixMyKeyCpf').innerText = cpfFormatted;
+            document.getElementById('keyDisplayCpf').innerText = cpfFormatted;
+            document.getElementById('qrModalCpf').innerText = `Chave: ${cpfFormatted}`;
             document.getElementById('miniCardHolder').innerText = fullName;
 
             const isJoao = currentAuthUser.tax_id === '33548376835';
@@ -1414,7 +1855,7 @@
                 'inicio': 'Visão Geral',
                 'extrato': 'Extrato & Recibos',
                 'cartoes': 'Central de Cartões',
-                'pix': 'Área Pix',
+                'pix': 'Central Pix',
                 'pagar': 'Pagamento de Boletos',
                 'cobrancas': 'Cobranças & Boletos',
                 'invest': 'Investimentos',
@@ -1617,11 +2058,9 @@
                     throw new Error(err.detail || 'Erro na transferência Pix.');
                 }
 
-                const createdTx = await res.json();
-                hideAlert('pixAlert');
+                closeModal('modalPixTransfer');
                 await refreshDashboard();
-
-                showToastNotification('Transferência Pix concluída com sucesso!', 'success');
+                showToastNotification(`Transferência Pix de R$ ${amount_reais.toFixed(2).replace('.',',')} concluída com sucesso!`, 'success');
             } catch (err) {
                 showAlert('pixAlert', err.message, 'bg-rose-500/20 text-rose-300');
             }
@@ -1679,7 +2118,6 @@
                     currentAccount = d;
                     updateAccountUI();
                     loadStatement();
-                    showToastNotification('Dados atualizados em tempo real.', 'info');
                 });
             }
         }
@@ -1734,7 +2172,10 @@
             showToastNotification('Sessão encerrada com segurança.', 'info');
         }
 
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function openModal(id) { 
+            document.getElementById(id).classList.remove('hidden'); 
+            lucide.createIcons();
+        }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function showAlert(id, msg, cls) {
