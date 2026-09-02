@@ -1,8 +1,19 @@
 import uuid
+import enum
 from datetime import datetime
 from sqlalchemy import Column, String, BigInteger, Boolean, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 from app.database import Base
+
+class TransactionType(str, enum.Enum):
+    DEPOSIT = "DEPOSIT"
+    WITHDRAWAL = "WITHDRAWAL"
+    TRANSFER = "TRANSFER"
+
+class TransactionStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
 
 class Account(Base):
     __tablename__ = "accounts"
@@ -10,7 +21,7 @@ class Account(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
     account_number = Column(String(20), unique=True, nullable=False, index=True)
-    balance_cents = Column(BigInteger, default=1000000, nullable=False) # R$ 10.000 inicial
+    balance_cents = Column(BigInteger, default=1000000, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
