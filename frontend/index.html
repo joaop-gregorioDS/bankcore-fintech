@@ -186,6 +186,29 @@
             border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
             background: color-mix(in srgb, var(--gold) 10%, transparent);
         }
+        .pdf-no-print { display: block; }
+        @media print {
+            @page { size: A4; margin: 12mm; }
+            html, body {
+                background: #F4F1EA !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            body > *:not(#bankcore-pdf-host) { display: none !important; }
+            #bankcore-pdf-host {
+                position: static !important;
+                inset: auto !important;
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+                background: #F4F1EA !important;
+                z-index: 1 !important;
+                overflow: visible !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .pdf-no-print { display: none !important; }
+        }
     </style>
 </head>
 <body class="h-full flex flex-col antialiased relative">
@@ -2266,10 +2289,8 @@
             const old = document.getElementById('bankcore-pdf-host');
             if (old) old.remove();
 
-            const host = document.createElement('div');
-            host.id = 'bankcore-pdf-host';
-            host.style.cssText = 'position:fixed;left:0;top:0;width:794px;padding:40px;background:#F4F1EA;color:#121212;z-index:2147483647;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;';
-            host.innerHTML =
+            const sheet =
+                '<div style="max-width:720px;margin:0 auto;background:#F4F1EA;color:#121212;padding:8px 8px 24px;font-family:Arial,Helvetica,sans-serif;">' +
                 '<div style="height:3px;background:#9A7B32;margin-bottom:20px;"></div>' +
                 '<table style="width:100%;margin-bottom:20px;"><tr>' +
                 '<td style="vertical-align:top;"><div style="font-size:22px;font-weight:700;">Bank<span style="color:#9A7B32;">Core</span></div>' +
@@ -2287,26 +2308,29 @@
                 '<table style="width:100%;margin-top:18px;"><tr>' +
                 '<td style="text-align:right;font-size:12px;">Entradas <b>+ R$ ' + moneyBr(income) + '</b> &nbsp;&nbsp; Saidas <b style="color:#B42318;">- R$ ' + moneyBr(expense) + '</b></td>' +
                 '</tr></table>' +
-                '<p style="margin-top:28px;font-size:10px;line-height:1.5;color:#6B6560;">Vortex Software · documento de demonstracao. Nao e extrato BACEN. Os lancamentos refletem o livro-razao BankCore.</p>';
+                '<p style="margin-top:28px;font-size:10px;line-height:1.5;color:#6B6560;">Vortex Software · documento de demonstracao. Nao e extrato BACEN. Os lancamentos refletem o livro-razao BankCore.</p>' +
+                '</div>';
 
+            const host = document.createElement('div');
+            host.id = 'bankcore-pdf-host';
+            host.style.cssText = 'position:fixed;inset:0;background:#F4F1EA;z-index:2147483647;overflow:auto;padding:28px 20px 88px;box-sizing:border-box;';
+            host.innerHTML = sheet +
+                '<div class="pdf-no-print" style="position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:center;gap:12px;">' +
+                '<button type="button" id="pdfPrintBtn" class="btn-primary" style="padding:12px 22px;">Salvar como PDF</button>' +
+                '<button type="button" id="pdfCloseBtn" class="btn-secondary" style="padding:12px 22px;">Fechar</button>' +
+                '</div>';
             document.body.appendChild(host);
-            showToastNotification('Gerando PDF do extrato…', 'info');
 
-            setTimeout(function () {
-                html2pdf().set({
-                    margin: 10,
-                    filename: 'Extrato_BankCore_' + name.replace(/\s+/g, '_') + '.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, backgroundColor: '#F4F1EA', useCORS: true, logging: false },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                }).from(host).save().then(function () {
-                    host.remove();
-                    showToastNotification('Extrato exportado em PDF.', 'success');
-                }).catch(function () {
-                    host.remove();
-                    showToastNotification('Nao foi possivel gerar o PDF do extrato.', 'error');
-                });
-            }, 300);
+            function closePdfHost() {
+                window.removeEventListener('afterprint', closePdfHost);
+                if (host.parentNode) host.remove();
+            }
+            document.getElementById('pdfCloseBtn').onclick = closePdfHost;
+            document.getElementById('pdfPrintBtn').onclick = function () { window.print(); };
+            window.addEventListener('afterprint', closePdfHost);
+
+            showToastNotification('Na janela de impressao, em Destino escolha Salvar como PDF.', 'info');
+            setTimeout(function () { window.print(); }, 200);
         }
 
         async function handleLogin(e) {
