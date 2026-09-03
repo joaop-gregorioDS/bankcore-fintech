@@ -544,8 +544,8 @@
                                 <p class="text-xs mt-1" style="color: var(--mute);">Clique em um lançamento para abrir o comprovante e baixar o PDF</p>
                             </div>
                             <div class="flex items-center gap-3">
-                                <button onclick="exportStatementCSV()" class="btn-primary px-4 py-2.5 flex items-center gap-2">
-                                    <i data-lucide="download" class="w-4 h-4"></i> Exportar CSV
+                                <button onclick="exportStatementPDF()" class="btn-primary px-4 py-2.5 flex items-center gap-2">
+                                    <i data-lucide="download" class="w-4 h-4"></i> Exportar extrato
                                 </button>
                                 <button onclick="refreshDashboard()" class="btn-secondary p-2.5" title="Atualizar">
                                     <i data-lucide="refresh-cw" class="w-4 h-4"></i>
@@ -1436,36 +1436,36 @@
     </div>
 
     <!-- MODAL: RECIBO INTERATIVO & COMPROVANTE OFICIAL -->
-    <div id="receiptModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(0,0,0,0.72);">
-        <div class="carbon-card max-w-md w-full p-6 relative space-y-5">
-            <div id="receiptPrintableArea" class="p-7 space-y-5" style="background: #0B0B0C; color: #F6F1E8; border: 1px solid #2A2A2E; border-radius: 12px;">
-                <div style="height: 2px; background: #C4A35A; margin: -28px -28px 16px; border-radius: 12px 12px 0 0;"></div>
-                <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #2A2A2E;">
+    <div id="receiptModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(18,18,18,0.45);">
+        <div class="max-w-md w-full p-5 relative space-y-4" style="background: #F4F1EA; border: 1px solid #E4DFD4; border-radius: 12px; box-shadow: 0 16px 40px rgba(18,18,18,0.12);">
+            <div id="receiptPrintableArea" class="p-6 space-y-5" style="background: #F4F1EA; color: #121212;">
+                <div style="height: 2px; background: #9A7B32; margin: -24px -24px 18px;"></div>
+                <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #E4DFD4;">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #C4A35A;">
-                            <i data-lucide="shield" class="w-5 h-5" style="color: #C4A35A;"></i>
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #9A7B32;">
+                            <i data-lucide="shield" class="w-5 h-5" style="color: #9A7B32;"></i>
                         </div>
                         <div>
-                            <div class="text-base font-semibold leading-tight">Bank<span style="color: #C4A35A;">Core</span></div>
-                            <div class="text-[10px] uppercase font-mono" style="color: #9A958C;">Comprovante · ledger interno</div>
+                            <div class="text-base font-semibold leading-tight">Bank<span style="color: #9A7B32;">Core</span></div>
+                            <div class="text-[10px] uppercase tracking-wide" style="color: #6B6560;">Comprovante · ledger interno</div>
                         </div>
                     </div>
-                    <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #C4A35A; border: 1px solid #C4A35A55;">Liquidado</span>
+                    <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #9A7B32; border: 1px solid #9A7B3255;">Liquidado</span>
                 </div>
 
                 <div class="text-center py-3">
-                    <div class="text-xs uppercase tracking-wide" style="color: #9A958C;">Valor da operação</div>
+                    <div class="text-xs uppercase tracking-wide" style="color: #6B6560;">Valor da operação</div>
                     <div class="text-4xl font-semibold font-mono mt-1 font-amount" id="recValor">R$ 0,00</div>
-                    <div class="text-[11px] mt-2 font-medium" style="color: #9A958C;" id="recHolder">—</div>
+                    <div class="text-[11px] mt-2 font-medium" style="color: #6B6560;" id="recHolder">—</div>
                 </div>
 
-                <div class="space-y-2.5 text-xs py-3.5" style="border-top: 1px solid #2A2A2E; border-bottom: 1px solid #2A2A2E;">
-                    <div class="flex justify-between"><span style="color: #9A958C;">Tipo</span><strong id="recTipo">Transferência Pix</strong></div>
-                    <div class="flex justify-between"><span style="color: #9A958C;">Descrição</span><strong class="truncate max-w-[200px]" id="recDesc">---</strong></div>
-                    <div class="flex justify-between"><span style="color: #9A958C;">Data/Hora</span><strong class="font-mono" id="recData">02/09/2026</strong></div>
-                    <div class="flex justify-between"><span style="color: #9A958C;">Autenticação</span><strong class="font-mono text-xs" style="color: #C4A35A;" id="recAuth">AUT-9823482394</strong></div>
+                <div class="space-y-2.5 text-xs py-3.5" style="border-top: 1px solid #E4DFD4; border-bottom: 1px solid #E4DFD4;">
+                    <div class="flex justify-between"><span style="color: #6B6560;">Tipo</span><strong id="recTipo">Transferência Pix</strong></div>
+                    <div class="flex justify-between"><span style="color: #6B6560;">Descrição</span><strong class="truncate max-w-[200px]" id="recDesc">---</strong></div>
+                    <div class="flex justify-between"><span style="color: #6B6560;">Data/Hora</span><strong class="font-mono" id="recData">02/09/2026</strong></div>
+                    <div class="flex justify-between"><span style="color: #6B6560;">Autenticação</span><strong class="font-mono text-xs" style="color: #9A7B32;" id="recAuth">AUT-9823482394</strong></div>
                 </div>
-                <div class="text-[10px] leading-relaxed" style="color: #9A958C;">
+                <div class="text-[10px] leading-relaxed" style="color: #6B6560;">
                     Vortex Software · documento de demonstração. Não é comprovante SPI/BACEN.
                     A liquidação ocorreu no livro-razão BankCore (partidas dobradas).
                 </div>
@@ -1479,6 +1479,8 @@
             </div>
         </div>
     </div>
+
+    <div id="statementPrintableArea" style="position:fixed;left:-9999px;top:0;width:720px;background:#F4F1EA;color:#121212;padding:36px;font-family:'Plus Jakarta Sans',sans-serif;"></div>
 
     <!-- MODAL: DDA PAGAR E GERENCIAR -->
     <div id="modalDDA" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
@@ -1501,42 +1503,42 @@
     </div>
 
     <!-- MODAL: FATURA DO CARTÃO EM PDF -->
-    <div id="invoiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(0,0,0,0.72);">
+    <div id="invoiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(18,18,18,0.45);">
         <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto p-6 relative space-y-5">
-            <div id="invoicePrintableArea" class="p-7 space-y-5" style="background: #0B0B0C; color: #F6F1E8; border: 1px solid #2A2A2E; border-radius: 12px;">
-                <div style="height: 2px; background: #C4A35A; margin: -28px -28px 16px; border-radius: 12px 12px 0 0;"></div>
-                <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #2A2A2E;">
+            <div id="invoicePrintableArea" class="p-7 space-y-5" style="background: #F4F1EA; color: #121212; border: 1px solid #E4DFD4; border-radius: 12px;">
+                <div style="height: 2px; background: #9A7B32; margin: -28px -28px 16px; border-radius: 12px 12px 0 0;"></div>
+                <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #E4DFD4;">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #C4A35A;">
-                            <i data-lucide="shield" class="w-5 h-5" style="color: #C4A35A;"></i>
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #9A7B32;">
+                            <i data-lucide="shield" class="w-5 h-5" style="color: #9A7B32;"></i>
                         </div>
                         <div>
-                            <div class="text-base font-semibold leading-tight">Bank<span style="color:#C4A35A;">Core</span> Card</div>
-                            <div class="text-[10px] uppercase font-mono" style="color: #9A958C;">Fatura simulada · Vortex Software</div>
+                            <div class="text-base font-semibold leading-tight">Bank<span style="color:#9A7B32;">Core</span> Card</div>
+                            <div class="text-[10px] uppercase tracking-wide" style="color: #6B6560;">Fatura simulada · Vortex Software</div>
                         </div>
                     </div>
-                    <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #C4A35A; border: 1px solid #C4A35A55;">Simulado</span>
+                    <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #9A7B32; border: 1px solid #9A7B3255;">Simulado</span>
                 </div>
 
-                <div class="p-5 rounded-xl flex items-center justify-between" style="border: 1px solid #2A2A2E;">
+                <div class="p-5 rounded-xl flex items-center justify-between" style="border: 1px solid #E4DFD4;">
                     <div>
-                        <div class="text-xs uppercase tracking-wide" style="color: #9A958C;">Total da fatura</div>
-                        <div class="text-3xl font-semibold font-mono font-amount" style="color: #C4A35A;" id="invoiceModalValue">R$ 2.296,07</div>
-                        <div class="text-xs mt-1" style="color: #9A958C;">Vencimento: <strong style="color:#F6F1E8;">10/09/2026</strong></div>
+                        <div class="text-xs uppercase tracking-wide" style="color: #6B6560;">Total da fatura</div>
+                        <div class="text-3xl font-semibold font-mono font-amount" style="color: #9A7B32;" id="invoiceModalValue">R$ 2.296,07</div>
+                        <div class="text-xs mt-1" style="color: #6B6560;">Vencimento: <strong style="color:#121212;">10/09/2026</strong></div>
                     </div>
-                    <div class="text-right text-xs" style="color: #9A958C;">
-                        <div>Melhor dia: <strong style="color:#F6F1E8;">03</strong></div>
-                        <div>Utilizado: <strong style="color:#C42B2B;">R$ 8.371,00</strong></div>
+                    <div class="text-right text-xs" style="color: #6B6560;">
+                        <div>Melhor dia: <strong style="color:#121212;">03</strong></div>
+                        <div>Utilizado: <strong style="color:#B42318;">R$ 8.371,00</strong></div>
                     </div>
                 </div>
 
-                <div class="pt-3 space-y-2" style="border-top: 1px solid #2A2A2E;">
-                    <div class="text-xs uppercase tracking-wide" style="color: #9A958C;">Linha digitável (demonstração)</div>
-                    <div class="text-xs font-mono p-3 rounded-lg break-all select-all" style="background:#141416; border: 1px solid #2A2A2E; color:#F6F1E8;">
+                <div class="pt-3 space-y-2" style="border-top: 1px solid #E4DFD4;">
+                    <div class="text-xs uppercase tracking-wide" style="color: #6B6560;">Linha digitável (demonstração)</div>
+                    <div class="text-xs font-mono p-3 rounded-lg break-all select-all" style="background:#FAF8F3; border: 1px solid #E4DFD4; color:#121212;">
                         00190.00009 02891.234567 89000.000018 1 98760000229607
                     </div>
                 </div>
-                <div class="text-[10px] leading-relaxed" style="color: #9A958C;">
+                <div class="text-[10px] leading-relaxed" style="color: #6B6560;">
                     Módulo didático. Esta fatura não liquida no ledger BankCore.
                 </div>
             </div>
@@ -1876,6 +1878,32 @@
             document.getElementById('appView').classList.add('hidden');
         }
 
+        function mockCardRow(name, meta, amount) {
+            return `<div class="py-3.5 flex items-center justify-between" style="border-bottom:1px solid var(--border-subtle);">
+                <div><div class="text-sm font-semibold">${name}</div><div class="text-xs" style="color:var(--mute);">${meta}</div></div>
+                <div class="text-right text-sm font-semibold font-mono font-amount amount-debit">− R$ ${amount}</div>
+            </div>`;
+        }
+        function mockDdaRow(name, due, amount) {
+            return `<div class="py-3.5 flex items-center justify-between" style="border-bottom:1px solid var(--border-subtle);">
+                <div><div class="text-xs font-semibold">${name}</div><div class="text-xs font-mono" style="color:var(--mute);">Vencimento ${due}</div></div>
+                <div class="text-right"><div class="text-xs font-semibold font-mono">${amount}</div>
+                <button type="button" onclick="showToastNotification('Simulação: boleto não liquida no ledger.', 'info')" class="text-xs font-medium text-gold hover:underline mt-1">Pagar</button></div>
+            </div>`;
+        }
+        function mockCobRow(client, desc, paid, date, amount) {
+            const badge = paid
+                ? '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md" style="color:var(--status);border:1px solid color-mix(in srgb, var(--status) 35%, transparent);">Pago</span>'
+                : '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md" style="color:var(--gold);border:1px solid var(--gold);">A vencer</span>';
+            return `<tr style="border-bottom:1px solid var(--border-subtle);">
+                <td class="py-3.5 px-3"><div class="font-semibold text-sm">${client}</div><div class="text-xs" style="color:var(--mute);">${desc}</div></td>
+                <td class="py-3.5 px-3">${badge}</td>
+                <td class="py-3.5 px-3 font-mono text-xs" style="color:var(--mute);">${date}</td>
+                <td class="py-3.5 px-3 text-right font-semibold font-mono text-sm">${amount}</td>
+                <td class="py-3.5 px-3 text-center"><button type="button" onclick="showToastNotification('Simulação: 2ª via.', 'info')" class="text-gold"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
+            </tr>`;
+        }
+
         async function showApp() {
             document.getElementById('authView').classList.add('hidden');
             document.getElementById('appView').classList.remove('hidden');
@@ -1918,58 +1946,27 @@
                 document.getElementById('cardLimitUsed').innerText = 'R$ 8.371,00';
                 document.getElementById('cardLimitAvailable').innerText = 'R$ 12.260,00';
                 document.getElementById('cardLimitTotalText').innerText = 'R$ 20.631,00';
-                document.getElementById('cardTransactionsList').innerHTML = `
-                    <div class="py-4 flex items-center justify-between hover:bg-black/5 dark:hover:bg-zinc-900/50 rounded-2xl px-3 transition">
-                        <div><div class="text-sm font-extrabold">Pg *qb Quero</div><div class="text-xs opacity-60">Ourocard-e 5745 • 30/Ago</div></div>
-                        <div class="text-right"><div class="text-sm font-black font-mono">R$ 224,90</div><div class="text-xs text-blue-500 font-bold">em 6x no crédito</div></div>
-                    </div>
-                    <div class="py-4 flex items-center justify-between hover:bg-black/5 dark:hover:bg-zinc-900/50 rounded-2xl px-3 transition">
-                        <div><div class="text-sm font-extrabold">Zp *olx Sergi</div><div class="text-xs opacity-60">Ourocard-e 6884 • 30/Ago</div></div>
-                        <div class="text-right"><div class="text-sm font-black font-mono">R$ 2.785,99</div><div class="text-xs text-blue-500 font-bold">em 10x no crédito</div></div>
-                    </div>
-                `;
-                document.getElementById('ddaSubtitle').innerText = 'Emitidos para Vortex Software (CNPJ)';
-                
-                const ddaHtml = `
-                    <div class="py-3.5 flex items-center justify-between">
-                        <div><div class="text-xs font-black">Amazon Web Services (AWS)</div><div class="text-xs opacity-60 font-mono">Vencimento: 10/09/2026 • DDA CIP</div></div>
-                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 650,00</div><button onclick="showToastNotification('Boleto AWS quitado via DDA!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
-                    </div>
-                    <div class="py-3.5 flex items-center justify-between">
-                        <div><div class="text-xs font-black">Contabilizei Tecnologia LTDA</div><div class="text-xs opacity-60 font-mono">Vencimento: 15/09/2026 • DDA CIP</div></div>
-                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 189,00</div><button onclick="showToastNotification('Boleto Contabilizei quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
-                    </div>
-                    <div class="py-3.5 flex items-center justify-between">
-                        <div><div class="text-xs font-black">Vivo Fibra Empresas 1Gbps</div><div class="text-xs opacity-60 font-mono">Vencimento: 20/09/2026 • DDA CIP</div></div>
-                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 249,90</div><button onclick="showToastNotification('Boleto Vivo Fibra quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
-                    </div>
-                `;
+                document.getElementById('cardTransactionsList').innerHTML =
+                    mockCardRow('AWS Amazon Web Services', 'Crédito · 6x · 01/Set', '1.240,00') +
+                    mockCardRow('Figma Inc.', 'Assinatura anual · 30/Ago', '184,90') +
+                    mockCardRow('Latam Airlines', 'SP–FLN · 28/Ago', '890,40') +
+                    mockCardRow('iFood Benefícios', 'Corporativo · 27/Ago', '320,00') +
+                    mockCardRow('Apple.com/bill', 'iCloud+ · 25/Ago', '42,90');
+                document.getElementById('ddaSubtitle').innerText = 'Agenda simulada · Vortex Software';
+                const ddaHtml =
+                    mockDdaRow('Amazon Web Services', '10/09/2026', 'R$ 650,00') +
+                    mockDdaRow('Contabilizei Tecnologia', '15/09/2026', 'R$ 189,00') +
+                    mockDdaRow('Vivo Fibra Empresas', '20/09/2026', 'R$ 249,90') +
+                    mockDdaRow('Google Workspace Business', '22/09/2026', 'R$ 72,00') +
+                    mockDdaRow('Serasa Experian PJ', '28/09/2026', 'R$ 119,90');
                 document.getElementById('ddaItemsList').innerHTML = ddaHtml;
                 document.getElementById('payDdaFullList').innerHTML = ddaHtml;
-
-                document.getElementById('cobrancasTableBody').innerHTML = `
-                    <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
-                        <td class="py-4 px-4"><div class="font-black">TechCorp Solutions LTDA</div><div class="text-xs opacity-60 font-mono">Contrato Software Enterprise</div></td>
-                        <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Pago</span></td>
-                        <td class="py-4 px-4 font-mono opacity-80">01/09/2026</td>
-                        <td class="py-4 px-4 text-right font-black text-emerald-500 font-mono text-sm">R$ 8.500,00</td>
-                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via do Contrato TechCorp aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
-                    </tr>
-                    <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
-                        <td class="py-4 px-4"><div class="font-black">André Morais</div><div class="text-xs opacity-60 font-mono">Licença SaaS Mensal</div></td>
-                        <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/10 text-amber-500 border border-amber-400/20">À vencer</span></td>
-                        <td class="py-4 px-4 font-mono opacity-80">16/09/2026</td>
-                        <td class="py-4 px-4 text-right font-black text-inherit font-mono text-sm">R$ 850,00</td>
-                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via da Licença André Morais aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
-                    </tr>
-                    <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
-                        <td class="py-4 px-4"><div class="font-black">Alpha Logística & Transportes</div><div class="text-xs opacity-60 font-mono">API de Rastreamento de Frotas</div></td>
-                        <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Pago</span></td>
-                        <td class="py-4 px-4 font-mono opacity-80">28/08/2026</td>
-                        <td class="py-4 px-4 text-right font-black text-emerald-500 font-mono text-sm">R$ 4.200,00</td>
-                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via Alpha Logística aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
-                    </tr>
-                `;
+                document.getElementById('cobrancasTableBody').innerHTML =
+                    mockCobRow('TechCorp Solutions LTDA', 'Contrato software enterprise', true, '01/09/2026', 'R$ 8.500,00') +
+                    mockCobRow('André Morais', 'Licença SaaS mensal', false, '16/09/2026', 'R$ 850,00') +
+                    mockCobRow('Alpha Logística', 'API de rastreamento', true, '28/08/2026', 'R$ 4.200,00') +
+                    mockCobRow('Nexus Cloud', 'Módulo customizado', false, '25/09/2026', 'R$ 1.500,00') +
+                    mockCobRow('Studio Harmonia', 'Manutenção anual', true, '12/08/2026', 'R$ 2.180,00');
             } else if (isMaria) {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 35.000,00';
                 document.getElementById('mainLimitDisplay').innerText = 'R$ 35.000,00';
@@ -1984,35 +1981,26 @@
                 document.getElementById('cardLimitUsed').innerText = 'R$ 4.210,00';
                 document.getElementById('cardLimitAvailable').innerText = 'R$ 15.790,00';
                 document.getElementById('cardLimitTotalText').innerText = 'R$ 20.000,00';
-                document.getElementById('cardTransactionsList').innerHTML = `
-                    <div class="py-4 flex items-center justify-between hover:bg-black/5 dark:hover:bg-zinc-900/50 rounded-2xl px-3 transition">
-                        <div><div class="text-sm font-extrabold">Latam Airlines Brasil</div><div class="text-xs opacity-60">Passagem SP-RJ • 29/Ago</div></div>
-                        <div class="text-right"><div class="text-sm font-black font-mono">R$ 890,00</div><div class="text-xs text-blue-500 font-bold">em 5x no crédito</div></div>
-                    </div>
-                `;
-                document.getElementById('ddaSubtitle').innerText = 'Emitidos para Maria Silva Santos (CPF)';
-                const ddaHtml = `
-                    <div class="py-3.5 flex items-center justify-between">
-                        <div><div class="text-xs font-black">Condomínio Edifício Paulista</div><div class="text-xs opacity-60 font-mono">Vencimento: 08/09/2026 • DDA CIP</div></div>
-                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 650,00</div><button onclick="showToastNotification('Boleto Condomínio quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
-                    </div>
-                    <div class="py-3.5 flex items-center justify-between">
-                        <div><div class="text-xs font-black">Unimed Saúde Corporativo</div><div class="text-xs opacity-60 font-mono">Vencimento: 12/09/2026 • DDA CIP</div></div>
-                        <div class="text-right"><div class="text-xs font-black font-mono">R$ 890,00</div><button onclick="showToastNotification('Boleto Unimed quitado!', 'success')" class="text-xs font-bold text-blue-500 hover:underline mt-1">Pagar Agora</button></div>
-                    </div>
-                `;
+                document.getElementById('cardTransactionsList').innerHTML =
+                    mockCardRow('Latam Airlines Brasil', 'SP–RJ · 5x · 29/Ago', '890,00') +
+                    mockCardRow('Farmácia Droga Raia', 'Crédito · 28/Ago', '186,40') +
+                    mockCardRow('Uber *Trip', 'Deslocamento · 27/Ago', '54,90') +
+                    mockCardRow('Netflix.com', 'Assinatura · 25/Ago', '55,90') +
+                    mockCardRow('Padaria Bella Vista', 'Débito · 24/Ago', '42,30');
+                document.getElementById('ddaSubtitle').innerText = 'Agenda simulada · Maria Silva Santos';
+                const ddaHtml =
+                    mockDdaRow('Condomínio Edifício Paulista', '08/09/2026', 'R$ 650,00') +
+                    mockDdaRow('Unimed Saúde Corporativo', '12/09/2026', 'R$ 890,00') +
+                    mockDdaRow('Enel Energia', '18/09/2026', 'R$ 312,45') +
+                    mockDdaRow('Claro Residencial', '22/09/2026', 'R$ 129,90');
                 document.getElementById('ddaItemsList').innerHTML = ddaHtml;
                 document.getElementById('payDdaFullList').innerHTML = ddaHtml;
 
-                document.getElementById('cobrancasTableBody').innerHTML = `
-                    <tr class="hover:bg-black/5 dark:hover:bg-zinc-900/50 transition">
-                        <td class="py-4 px-4"><div class="font-black">Finanças & Gestão Integrada</div><div class="text-xs opacity-60 font-mono">Consultoria Financeira</div></td>
-                        <td class="py-4 px-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Pago</span></td>
-                        <td class="py-4 px-4 font-mono opacity-80">28/08/2026</td>
-                        <td class="py-4 px-4 text-right font-black text-emerald-500 font-mono text-sm">R$ 4.200,00</td>
-                        <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via da Consultoria aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
-                    </tr>
-                `;
+                document.getElementById('cobrancasTableBody').innerHTML =
+                    mockCobRow('Finanças & Gestão Integrada', 'Consultoria financeira', true, '28/08/2026', 'R$ 4.200,00') +
+                    mockCobRow('Studio Harmonia', 'Projeto de identidade', false, '18/09/2026', 'R$ 1.280,00') +
+                    mockCobRow('Ateliê Norte', 'Licença trimestral', true, '10/08/2026', 'R$ 960,00') +
+                    mockCobRow('Clínica Prime', 'Honorários agosto', false, '20/09/2026', 'R$ 740,00');
             } else {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 10.000,00';
                 document.getElementById('mainLimitDisplay').innerText = 'R$ 10.000,00';
@@ -2027,11 +2015,19 @@
                 document.getElementById('cardLimitUsed').innerText = 'R$ 0,00';
                 document.getElementById('cardLimitAvailable').innerText = 'R$ 10.000,00';
                 document.getElementById('cardLimitTotalText').innerText = 'R$ 10.000,00';
-                document.getElementById('cardTransactionsList').innerHTML = '<div class="py-4 px-3 text-xs opacity-60">Sem lançamentos simulados para esta conta.</div>';
-                document.getElementById('ddaSubtitle').innerText = 'Agenda DDA simulada';
-                document.getElementById('ddaItemsList').innerHTML = '<div class="py-3.5 text-xs opacity-60">Nenhum boleto simulado para este CPF.</div>';
-                document.getElementById('payDdaFullList').innerHTML = '<div class="py-3.5 text-xs opacity-60">Nenhum boleto simulado para este CPF.</div>';
-                document.getElementById('cobrancasTableBody').innerHTML = '<tr><td colspan="5" class="py-6 px-4 text-xs opacity-60 text-center">Nenhuma cobrança simulada. Use Pix e depósito para operar o ledger real.</td></tr>';
+                document.getElementById('cardTransactionsList').innerHTML =
+                    mockCardRow('Mercado Livre', 'Crédito · 01/Set', '219,90') +
+                    mockCardRow('Posto Ipiranga', 'Débito · 30/Ago', '180,00') +
+                    mockCardRow('Spotify', 'Assinatura · 28/Ago', '21,90');
+                document.getElementById('ddaSubtitle').innerText = 'Agenda simulada';
+                const ddaHtmlNew =
+                    mockDdaRow('Conta de energia', '12/09/2026', 'R$ 210,00') +
+                    mockDdaRow('Internet fibra', '18/09/2026', 'R$ 99,90');
+                document.getElementById('ddaItemsList').innerHTML = ddaHtmlNew;
+                document.getElementById('payDdaFullList').innerHTML = ddaHtmlNew;
+                document.getElementById('cobrancasTableBody').innerHTML =
+                    mockCobRow('Cliente demonstração', 'Serviço avulso', false, '30/09/2026', 'R$ 1.200,00') +
+                    mockCobRow('Projeto piloto', 'Setup inicial', true, '05/09/2026', 'R$ 3.000,00');
             }
 
             await loadOrCreateAccount();
@@ -2187,7 +2183,7 @@
 
             const recValor = document.getElementById('recValor');
             recValor.innerText = (isCredit ? '+ ' : '− ') + 'R$ ' + tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-            recValor.style.color = isCredit ? '#F6F1E8' : '#C42B2B';
+            recValor.style.color = isCredit ? '#121212' : '#B42318';
             const holderEl = document.getElementById('recHolder');
             if (holderEl) holderEl.innerText = (currentAuthUser && currentAuthUser.full_name) ? currentAuthUser.full_name : 'Correntista BankCore';
             document.getElementById('recTipo').innerText = tx.transaction_type === 'BILL_PAYMENT' ? 'Pagamento de boleto' : (isCredit ? 'Pix recebido' : 'Pix enviado');
@@ -2205,7 +2201,7 @@
                 margin:       10,
                 filename:     `Comprovante_BankCore_${Date.now()}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, backgroundColor: '#0B0B0C' },
+                html2canvas:  { scale: 2, backgroundColor: '#F4F1EA' },
                 jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
@@ -2223,42 +2219,85 @@
                 margin:       10,
                 filename:     `Fatura_Cartao_BankCore_${Date.now()}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, backgroundColor: '#0B0B0C' },
+                html2canvas:  { scale: 2, backgroundColor: '#F4F1EA' },
                 jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
             showToastNotification('Fatura simulada baixada em PDF.', 'success');
         }
 
-        function exportStatementCSV() {
-            if (!window._currentTransactions || window._currentTransactions.length === 0) {
+        function moneyBr(n) {
+            return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        function exportStatementPDF() {
+            const txs = window._currentTransactions;
+            if (!txs || txs.length === 0) {
                 showToastNotification('Nenhuma movimentação para exportar.', 'warning');
                 return;
             }
-
+            const name = (currentAuthUser && currentAuthUser.full_name) || 'Correntista';
+            const cpf = formatCPF(currentAuthUser && currentAuthUser.tax_id);
+            const acc = currentAccount && currentAccount.account_number ? currentAccount.account_number : '—';
             const now = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-            let csv = "\uFEFF";
-            csv += `RELATÓRIO CONTÁBIL OFICIAL - BANKCORE | VORTEX SOFTWARE\n`;
-            csv += `Titular da Conta;${currentAuthUser.full_name}\n`;
-            csv += `CPF / CNPJ;${formatCPF(currentAuthUser.tax_id)}\n`;
-            csv += `Emissão;${now} (Horário Oficial de Brasília)\n\n`;
-            csv += `Data;Hora;Identificação da Transação;Operação;Valor (R$);Protocolo\n`;
-
-            window._currentTransactions.forEach(tx => {
+            let income = 0, expense = 0;
+            const rows = txs.map(function (tx) {
                 const isCredit = tx.direction === 'CREDIT';
+                if (isCredit) income += tx.amount_reais; else expense += tx.amount_reais;
                 const d = new Date(tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z');
-                csv += `"${d.toLocaleDateString('pt-BR')}";"${d.toLocaleTimeString('pt-BR')}";"${tx.description}";"${isCredit ? 'CRÉDITO' : 'DÉBITO'}";"${(isCredit ? '' : '-') + tx.amount_reais.toFixed(2).replace('.', ',')}";"${tx.idempotency_key}"\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Extrato_BankCore_${currentAuthUser.full_name.replace(/\s+/g, '_')}_${Date.now()}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToastNotification('Extrato CSV exportado com sucesso!', 'success');
+                const when = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                const color = isCredit ? '#121212' : '#B42318';
+                const sign = isCredit ? '+' : '−';
+                return `<tr>
+                    <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;font-family:ui-monospace,monospace;">${when}</td>
+                    <td style="padding:10px 8px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;">${tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado')}</td>
+                    <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;">${isCredit ? 'Crédito' : 'Débito'}</td>
+                    <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:${color};">${sign} R$ ${moneyBr(tx.amount_reais)}</td>
+                </tr>`;
+            }).join('');
+            const el = document.getElementById('statementPrintableArea');
+            el.innerHTML = `
+                <div style="height:2px;background:#9A7B32;margin:-36px -36px 22px;"></div>
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+                    <div>
+                        <div style="font-size:22px;font-weight:600;">Bank<span style="color:#9A7B32;">Core</span></div>
+                        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6560;margin-top:4px;">Extrato da conta corrente</div>
+                    </div>
+                    <div style="text-align:right;font-size:11px;color:#6B6560;line-height:1.6;">
+                        <div>${name}</div>
+                        <div>CPF ${cpf}</div>
+                        <div>Ag. 0001-9 · Cc. ${acc}</div>
+                        <div>Emitido em ${now}</div>
+                    </div>
+                </div>
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Data</th>
+                            <th style="text-align:left;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Descrição</th>
+                            <th style="text-align:left;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Tipo</th>
+                            <th style="text-align:right;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <div style="display:flex;justify-content:flex-end;gap:28px;margin-top:18px;font-size:12px;">
+                    <div>Entradas <strong>+ R$ ${moneyBr(income)}</strong></div>
+                    <div>Saídas <strong style="color:#B42318;">− R$ ${moneyBr(expense)}</strong></div>
+                </div>
+                <div style="margin-top:28px;font-size:10px;line-height:1.5;color:#6B6560;">
+                    Vortex Software · documento de demonstração. Não é extrato BACEN.
+                    Os lançamentos refletem o livro-razão BankCore (partidas dobradas).
+                </div>
+            `;
+            html2pdf().set({
+                margin: 10,
+                filename: `Extrato_BankCore_${name.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#F4F1EA' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(el).save();
+            showToastNotification('Extrato exportado em PDF.', 'success');
         }
 
         async function handleLogin(e) {
