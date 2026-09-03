@@ -1,95 +1,143 @@
-# BankCore — Web Banking de Demonstração
+# BankCore
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+Web banking corporativo de **demonstração** — FastAPI, PostgreSQL, Redis e um ledger de partidas dobradas. Feito para portfólio: o avaliador entra em um clique, envia Pix, lê o extrato e baixa o comprovante em PDF.
+
+**Isto não é um banco real e não se conecta ao SPI/DICT do BACEN.** O núcleo financeiro (login, saldo, depósito, Pix interno, extrato) é API de verdade. Cartões, DDA, MED, boletos, investimentos e crédito são simulação de interface, com dados mock só para a tela parecer viva.
+
+[![FastAPI](https://img.shields.io/badge/FastAPI-async-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192.svg?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-
-Demo de **web banking corporativo (PJ)** para portfólio: um avaliador abre a URL, entra em um clique e opera saldo, Pix interno, depósito e extrato contra um ledger com partidas dobradas, lock pessimista e idempotência.
-
-Isto **não** é um core conectado ao SPI/DICT do BACEN nem um banco real. Cartões, DDA, MED, boletos, invest e crédito são **simulação de interface** (módulos didáticos na SPA).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 ---
 
-## Acesso
+## Demonstração
 
-* Demo: [http://2.25.126.53](http://2.25.126.53)
-* Swagger Auth: [http://2.25.126.53/auth/docs](http://2.25.126.53/auth/docs)
-* Swagger Ledger: [http://2.25.126.53/transactions/docs](http://2.25.126.53/transactions/docs)
+- App: [http://2.25.126.53](http://2.25.126.53)
+- Auth API: [http://2.25.126.53/auth/docs](http://2.25.126.53/auth/docs)
+- Ledger API: [http://2.25.126.53/transactions/docs](http://2.25.126.53/transactions/docs)
 
-Ambiente HTTP de laboratório (IP da VPS, sem TLS).
+Ambiente de laboratório em HTTP (IP da VPS).
 
-### Contas de demonstração
+### Contas de um clique
 
-| Titular | CPF | Senha | Saldo inicial (seed) |
-| :--- | :--- | :--- | :--- |
-| João Paulo Gregorio de Souza | `33548376835` | `teste123456` | R$ 18.450,80 |
-| Maria Silva Santos | `12345678900` | `teste123456` | R$ 12.870,40 |
-
-Contas já existentes na VPS **não** são sobrescritas pelo seed.
-
-Dá para **Abrir Conta Carbon** com outro CPF: o cadastro chama a API, cria a conta no ledger e permite Pix para João/Maria.
-
----
-
-## O que o avaliador opera de verdade
-
-| Operação | Onde | Efeito |
+| Titular | CPF | Senha |
 | :--- | :--- | :--- |
-| Login / register | `POST /auth/login`, `POST /auth/register` | JWT HS256 |
-| Conta corrente | `POST /accounts/` (Bearer) | Cria ou devolve a conta do `sub` do token |
-| Depósito | `POST /transactions/deposit` | Débito na conta de liquidação + crédito no correntista |
-| Pix por CPF | `POST /transactions/pix` | Diretório interno `GET /auth/directory/{cpf}` — **sem** senha do destino |
-| Extrato, CSV, PDF | `GET /accounts/{id}/statement` | Cabeçalho da transação + direção CREDIT/DEBIT |
+| João Paulo Gregorio de Souza | `33548376835` | `teste123456` |
+| Maria Silva Santos | `12345678900` | `teste123456` |
 
-Rotas financeiras **exigem JWT**. Request sem token → 401.
+**Caminho do avaliador (2 minutos):** login → Pix para o CPF da outra conta → extrato → comprovante PDF. Também dá para **Abrir conta** com um CPF novo e Pixar para João ou Maria.
 
-### O que é simulação de UX
-
-Central de Cartões, DDA CIP, boletos, débitos automáticos, Pix de presente, MED BACEN, limites Pix, cobranças PJ, BankCore Invest e o simulador Price **não gravam no ledger**. A UI deixa isso explícito.
+Rotas financeiras exigem JWT. Sem token, `POST /accounts/` e `POST /transactions/*` respondem **401**.
 
 ---
 
-## Engenharia do ledger (o que defender em entrevista)
+## O que é real e o que é simulado
 
-1. **Centavos inteiros** (`BIGINT`). Nada de `float` para dinheiro.
-2. **Partidas dobradas:** cada operação gera um par `ledger_entries` (DEBIT + CREDIT) de mesmo valor. Depósito: débito na conta de liquidação interna `00000-0`, crédito no correntista. Pix: débito origem, crédito destino. \(\sum\) débitos \(=\) \(\sum\) créditos.
-3. **Saldo em `accounts.balance_cents`** é cache atualizado **na mesma transação** das entradas. Fonte auditável = o razão.
-4. **ACID + `SELECT … FOR UPDATE`** nas contas envolvidas, em ordem de UUID, para evitar deadlock e gasto duplo.
-5. **Idempotência em duas camadas:** `SET idem:{key} NX EX 86400` no Redis e `idempotency_key` unique no Postgres (`IntegrityError` devolve a transação existente).
-6. **Pix interno:** o CPF é resolvido no Auth Service com o JWT do remetente. Não há login com senha fixa no destino.
+| Real (grava no ledger) | Simulado (só UX / mock) |
+| :--- | :--- |
+| Cadastro, login, JWT | Central de cartões e fatura |
+| Conta corrente e saldo | Agenda DDA, boletos, débitos automáticos |
+| Depósito | Pix de presente, QR, limites Pix, MED |
+| Pix interno por CPF | Cobranças PJ |
+| Extrato, comprovante PDF, extrato PDF | BankCore Invest e crédito (Tabela Price) |
 
-Stack: FastAPI (async) + SQLAlchemy 2 + asyncpg + PostgreSQL 16 + Redis 7 + Nginx + SPA Vanilla JS / Tailwind.
+---
+
+## Arquitetura
 
 ```
-Navegador → Nginx :80
-              ├─ /                 frontend/index.html
-              ├─ /auth/*           auth-service :8000
-              └─ /transactions/*, /accounts/*   transactions-service :8001
-                    ├─ PostgreSQL  (bankcore_auth | bankcore_transactions)
-                    └─ Redis       (chaves de idempotência)
+Navegador
+    │
+    ▼
+Nginx (porta 80)
+    ├─ /                         SPA  (frontend/index.html)
+    ├─ /auth/*                   auth-service        :8000
+    └─ /transactions/*  /accounts/*   transactions-service :8001
+              │                              │
+              ▼                              ▼
+        PostgreSQL                    PostgreSQL + Redis
+        bankcore_auth                 bankcore_transactions
+                                      idempotência NX + razão
 ```
+
+| Peça | Papel |
+| :--- | :--- |
+| `services/auth-service` | Correntistas, bcrypt, JWT, diretório de CPF (`GET /auth/directory/{tax_id}`) |
+| `services/transactions-service` | Contas, depósito, Pix, extrato, partidas dobradas |
+| `frontend/index.html` | SPA Vanilla JS + Tailwind (tema Carbon Ledger) |
+| `infra/nginx/bankcore.conf` | Proxy e estáticos |
+| `docker-compose.yml` | Stack local |
+| `docker-compose.vps.yml` | Overlay: junta os serviços à rede `web_gateway` da VPS |
+
+---
+
+## Ledger (o que o código faz)
+
+Implementação em `services/transactions-service/app/services/ledger.py`. Notas para entrevista: [`docs/ENTREVISTA.md`](docs/ENTREVISTA.md).
+
+1. **Centavos inteiros** (`BIGINT`). A API só converte para reais na borda.
+2. **Partidas dobradas.** Cada operação gera um par `ledger_entries` (DEBIT + CREDIT) do mesmo valor.
+   - Depósito: débito na conta de liquidação `00000-0`, crédito no correntista.
+   - Pix: débito na origem, crédito no destino.
+3. **Saldo em cache.** `accounts.balance_cents` atualiza no mesmo `COMMIT` das entradas. A trilha auditável é o razão.
+4. **Concorrência.** `SELECT … FOR UPDATE` nas contas, ordenadas por UUID (anti-deadlock, anti gasto-duplo).
+5. **Idempotência em duas camadas.** Redis `SET idem:{key} NX EX 86400` e unique no Postgres; em falha a chave Redis é liberada.
+6. **Pix interno.** O CPF do destino é resolvido no Auth com o JWT do **remetente**. Não há login com senha do destinatário.
+
+---
+
+## Interface
+
+Paleta **Carbon Ledger**: preto / ivory / ouro (acento) / vermelho só em saídas. Tipografia contida, um CTA ouro por tela.
+
+Comprovante e extrato em PDF saem em papel cream, coerentes com a página — com aviso explícito de documento de demonstração (não é SPI/BACEN).
+
+---
+
+## Stack
+
+Python 3.12 · FastAPI (async) · SQLAlchemy 2 · asyncpg · PostgreSQL 16 · Redis 7 · Nginx · Vanilla JS · Tailwind CSS (CDN)
 
 ---
 
 ## Rodar local
 
 ```bash
+git clone https://github.com/joaop-gregorioDS/bankcore-fintech.git
+cd bankcore-fintech
 cp .env.example .env
 docker compose up -d --build
 ```
 
-Abra `http://localhost`. Na VPS que já usa Nginx do host na rede `web_gateway`:
+Abra `http://localhost`.
+
+Na VPS que já usa o Nginx `central-nginx-proxy` na rede `web_gateway`:
 
 ```bash
+cp .env.example .env          # senha do Postgres = a do volume existente
+export GATEWAY_PORT=8080      # não disputa a porta 80 com o proxy do host
 docker compose -f docker-compose.yml -f docker-compose.vps.yml up -d --build
 ```
 
-**Segredos:** o histórico do Git já publicou senha antiga de Postgres/JWT. Na VPS, gere valores novos em `.env` e **não** reuse `bankcore_secret_password_2026` / `super_secret_jwt_key_bankcore_production_2026`.
+Segredos ficam no `.env` (não versionado). Use valores próprios; o histórico público do Git já teve credenciais de exemplo.
 
 ---
 
-## Autor
+## Estrutura
 
-**João Paulo Gregorio de Souza**  
-Vortex Software
+```
+frontend/                 SPA
+services/auth-service/    autenticação e diretório Pix
+services/transactions-service/
+  app/services/ledger.py  partidas dobradas, lock, idempotência
+infra/nginx/              conf do gateway
+docs/ENTREVISTA.md        mapa código ↔ perguntas de entrevista
+```
+
+---
+
+## Licença
+
+MIT © João Paulo Gregorio de Souza · Vortex Software
