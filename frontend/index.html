@@ -1480,7 +1480,7 @@
         </div>
     </div>
 
-    <div id="statementPrintableArea" style="position:fixed;left:-9999px;top:0;width:720px;background:#F4F1EA;color:#121212;padding:36px;font-family:'Plus Jakarta Sans',sans-serif;"></div>
+    <div id="statementPrintableArea" style="position:fixed;left:0;top:0;width:720px;padding:36px;background:#F4F1EA;color:#121212;font-family:'Plus Jakarta Sans',sans-serif;z-index:-1;pointer-events:none;opacity:0;"></div>
 
     <!-- MODAL: DDA PAGAR E GERENCIAR -->
     <div id="modalDDA" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
@@ -2230,6 +2230,12 @@
             return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         }
 
+        function escapeHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+            });
+        }
+
         function exportStatementPDF() {
             const txs = window._currentTransactions;
             if (!txs || txs.length === 0) {
@@ -2248,26 +2254,27 @@
                 const when = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
                 const color = isCredit ? '#121212' : '#B42318';
                 const sign = isCredit ? '+' : '−';
+                const desc = escapeHtml(tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado'));
                 return `<tr>
                     <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;font-family:ui-monospace,monospace;">${when}</td>
-                    <td style="padding:10px 8px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;">${tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado')}</td>
+                    <td style="padding:10px 8px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;">${desc}</td>
                     <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;">${isCredit ? 'Crédito' : 'Débito'}</td>
                     <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:${color};">${sign} R$ ${moneyBr(tx.amount_reais)}</td>
                 </tr>`;
             }).join('');
             const el = document.getElementById('statementPrintableArea');
             el.innerHTML = `
-                <div style="height:2px;background:#9A7B32;margin:-36px -36px 22px;"></div>
+                <div style="height:2px;background:#9A7B32;margin:0 0 22px;"></div>
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
                     <div>
                         <div style="font-size:22px;font-weight:600;">Bank<span style="color:#9A7B32;">Core</span></div>
                         <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6560;margin-top:4px;">Extrato da conta corrente</div>
                     </div>
                     <div style="text-align:right;font-size:11px;color:#6B6560;line-height:1.6;">
-                        <div>${name}</div>
-                        <div>CPF ${cpf}</div>
-                        <div>Ag. 0001-9 · Cc. ${acc}</div>
-                        <div>Emitido em ${now}</div>
+                        <div>${escapeHtml(name)}</div>
+                        <div>CPF ${escapeHtml(cpf)}</div>
+                        <div>Ag. 0001-9 · Cc. ${escapeHtml(acc)}</div>
+                        <div>Emitido em ${escapeHtml(now)}</div>
                     </div>
                 </div>
                 <table style="width:100%;border-collapse:collapse;">
@@ -2290,14 +2297,40 @@
                     Os lançamentos refletem o livro-razão BankCore (partidas dobradas).
                 </div>
             `;
+            el.style.opacity = '1';
+            el.style.zIndex = '0';
+            showToastNotification('Gerando PDF do extrato…', 'info');
             html2pdf().set({
-                margin: 10,
+                margin: 12,
                 filename: `Extrato_BankCore_${name.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, backgroundColor: '#F4F1EA' },
+                html2canvas: {
+                    scale: 2,
+                    backgroundColor: '#F4F1EA',
+                    scrollX: 0,
+                    scrollY: 0,
+                    useCORS: true,
+                    onclone: function (clonedDoc) {
+                        const clone = clonedDoc.getElementById('statementPrintableArea');
+                        if (!clone) return;
+                        clone.style.opacity = '1';
+                        clone.style.position = 'static';
+                        clone.style.left = 'auto';
+                        clone.style.top = 'auto';
+                        clone.style.zIndex = '1';
+                        clone.style.display = 'block';
+                    }
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).from(el).save();
-            showToastNotification('Extrato exportado em PDF.', 'success');
+            }).from(el).save().then(function () {
+                el.style.opacity = '0';
+                el.style.zIndex = '-1';
+                showToastNotification('Extrato exportado em PDF.', 'success');
+            }).catch(function () {
+                el.style.opacity = '0';
+                el.style.zIndex = '-1';
+                showToastNotification('Não foi possível gerar o PDF do extrato.', 'error');
+            });
         }
 
         async function handleLogin(e) {
