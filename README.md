@@ -134,6 +134,7 @@ services/transactions-service/
   app/services/ledger.py  partidas dobradas, lock, idempotência
 infra/nginx/              conf do gateway
 docs/LEDGER.md            mapa afirmação → arquivo (ledger, JWT, Pix)
+docs/clients/             specs iOS (Mac), Android e Tauri
 ```
 
 ---
