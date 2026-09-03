@@ -2244,7 +2244,7 @@
             }
             const name = (currentAuthUser && currentAuthUser.full_name) || 'Correntista';
             const cpf = formatCPF(currentAuthUser && currentAuthUser.tax_id);
-            const acc = currentAccount && currentAccount.account_number ? currentAccount.account_number : '—';
+            const acc = currentAccount && currentAccount.account_number ? currentAccount.account_number : '-';
             const now = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
             let income = 0, expense = 0;
             const rows = txs.map(function (tx) {
@@ -2253,84 +2253,60 @@
                 const d = new Date(tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z');
                 const when = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
                 const color = isCredit ? '#121212' : '#B42318';
-                const sign = isCredit ? '+' : '−';
+                const sign = isCredit ? '+' : '-';
                 const desc = escapeHtml(tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado'));
-                return `<tr>
-                    <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;font-family:ui-monospace,monospace;">${when}</td>
-                    <td style="padding:10px 8px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;">${desc}</td>
-                    <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;">${isCredit ? 'Crédito' : 'Débito'}</td>
-                    <td style="padding:10px 0;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:${color};">${sign} R$ ${moneyBr(tx.amount_reais)}</td>
-                </tr>`;
+                return '<tr>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;">' + when + '</td>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;">' + desc + '</td>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;">' + (isCredit ? 'Credito' : 'Debito') + '</td>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;text-align:right;color:' + color + ';">' + sign + ' R$ ' + moneyBr(tx.amount_reais) + '</td>' +
+                    '</tr>';
             }).join('');
-            const el = document.getElementById('statementPrintableArea');
-            el.innerHTML = `
-                <div style="height:2px;background:#9A7B32;margin:0 0 22px;"></div>
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
-                    <div>
-                        <div style="font-size:22px;font-weight:600;">Bank<span style="color:#9A7B32;">Core</span></div>
-                        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6560;margin-top:4px;">Extrato da conta corrente</div>
-                    </div>
-                    <div style="text-align:right;font-size:11px;color:#6B6560;line-height:1.6;">
-                        <div>${escapeHtml(name)}</div>
-                        <div>CPF ${escapeHtml(cpf)}</div>
-                        <div>Ag. 0001-9 · Cc. ${escapeHtml(acc)}</div>
-                        <div>Emitido em ${escapeHtml(now)}</div>
-                    </div>
-                </div>
-                <table style="width:100%;border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th style="text-align:left;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Data</th>
-                            <th style="text-align:left;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Descrição</th>
-                            <th style="text-align:left;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Tipo</th>
-                            <th style="text-align:right;font-size:10px;font-weight:600;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rows}</tbody>
-                </table>
-                <div style="display:flex;justify-content:flex-end;gap:28px;margin-top:18px;font-size:12px;">
-                    <div>Entradas <strong>+ R$ ${moneyBr(income)}</strong></div>
-                    <div>Saídas <strong style="color:#B42318;">− R$ ${moneyBr(expense)}</strong></div>
-                </div>
-                <div style="margin-top:28px;font-size:10px;line-height:1.5;color:#6B6560;">
-                    Vortex Software · documento de demonstração. Não é extrato BACEN.
-                    Os lançamentos refletem o livro-razão BankCore (partidas dobradas).
-                </div>
-            `;
-            el.style.opacity = '1';
-            el.style.zIndex = '0';
+
+            const old = document.getElementById('bankcore-pdf-host');
+            if (old) old.remove();
+
+            const host = document.createElement('div');
+            host.id = 'bankcore-pdf-host';
+            host.style.cssText = 'position:fixed;left:0;top:0;width:794px;padding:40px;background:#F4F1EA;color:#121212;z-index:2147483647;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;';
+            host.innerHTML =
+                '<div style="height:3px;background:#9A7B32;margin-bottom:20px;"></div>' +
+                '<table style="width:100%;margin-bottom:20px;"><tr>' +
+                '<td style="vertical-align:top;"><div style="font-size:22px;font-weight:700;">Bank<span style="color:#9A7B32;">Core</span></div>' +
+                '<div style="font-size:11px;color:#6B6560;margin-top:4px;">EXTRATO DA CONTA CORRENTE</div></td>' +
+                '<td style="vertical-align:top;text-align:right;font-size:11px;color:#6B6560;line-height:1.55;">' +
+                escapeHtml(name) + '<br>CPF ' + escapeHtml(cpf) + '<br>Ag. 0001-9 · Cc. ' + escapeHtml(acc) + '<br>Emitido em ' + escapeHtml(now) +
+                '</td></tr></table>' +
+                '<table style="width:100%;border-collapse:collapse;">' +
+                '<thead><tr>' +
+                '<th style="text-align:left;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Data</th>' +
+                '<th style="text-align:left;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Descricao</th>' +
+                '<th style="text-align:left;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Tipo</th>' +
+                '<th style="text-align:right;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Valor</th>' +
+                '</tr></thead><tbody>' + rows + '</tbody></table>' +
+                '<table style="width:100%;margin-top:18px;"><tr>' +
+                '<td style="text-align:right;font-size:12px;">Entradas <b>+ R$ ' + moneyBr(income) + '</b> &nbsp;&nbsp; Saidas <b style="color:#B42318;">- R$ ' + moneyBr(expense) + '</b></td>' +
+                '</tr></table>' +
+                '<p style="margin-top:28px;font-size:10px;line-height:1.5;color:#6B6560;">Vortex Software · documento de demonstracao. Nao e extrato BACEN. Os lancamentos refletem o livro-razao BankCore.</p>';
+
+            document.body.appendChild(host);
             showToastNotification('Gerando PDF do extrato…', 'info');
-            html2pdf().set({
-                margin: 12,
-                filename: `Extrato_BankCore_${name.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    backgroundColor: '#F4F1EA',
-                    scrollX: 0,
-                    scrollY: 0,
-                    useCORS: true,
-                    onclone: function (clonedDoc) {
-                        const clone = clonedDoc.getElementById('statementPrintableArea');
-                        if (!clone) return;
-                        clone.style.opacity = '1';
-                        clone.style.position = 'static';
-                        clone.style.left = 'auto';
-                        clone.style.top = 'auto';
-                        clone.style.zIndex = '1';
-                        clone.style.display = 'block';
-                    }
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).from(el).save().then(function () {
-                el.style.opacity = '0';
-                el.style.zIndex = '-1';
-                showToastNotification('Extrato exportado em PDF.', 'success');
-            }).catch(function () {
-                el.style.opacity = '0';
-                el.style.zIndex = '-1';
-                showToastNotification('Não foi possível gerar o PDF do extrato.', 'error');
-            });
+
+            setTimeout(function () {
+                html2pdf().set({
+                    margin: 10,
+                    filename: 'Extrato_BankCore_' + name.replace(/\s+/g, '_') + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, backgroundColor: '#F4F1EA', useCORS: true, logging: false },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                }).from(host).save().then(function () {
+                    host.remove();
+                    showToastNotification('Extrato exportado em PDF.', 'success');
+                }).catch(function () {
+                    host.remove();
+                    showToastNotification('Nao foi possivel gerar o PDF do extrato.', 'error');
+                });
+            }, 300);
         }
 
         async function handleLogin(e) {
