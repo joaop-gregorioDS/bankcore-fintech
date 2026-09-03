@@ -7,13 +7,25 @@ engine = create_async_engine(settings.DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
 
+redis_client = None
+
+
+async def init_redis():
+    global redis_client
+    redis_client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+
+
+async def close_redis():
+    global redis_client
+    if redis_client is not None:
+        await redis_client.close()
+        redis_client = None
+
+
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
+
 async def get_redis():
-    client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
-    try:
-        yield client
-    finally:
-        await client.close()
+    yield redis_client

@@ -130,7 +130,8 @@
                     <i data-lucide="shield" class="w-7 h-7 text-amber-400"></i>
                 </div>
                 <h1 class="text-3xl font-black text-white tracking-tight">Bank<span class="text-amber-400">Core</span></h1>
-                <p class="text-sm text-zinc-400 font-semibold">Web Banking de Alta Performance • Vortex Software</p>
+                <p class="text-sm text-zinc-400 font-semibold">Web Banking de demonstração • Vortex Software</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-amber-400/90">Ambiente de portfólio — operações reais no ledger interno</p>
             </div>
 
             <div class="carbon-card rounded-3xl p-5 border border-amber-500/30 shadow-2xl">
@@ -487,7 +488,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         <div class="lg:col-span-5 carbon-card rounded-3xl p-7 flex flex-col justify-between space-y-6">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-2xl font-black">Limite único</h2>
+                                <h2 class="text-2xl font-black flex items-center gap-2">Limite único <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-500/20 border border-zinc-500/30 tracking-wider">Simulado</span></h2>
                                 <button onclick="showToastNotification('Gestão de limites de crédito aberta.', 'info')" class="text-xs font-extrabold text-blue-500 hover:underline transition">
                                     Gerenciar limites
                                 </button>
@@ -624,7 +625,7 @@
                                 </div>
                                 <span>Central Pix</span>
                             </h2>
-                            <p class="text-xs opacity-70 mt-1">Transferências instantâneas, cobranças e gestão de limites do Banco Central</p>
+                            <p class="text-xs opacity-70 mt-1">Pix interno entre correntistas BankCore. Limites, MED e QR Code são simulação de UX.</p>
                         </div>
                         <button onclick="showToastNotification('Central de Ajuda Pix disponível 24h via SPI BACEN.', 'info')" class="w-10 h-10 rounded-2xl carbon-card hover:border-amber-500/50 flex items-center justify-center transition" title="Ajuda Pix">
                             <i data-lucide="help-circle" class="w-5 h-5 opacity-70"></i>
@@ -671,7 +672,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2">
-                                        <div class="text-base font-extrabold group-hover:text-emerald-500 transition">Pix de presente</div>
+                                        <div class="text-base font-extrabold group-hover:text-emerald-500 transition">Pix de presente <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-500/20 border border-zinc-500/30 text-inherit">Simulado</span></div>
                                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-black shadow-sm">Novo</span>
                                     </div>
                                     <div class="text-xs opacity-70 mt-1 leading-snug">Envie um Pix com cartão comemorativo personalizado.</div>
@@ -742,7 +743,7 @@
                                         <i data-lucide="shield-alert" class="w-5 h-5"></i>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-bold text-inherit group-hover:text-rose-500 transition">Informar golpe ou fraude (MED BACEN)</div>
+                                        <div class="text-sm font-bold text-inherit group-hover:text-rose-500 transition">Informar golpe ou fraude (MED BACEN) <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-500/20 border border-zinc-500/30">Simulado</span></div>
                                         <div class="text-xs opacity-70 mt-0.5">Use o Mecanismo Especial de Devolução para estorno em suspeitas de golpes.</div>
                                     </div>
                                 </div>
@@ -762,7 +763,7 @@
                                 </div>
                                 <span>Central de Pagamentos</span>
                             </h2>
-                            <p class="text-xs opacity-70 mt-1">Gestão de boletos, tributos, DDA e débitos automáticos</p>
+                            <p class="text-xs opacity-70 mt-1">Simulação de UX — boletos, tributos, DDA e débitos automáticos não liquidam no ledger</p>
                         </div>
                     </div>
 
@@ -886,7 +887,7 @@
                                 </div>
                                 <span>Gestão de Cobranças & Contratos</span>
                             </h2>
-                            <p class="text-xs opacity-70 mt-1">Emissão de faturas, links de pagamento e relatórios de recebíveis PJ</p>
+                            <p class="text-xs opacity-70 mt-1">Simulação de UX — emissão de faturas e links não grava no ledger</p>
                         </div>
                         <div class="flex items-center gap-3">
                             <button onclick="openModal('modalEmitirCobranca')" class="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition flex items-center gap-2 shadow-lg shadow-amber-500/15">
@@ -960,7 +961,7 @@
                                 </div>
                                 <span>BankCore Invest</span>
                             </h2>
-                            <p class="text-xs opacity-70 mt-1">Plataforma corporativa de investimentos com garantia do FGC até R$ 250 mil</p>
+                            <p class="text-xs opacity-70 mt-1">Módulo didático — simulação de CDB 104% do CDI. Não aplica saldo em conta.</p>
                         </div>
                         <button onclick="showToastNotification('Aporte de capital nos investimentos liberado!', 'success')" class="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center gap-2">
                             <i data-lucide="plus-circle" class="w-4.5 h-4.5"></i> Novo Aporte
@@ -1102,7 +1103,7 @@
                                 </div>
                                 <span>Empréstimos & Crédito Inteligente</span>
                             </h2>
-                            <p class="text-xs opacity-70 mt-1">Crédito pré-aprovado corporativo com liberação em até 2 minutos na conta corrente</p>
+                            <p class="text-xs opacity-70 mt-1">Módulo didático — Tabela Price no browser. Não concede crédito real.</p>
                         </div>
                     </div>
 
@@ -1594,9 +1595,35 @@
         let isSidebarCollapsed = false;
         let isFontScaleLarge = localStorage.getItem('bankcore_font_large') === 'true';
         let currentTheme = localStorage.getItem('bankcore_theme') || 'dark';
-        let sessionSeconds = 899;
+        let sessionSeconds = 3600;
         let toastTimeout = null;
         let currentLoanMonths = 24;
+        let sessionTimerHandle = null;
+
+        function taxIdDigits(value) {
+            return String(value || '').replace(/\D/g, '');
+        }
+
+        function authHeaders(extra) {
+            const headers = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+            if (currentAuthUser && currentAuthUser.token) {
+                headers['Authorization'] = 'Bearer ' + currentAuthUser.token;
+            }
+            return headers;
+        }
+
+        async function readApiError(res) {
+            try {
+                const body = await res.json();
+                if (typeof body.detail === 'string') return body.detail;
+                if (Array.isArray(body.detail)) {
+                    return body.detail.map(function (d) { return d.msg || JSON.stringify(d); }).join('; ');
+                }
+                return 'Falha na operação.';
+            } catch (e) {
+                return 'Falha na operação.';
+            }
+        }
 
         function applyTheme(theme) {
             currentTheme = theme;
@@ -1641,9 +1668,10 @@
         }
 
         function formatCPF(v) {
-            if (!v) return '335.483.768-35';
+            if (!v) return '—';
             v = String(v).replace(/\D/g, "");
             if (v.length === 11) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+            if (v.length === 14) return v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
             return v;
         }
 
@@ -1733,6 +1761,31 @@
             switchAuthTab('login');
         }
 
+        async function handleRegister(e) {
+            e.preventDefault();
+            const payload = {
+                tax_id: taxIdDigits(document.getElementById('regTaxId').value),
+                full_name: document.getElementById('regName').value.trim(),
+                email: document.getElementById('regEmail').value.trim(),
+                password: document.getElementById('regPassword').value
+            };
+            try {
+                showAlert('authAlert', 'Criando conta Carbon...', 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20');
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error(await readApiError(res));
+                document.getElementById('loginTaxId').value = payload.tax_id;
+                document.getElementById('loginPassword').value = payload.password;
+                switchAuthTab('login');
+                await handleLogin({ preventDefault: function () {} });
+            } catch (err) {
+                showAlert('authAlert', err.message, 'bg-rose-500/20 text-rose-500 border border-rose-500/30');
+            }
+        }
+
         function showAuth() {
             document.getElementById('authView').classList.remove('hidden');
             document.getElementById('appView').classList.add('hidden');
@@ -1742,11 +1795,14 @@
             document.getElementById('authView').classList.add('hidden');
             document.getElementById('appView').classList.remove('hidden');
 
-            const isJoao = (currentAuthUser.tax_id === '33548376835');
-            const fullName = isJoao ? 'João Paulo Gregorio de Souza' : 'Maria Silva Santos';
-            const cpfFormatted = formatCPF(isJoao ? '33548376835' : '12345678900');
-            const initials = isJoao ? 'JP' : 'MS';
-            const accNumber = isJoao ? '77412-7' : '88921-3';
+            const taxId = taxIdDigits(currentAuthUser.tax_id);
+            const isJoao = taxId === '33548376835';
+            const isMaria = taxId === '12345678900';
+            const fullName = currentAuthUser.full_name || (isJoao ? 'João Paulo Gregorio de Souza' : isMaria ? 'Maria Silva Santos' : 'Correntista BankCore');
+            const cpfFormatted = formatCPF(taxId);
+            const nameParts = fullName.split(/\s+/).filter(Boolean);
+            const initials = (nameParts.slice(0, 2).map(function (p) { return p[0]; }).join('') || 'BC').toUpperCase();
+            const accNumber = isJoao ? '77412-7' : isMaria ? '88921-3' : '—';
 
             document.getElementById('sideUserName').innerText = fullName;
             document.getElementById('topUserName').innerText = fullName;
@@ -1758,10 +1814,10 @@
             document.getElementById('perfilHeroName').innerText = fullName;
             document.getElementById('perfilHeroCpf').innerText = 'CPF: ' + cpfFormatted;
             document.getElementById('perfilHeroAcc').innerText = `Ag. 0001-9 • Cc. ${accNumber}`;
-            document.getElementById('perfilHeroSegment').innerText = isJoao ? 'Segmento: Vortex Carbon Black Corporate' : 'Segmento: Vortex Carbon Platinum';
+            document.getElementById('perfilHeroSegment').innerText = isJoao ? 'Segmento: Vortex Carbon Black Corporate' : isMaria ? 'Segmento: Vortex Carbon Platinum' : 'Segmento: BankCore Demo';
             document.getElementById('perfilInputName').value = fullName;
             document.getElementById('perfilInputCpf').value = cpfFormatted;
-            document.getElementById('perfilInputEmail').value = isJoao ? 'joao.paulo@vortexsoftware.com.br' : 'maria.silva@vortexsoftware.com.br';
+            document.getElementById('perfilInputEmail').value = isJoao ? 'joao.paulo@vortexsoftware.com.br' : isMaria ? 'maria.silva@vortexsoftware.com.br' : '';
 
             if (isJoao) {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 50.000,00';
@@ -1829,7 +1885,7 @@
                         <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via Alpha Logística aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
                     </tr>
                 `;
-            } else {
+            } else if (isMaria) {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 35.000,00';
                 document.getElementById('mainLimitDisplay').innerText = 'R$ 35.000,00';
                 document.getElementById('creditMaxDisplay').innerText = 'R$ 35.000,00';
@@ -1872,9 +1928,31 @@
                         <td class="py-4 px-4 text-center"><button onclick="showToastNotification('2ª Via da Consultoria aberta.', 'info')" class="opacity-60 hover:opacity-100 p-1"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
                     </tr>
                 `;
+            } else {
+                document.getElementById('sideLimitDisplay').innerText = 'R$ 10.000,00';
+                document.getElementById('mainLimitDisplay').innerText = 'R$ 10.000,00';
+                document.getElementById('creditMaxDisplay').innerText = 'R$ 10.000,00';
+                document.getElementById('cardBadgeType').innerText = 'Carbon';
+                document.getElementById('miniCardNumber').innerText = '•••• ••••';
+                document.getElementById('miniCardHolder').innerText = fullName.toUpperCase().slice(0, 22);
+                document.getElementById('cardNameSubtitle').innerText = 'Cartão virtual de demonstração';
+                document.getElementById('cardInvoiceValue').innerText = 'R$ 0,00';
+                document.getElementById('cardVisualNumber').innerText = '•••• •••• •••• ••••';
+                document.getElementById('cardVisualHolder').innerText = fullName.split(' ')[0].toUpperCase();
+                document.getElementById('cardLimitUsed').innerText = 'R$ 0,00';
+                document.getElementById('cardLimitAvailable').innerText = 'R$ 10.000,00';
+                document.getElementById('cardLimitTotalText').innerText = 'R$ 10.000,00';
+                document.getElementById('cardTransactionsList').innerHTML = '<div class="py-4 px-3 text-xs opacity-60">Sem lançamentos simulados para esta conta.</div>';
+                document.getElementById('ddaSubtitle').innerText = 'Agenda DDA simulada';
+                document.getElementById('ddaItemsList').innerHTML = '<div class="py-3.5 text-xs opacity-60">Nenhum boleto simulado para este CPF.</div>';
+                document.getElementById('payDdaFullList').innerHTML = '<div class="py-3.5 text-xs opacity-60">Nenhum boleto simulado para este CPF.</div>';
+                document.getElementById('cobrancasTableBody').innerHTML = '<tr><td colspan="5" class="py-6 px-4 text-xs opacity-60 text-center">Nenhuma cobrança simulada. Use Pix e depósito para operar o ledger real.</td></tr>';
             }
 
             await loadOrCreateAccount();
+            if (currentAccount && currentAccount.account_number) {
+                document.getElementById('perfilHeroAcc').innerText = `Ag. 0001-9 • Cc. ${currentAccount.account_number}`;
+            }
             await loadStatement();
             recalcLoan();
             navigateTo('inicio');
@@ -1917,7 +1995,7 @@
             const client = document.getElementById('cobClientName').value;
             const amount = parseFloat(document.getElementById('cobAmount').value);
             closeModal('modalEmitirCobranca');
-            showToastNotification(`Cobrança de R$ ${amount.toFixed(2).replace('.',',')} para ${client} emitida com sucesso!`, 'success', 'Cobrança Criada');
+            showToastNotification(`Simulação: cobrança de R$ ${amount.toFixed(2).replace('.',',')} para ${client} não grava no ledger.`, 'info', 'UX simulada');
         }
 
         function filterCobrancas(status) {
@@ -1939,26 +2017,21 @@
             try {
                 const res = await fetch('/accounts/', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders(),
                     body: JSON.stringify({ user_id: currentAuthUser.id })
                 });
 
-                if (res.ok) {
-                    currentAccount = await res.json();
-                } else {
-                    const isJoao = (currentAuthUser.tax_id === '33548376835');
-                    currentAccount = { id: isJoao ? 'aaaa1111-1111-1111-1111-111111111111' : 'bbbb2222-2222-2222-2222-222222222222', balance_reais: isJoao ? 18450.80 : 12870.40 };
-                }
+                if (!res.ok) throw new Error(await readApiError(res));
+                currentAccount = await res.json();
             } catch (err) {
-                const isJoao = (currentAuthUser.tax_id === '33548376835');
-                currentAccount = { id: isJoao ? 'aaaa1111-1111-1111-1111-111111111111' : 'bbbb2222-2222-2222-2222-222222222222', balance_reais: isJoao ? 18450.80 : 12870.40 };
+                currentAccount = null;
+                showToastNotification(err.message || 'Não foi possível carregar a conta.', 'error');
             }
             updateAccountUI();
         }
 
         function updateAccountUI() {
-            const isJoao = (currentAuthUser.tax_id === '33548376835');
-            const balance = currentAccount ? currentAccount.balance_reais : (isJoao ? 18450.80 : 12870.40);
+            const balance = currentAccount ? currentAccount.balance_reais : 0;
             const formatted = balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             
             document.getElementById('sideBalanceDisplay').innerHTML = isBalanceHidden ? '••••••' : `<span class="text-xs opacity-60 font-normal">R$</span> ${formatted}`;
@@ -1974,7 +2047,9 @@
 
             try {
                 if (!currentAccount) return;
-                const res = await fetch(`/accounts/${currentAccount.id}/statement`);
+                const res = await fetch(`/accounts/${currentAccount.id}/statement`, {
+                    headers: authHeaders()
+                });
                 if (res.ok) {
                     const txs = await res.json();
                     window._currentTransactions = txs;
@@ -2120,8 +2195,8 @@
                 const payload = JSON.parse(atob(tokenParts[1]));
                 currentAuthUser = {
                     id: payload.sub,
-                    tax_id: payload.tax_id || tax_id,
-                    full_name: payload.name || (tax_id === '33548376835' ? 'João Paulo Gregorio de Souza' : 'Maria Silva Santos'),
+                    tax_id: payload.tax_id || taxIdDigits(tax_id),
+                    full_name: payload.name || '',
                     token: data.access_token
                 };
 
@@ -2140,23 +2215,25 @@
             const idempotency_key = 'dep_' + Date.now();
 
             try {
+                if (!currentAccount) throw new Error('Conta não carregada.');
                 showAlert('depositAlert', 'Processando depósito no Ledger...', 'bg-emerald-500/20 text-emerald-500');
-                await fetch('/transactions/deposit', {
+                const res = await fetch('/transactions/deposit', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders(),
                     body: JSON.stringify({
                         account_id: currentAccount.id,
                         amount_reais: amount,
                         idempotency_key: idempotency_key
                     })
                 });
+                if (!res.ok) throw new Error(await readApiError(res));
 
                 closeModal('depositModal');
                 await refreshDashboard();
                 showToastNotification(`Depósito de R$ ${amount.toFixed(2).replace('.',',')} adicionado!`, 'success');
             } catch (err) {
-                closeModal('depositModal');
-                showToastNotification(`Depósito adicionado ao saldo!`, 'success');
+                showAlert('depositAlert', err.message, 'bg-rose-500/20 text-rose-500');
+                showToastNotification(err.message || 'Falha no depósito.', 'error');
             }
         }
 
@@ -2167,9 +2244,10 @@
             const desc = document.getElementById('pixDescInput').value;
 
             try {
-                await fetch('/transactions/pix', {
+                if (!currentAccount) throw new Error('Conta não carregada.');
+                const res = await fetch('/transactions/pix', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders(),
                     body: JSON.stringify({
                         source_account_id: currentAccount.id,
                         destination_key: dest,
@@ -2178,12 +2256,12 @@
                         description: desc
                     })
                 });
+                if (!res.ok) throw new Error(await readApiError(res));
                 closeModal('modalPixTransfer');
                 await refreshDashboard();
                 showToastNotification(`Pix de R$ ${amount.toFixed(2).replace('.',',')} enviado com sucesso!`, 'success');
             } catch (err) {
-                closeModal('modalPixTransfer');
-                showToastNotification(`Pix enviado com sucesso!`, 'success');
+                showToastNotification(err.message || 'Falha no Pix.', 'error');
             }
         }
 
@@ -2191,7 +2269,7 @@
             e.preventDefault();
             const amount = parseFloat(document.getElementById('boletoAmountInput').value);
             closeModal('modalBoletoPay');
-            showToastNotification(`Boleto de R$ ${amount.toFixed(2).replace('.',',')} pago com sucesso!`, 'success');
+            showToastNotification(`Simulação: boleto de R$ ${amount.toFixed(2).replace('.',',')} não altera o ledger.`, 'info', 'UX simulada');
         }
 
         function generateVirtualCard() {
@@ -2229,10 +2307,13 @@
         }
 
         function copyPixKey() {
-            const isJoao = !currentAuthUser || currentAuthUser.tax_id === '33548376835';
-            const key = isJoao ? '33548376835' : '12345678900';
+            const key = taxIdDigits(currentAuthUser && currentAuthUser.tax_id);
+            if (!key) {
+                showToastNotification('Chave Pix indisponível nesta sessão.', 'warning');
+                return;
+            }
             navigator.clipboard.writeText(key);
-            showToastNotification('Chave Pix copiada para a área de transferência!', 'success');
+            showToastNotification('Chave Pix (CPF) copiada para a área de transferência!', 'success');
         }
 
         function toggleBalanceVisibility() {
@@ -2266,13 +2347,19 @@
         }
 
         function startSessionTimer() {
-            setInterval(() => {
+            if (sessionTimerHandle) clearInterval(sessionTimerHandle);
+            sessionSeconds = 3600;
+            sessionTimerHandle = setInterval(() => {
                 if (sessionSeconds > 0) {
                     sessionSeconds--;
                     const min = String(Math.floor(sessionSeconds / 60)).padStart(2, '0');
                     const sec = String(sessionSeconds % 60).padStart(2, '0');
                     const el = document.getElementById('sessionTimer');
                     if (el) el.innerText = `${min}:${sec}`;
+                    if (sessionSeconds === 0) {
+                        logout();
+                        showToastNotification('Sessão expirada. Entre novamente.', 'warning');
+                    }
                 }
             }, 1000);
         }

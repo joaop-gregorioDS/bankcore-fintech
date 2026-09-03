@@ -1,7 +1,9 @@
+import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import engine, Base
+from app.database import engine, Base, AsyncSessionLocal, init_redis, close_redis
 from app.routes import accounts, transactions
+from app.seed import seed_demo_accounts
 
 app = FastAPI(
     title="BankCore Transactions & Ledger Service",
@@ -18,10 +20,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 async def startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await init_redis()
+    for _ in range(10):
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            async with AsyncSessionLocal() as session:
+                await seed_demo_accounts(session)
+            break
+        except Exception:
+            await asyncio.sleep(2)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await close_redis()
+
 
 @app.get("/health")
 async def health_check():

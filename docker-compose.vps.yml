@@ -1,0 +1,21 @@
+# Overlay para a VPS que já tem Nginx do host na rede web_gateway.
+# Uso:
+#   GATEWAY_PORT=8080 docker compose -f docker-compose.yml -f docker-compose.vps.yml up -d --build
+# (8080 evita colidir com o Nginx do host na porta 80.)
+
+services:
+  auth-service:
+    networks:
+      - bankcore_net
+      - web_gateway
+
+  transactions-service:
+    networks:
+      - bankcore_net
+      - web_gateway
+
+networks:
+  web_gateway:
+    name: web_gateway
+    external: true
+

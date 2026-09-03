@@ -3,6 +3,7 @@ __pycache__/
 *$py.class
 .pytest_cache/
 .env
+.grok/
 .venv
 env/
 venv/

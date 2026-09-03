@@ -21,7 +21,7 @@ class Account(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
     account_number = Column(String(20), unique=True, nullable=False, index=True)
-    balance_cents = Column(BigInteger, default=1000000, nullable=False)
+    balance_cents = Column(BigInteger, default=0, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
@@ -41,3 +41,13 @@ class LedgerTransaction(Base):
     __table_args__ = (
         Index("idx_ledger_accounts", "source_account_id", "destination_account_id"),
     )
+
+class LedgerEntry(Base):
+    __tablename__ = "ledger_entries"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    transaction_id = Column(UUID(as_uuid=True), ForeignKey("ledger_transactions.id"), nullable=False, index=True)
+    account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=False, index=True)
+    side = Column(String(6), nullable=False)
+    amount_cents = Column(BigInteger, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

@@ -27,3 +27,8 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class DirectoryLookupResponse(BaseModel):
+    user_id: UUID
+    tax_id: str
+    full_name: str

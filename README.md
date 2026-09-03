@@ -1,72 +1,95 @@
-# 🏦 BankCore — Enterprise Web Banking & Financial Ledger
+# BankCore — Web Banking de Demonstração
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0+-316192.svg?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED.svg?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639.svg?style=flat-square&logo=nginx&logoColor=white)](https://nginx.org/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0+-38B2AC.svg?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192.svg?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 
-Plataforma de **Core Banking Corporativo (PJ) & Clientes Carbon**, desenvolvida em arquitetura de microserviços distribuídos com garantia de consistência contábil estrita (**Double-Entry Bookkeeping Ledger / Partidas Dobradas**) e ecossistema SPI BACEN (Pix).
+Demo de **web banking corporativo (PJ)** para portfólio: um avaliador abre a URL, entra em um clique e opera saldo, Pix interno, depósito e extrato contra um ledger com partidas dobradas, lock pessimista e idempotência.
 
----
-
-## 🌐 Acesso Rápido & Demonstração
-
-* 🚀 **Web Banking (Produção):** [http://2.25.126.53](http://2.25.126.53)
-* 📑 **Documentação Swagger (Transactions API):** [http://2.25.126.53/transactions/docs](http://2.25.126.53/transactions/docs)
-* 🔐 **Documentação Swagger (Auth API):** [http://2.25.126.53/auth/docs](http://2.25.126.53/auth/docs)
+Isto **não** é um core conectado ao SPI/DICT do BACEN nem um banco real. Cartões, DDA, MED, boletos, invest e crédito são **simulação de interface** (módulos didáticos na SPA).
 
 ---
 
-## ✨ Destaques de Engenharia & Funcionalidades
+## Acesso
 
-### 1. 💼 Livro-Razão Contábil (Double-Entry Bookkeeping)
-* **Integridade Contábil Absoluta**: Nenhuma operação altera saldos isoladamente; cada débito gera o respectivo crédito na conta de liquidação bancária.
-* **Idempotência com Redis**: Eliminação de transações duplicadas em caso de instabilidade de rede.
-* **Exportação Contábil**: Geração de extrato em **CSV** e emissão de **Comprovantes Oficiais em PDF**.
+* Demo: [http://2.25.126.53](http://2.25.126.53)
+* Swagger Auth: [http://2.25.126.53/auth/docs](http://2.25.126.53/auth/docs)
+* Swagger Ledger: [http://2.25.126.53/transactions/docs](http://2.25.126.53/transactions/docs)
 
-### 2. 💠 Central Pix Completa (SPI BACEN)
-* Transferências por chave CPF, e-mail e dados bancários.
-* **Pix de Presente** com cartões temáticos comemorativos.
-* Gestão de **Limites Diurnos e Noturnos** e chamado via **MED (Mecanismo Especial de Devolução do BACEN)**.
+Ambiente HTTP de laboratório (IP da VPS, sem TLS).
 
-### 3. 🧾 Central de Pagamentos & Agenda DDA CIP
-* Captura eletrônica de boletos emitidos para o CNPJ/CPF com quitação e agendamento.
-* Gestão de contas em **Débito Automático** (Energia, Água, Telecomunicações).
-* Gerenciador de limites para tributos federais (DARF, GPS, Simples Nacional).
+### Contas de demonstração
 
-### 4. 💳 Central de Cartões Carbon
-* Limite Único inteligente com barra de progresso.
-* Emissão de cartões virtuais e **Download da Fatura Fechada em PDF**.
+| Titular | CPF | Senha | Saldo inicial (seed) |
+| :--- | :--- | :--- | :--- |
+| João Paulo Gregorio de Souza | `33548376835` | `teste123456` | R$ 18.450,80 |
+| Maria Silva Santos | `12345678900` | `teste123456` | R$ 12.870,40 |
 
-### 5. 📑 Gestão de Cobranças PJ & Contratos
-* Dashboard com indicadores de faturamento recebido, valores a vencer e inadimplência zero.
-* Emissão de boletos e links de pagamento com QR Code Pix.
+Contas já existentes na VPS **não** são sobrescritas pelo seed.
 
-### 6. 📈 BankCore Invest & 🪙 Crédito Inteligente
-* Plataforma de investimentos com alocação de carteira (104% do CDI com garantia do FGC).
-* Simulador de crédito corporativo com cálculo de parcelas (Tabela Price e CET).
-
-### 7. ☀️🌙 Bi-Temático & Acessibilidade
-* Alternador de **Tema Claro (Banco do Brasil Gold / Clean Slate)** e **Tema Escuro (Carbon Black)**.
-* Botão **A⁺ de Acessibilidade** (ampliação imediata de 112% na escala de fonte).
+Dá para **Abrir Conta Carbon** com outro CPF: o cadastro chama a API, cria a conta no ledger e permite Pix para João/Maria.
 
 ---
 
-## 👥 Contas de Demonstração
+## O que o avaliador opera de verdade
 
-| Titular | CPF | Cargo / Segmento | Saldo Inicial | Limite Carbon |
-| :--- | :--- | :--- | :--- | :--- |
-| **João Paulo Gregorio de Souza** | `33548376835` | CEO • Vortex Software | `R$ 18.450,80` | `R$ 50.000,00` |
-| **Maria Silva Santos** | `12345678900` | CFO • Sócia Diretora | `R$ 12.870,40` | `R$ 35.000,00` |
+| Operação | Onde | Efeito |
+| :--- | :--- | :--- |
+| Login / register | `POST /auth/login`, `POST /auth/register` | JWT HS256 |
+| Conta corrente | `POST /accounts/` (Bearer) | Cria ou devolve a conta do `sub` do token |
+| Depósito | `POST /transactions/deposit` | Débito na conta de liquidação + crédito no correntista |
+| Pix por CPF | `POST /transactions/pix` | Diretório interno `GET /auth/directory/{cpf}` — **sem** senha do destino |
+| Extrato, CSV, PDF | `GET /accounts/{id}/statement` | Cabeçalho da transação + direção CREDIT/DEBIT |
 
-*Senha padrão para ambas as contas:* `teste123456`
+Rotas financeiras **exigem JWT**. Request sem token → 401.
+
+### O que é simulação de UX
+
+Central de Cartões, DDA CIP, boletos, débitos automáticos, Pix de presente, MED BACEN, limites Pix, cobranças PJ, BankCore Invest e o simulador Price **não gravam no ledger**. A UI deixa isso explícito.
 
 ---
 
-## 👨‍💻 Autor
+## Engenharia do ledger (o que defender em entrevista)
+
+1. **Centavos inteiros** (`BIGINT`). Nada de `float` para dinheiro.
+2. **Partidas dobradas:** cada operação gera um par `ledger_entries` (DEBIT + CREDIT) de mesmo valor. Depósito: débito na conta de liquidação interna `00000-0`, crédito no correntista. Pix: débito origem, crédito destino. \(\sum\) débitos \(=\) \(\sum\) créditos.
+3. **Saldo em `accounts.balance_cents`** é cache atualizado **na mesma transação** das entradas. Fonte auditável = o razão.
+4. **ACID + `SELECT … FOR UPDATE`** nas contas envolvidas, em ordem de UUID, para evitar deadlock e gasto duplo.
+5. **Idempotência em duas camadas:** `SET idem:{key} NX EX 86400` no Redis e `idempotency_key` unique no Postgres (`IntegrityError` devolve a transação existente).
+6. **Pix interno:** o CPF é resolvido no Auth Service com o JWT do remetente. Não há login com senha fixa no destino.
+
+Stack: FastAPI (async) + SQLAlchemy 2 + asyncpg + PostgreSQL 16 + Redis 7 + Nginx + SPA Vanilla JS / Tailwind.
+
+```
+Navegador → Nginx :80
+              ├─ /                 frontend/index.html
+              ├─ /auth/*           auth-service :8000
+              └─ /transactions/*, /accounts/*   transactions-service :8001
+                    ├─ PostgreSQL  (bankcore_auth | bankcore_transactions)
+                    └─ Redis       (chaves de idempotência)
+```
+
+---
+
+## Rodar local
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+Abra `http://localhost`. Na VPS que já usa Nginx do host na rede `web_gateway`:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.vps.yml up -d --build
+```
+
+**Segredos:** o histórico do Git já publicou senha antiga de Postgres/JWT. Na VPS, gere valores novos em `.env` e **não** reuse `bankcore_secret_password_2026` / `super_secret_jwt_key_bankcore_production_2026`.
+
+---
+
+## Autor
 
 **João Paulo Gregorio de Souza**  
-*Desenvolvedor Full Stack & Especialista em Arquitetura de Software*  
-Empresa: **Vortex Software**
+Vortex Software

@@ -4,8 +4,8 @@ services:
     container_name: bankcore-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: bankadmin
-      POSTGRES_PASSWORD: bankcore_secret_password_2026
+      POSTGRES_USER: ${POSTGRES_USER:-bankadmin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bankcore_demo_change_me}
       POSTGRES_DB: bankcore_auth
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -30,17 +30,16 @@ services:
     volumes:
       - ./services/auth-service/app:/app/app
     environment:
-      DATABASE_URL: postgresql+asyncpg://bankadmin:bankcore_secret_password_2026@postgres:5432/bankcore_auth
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD:-bankcore_demo_change_me}@postgres:5432/bankcore_auth
       REDIS_URL: redis://redis:6379/0
-      JWT_SECRET_KEY: super_secret_jwt_key_bankcore_production_2026
-      JWT_ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-bankcore_demo_jwt_change_me}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
     depends_on:
       - postgres
       - redis
     networks:
       - bankcore_net
-      - web_gateway
 
   transactions-service:
     build: ./services/transactions-service
@@ -49,14 +48,32 @@ services:
     volumes:
       - ./services/transactions-service/app:/app/app
     environment:
-      DATABASE_URL: postgresql+asyncpg://bankadmin:bankcore_secret_password_2026@postgres:5432/bankcore_transactions
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD:-bankcore_demo_change_me}@postgres:5432/bankcore_transactions
       REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-bankcore_demo_jwt_change_me}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:8000}
     depends_on:
       - postgres
       - redis
+      - auth-service
     networks:
       - bankcore_net
-      - web_gateway
+
+  nginx:
+    image: nginx:alpine
+    container_name: bankcore-nginx
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_PORT:-80}:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./infra/nginx/bankcore.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - auth-service
+      - transactions-service
+    networks:
+      - bankcore_net
 
 volumes:
   postgres_data:
@@ -65,5 +82,3 @@ volumes:
 networks:
   bankcore_net:
     driver: bridge
-  web_gateway:
-    external: true
