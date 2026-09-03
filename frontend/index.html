@@ -153,6 +153,39 @@
         .sidebar-collapsed .nav-item.active::before { left: 2px; }
 
         html.font-scale-large { font-size: 112%; }
+
+        /* Hubs e modais ainda com classes Tailwind antigas herdam o Carbon Ledger */
+        .rounded-3xl { border-radius: var(--radius) !important; }
+        [class*="text-amber-"] { color: var(--gold) !important; }
+        .bg-amber-400, .bg-amber-500, .from-amber-400, .to-amber-500 {
+            background-color: var(--gold) !important;
+            background-image: none !important;
+            color: #0B0B0C !important;
+        }
+        [class*="bg-amber-400/"], [class*="bg-amber-500/"] {
+            background-color: color-mix(in srgb, var(--gold) 12%, transparent) !important;
+            color: var(--gold) !important;
+        }
+        [class*="border-amber-"] { border-color: color-mix(in srgb, var(--gold) 42%, transparent) !important; }
+        [class*="shadow-amber"] { box-shadow: none !important; }
+        [class*="text-emerald-"] { color: var(--status) !important; }
+        [class*="bg-emerald-"] { background-color: color-mix(in srgb, var(--status) 14%, transparent) !important; }
+        [class*="border-emerald-"] { border-color: color-mix(in srgb, var(--status) 32%, transparent) !important; }
+        [class*="text-rose-"] { color: var(--debit) !important; }
+        [class*="bg-rose-"] { background-color: color-mix(in srgb, var(--debit) 12%, transparent) !important; }
+        [class*="border-rose-"] { border-color: color-mix(in srgb, var(--debit) 32%, transparent) !important; }
+        [class*="text-blue-"] { color: var(--gold) !important; }
+        [class*="bg-blue-500"], [class*="bg-blue-600"] { background-color: color-mix(in srgb, var(--gold) 14%, transparent) !important; }
+        .bg-blue-500, .bg-blue-600 { background-color: var(--gold) !important; color: #0B0B0C !important; }
+        [class*="border-blue-"] { border-color: color-mix(in srgb, var(--gold) 35%, transparent) !important; }
+        [class*="hover:border-amber"]:hover,
+        [class*="hover:border-blue"]:hover,
+        [class*="hover:border-emerald"]:hover { border-color: var(--gold) !important; }
+        .icon-gold {
+            color: var(--gold);
+            border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+            background: color-mix(in srgb, var(--gold) 10%, transparent);
+        }
     </style>
 </head>
 <body class="h-full flex flex-col antialiased relative">
@@ -429,40 +462,40 @@
                             </div>
                         </div>
 
-                        <div class="lg:col-span-4 carbon-card rounded-3xl p-7 flex flex-col justify-between">
+                        <div class="lg:col-span-4 carbon-card p-7 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between mb-4">
-                                    <span class="text-xs font-bold uppercase opacity-60">Cartão Virtual Ativo</span>
-                                    <span class="text-[11px] uppercase font-black text-amber-500 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20" id="cardBadgeType">Carbon Black</span>
+                                    <span class="text-xs font-medium" style="color: var(--mute);">Cartão virtual</span>
+                                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-md" style="color: var(--gold); border: 1px solid var(--gold);" id="cardBadgeType">Carbon Black</span>
                                 </div>
-                                <div class="h-36 rounded-2xl card-theme-carbon p-5 flex flex-col justify-between relative overflow-hidden shadow-xl text-white" id="miniCardTheme">
+                                <div class="h-36 rounded-xl card-theme-carbon p-5 flex flex-col justify-between relative overflow-hidden text-white" id="miniCardTheme">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm font-black">Bank<span class="text-amber-400">Core</span></span>
+                                        <span class="text-sm font-semibold">Bank<span style="color:#C4A35A;">Core</span></span>
                                         <i data-lucide="wifi" class="w-4 h-4 rotate-90 text-zinc-400"></i>
                                     </div>
-                                    <div class="text-sm font-mono text-zinc-300 font-bold" id="miniCardNumber">•••• 4289</div>
+                                    <div class="text-sm font-mono text-zinc-300 font-medium" id="miniCardNumber">•••• 4289</div>
                                     <div class="flex items-center justify-between text-[11px] font-mono text-zinc-300 uppercase">
                                         <span id="miniCardHolder">JOAO PAULO SOUZA</span>
                                         <span>12/29</span>
                                     </div>
                                 </div>
                             </div>
-                            <button onclick="navigateTo('cartoes')" class="mt-4 w-full py-3 rounded-2xl carbon-card hover:border-amber-500/50 text-xs font-bold transition">
-                                Central de Cartões →
+                            <button onclick="navigateTo('cartoes')" class="btn-secondary mt-4 w-full py-2.5 text-xs">
+                                Central de cartões →
                             </button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="carbon-card rounded-3xl p-6 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
-                                <i data-lucide="qr-code" class="w-6 h-6"></i>
+                        <div class="carbon-card p-6 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-lg icon-gold flex items-center justify-center">
+                                <i data-lucide="qr-code" class="w-5 h-5"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="text-[11px] uppercase font-extrabold opacity-60">Chave Pix Principal (CPF)</div>
-                                <div class="text-base font-black font-mono text-amber-500 truncate mt-0.5" id="mainPixCpf">335.483.768-35</div>
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">Chave Pix (CPF)</div>
+                                <div class="text-base font-semibold font-mono text-gold truncate mt-0.5" id="mainPixCpf">335.483.768-35</div>
                             </div>
-                            <button onclick="copyPixKey()" class="p-2.5 hover:bg-amber-500/10 text-amber-500 rounded-xl transition">
+                            <button onclick="copyPixKey()" class="p-2 rounded-lg text-gold transition" title="Copiar chave">
                                 <i data-lucide="copy" class="w-5 h-5"></i>
                             </button>
                         </div>
@@ -529,7 +562,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         <div class="lg:col-span-5 carbon-card rounded-3xl p-7 flex flex-col justify-between space-y-6">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-2xl font-black flex items-center gap-2">Limite único <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-500/20 border border-zinc-500/30 tracking-wider">Simulado</span></h2>
+                                <h2 class="text-2xl font-semibold flex items-center gap-2">Limite único <span class="text-[10px] font-medium uppercase px-2 py-0.5 rounded-md" style="color: var(--mute); border: 1px solid var(--line);">Simulado</span></h2>
                                 <button onclick="showToastNotification('Gestão de limites de crédito aberta.', 'info')" class="text-xs font-extrabold text-blue-500 hover:underline transition">
                                     Gerenciar limites
                                 </button>
@@ -661,7 +694,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
                             <h2 class="text-3xl font-black flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
                                     <i data-lucide="qr-code" class="w-5 h-5"></i>
                                 </div>
                                 <span>Central Pix</span>
@@ -799,7 +832,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
                             <h2 class="text-3xl font-black flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
                                     <i data-lucide="barcode" class="w-5 h-5"></i>
                                 </div>
                                 <span>Central de Pagamentos</span>
@@ -923,7 +956,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-inherit">
                         <div>
                             <h2 class="text-3xl font-black flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
                                     <i data-lucide="receipt" class="w-5 h-5"></i>
                                 </div>
                                 <span>Gestão de Cobranças & Contratos</span>
@@ -931,7 +964,7 @@
                             <p class="text-xs opacity-70 mt-1">Simulação de UX — emissão de faturas e links não grava no ledger</p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <button onclick="openModal('modalEmitirCobranca')" class="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition flex items-center gap-2 shadow-lg shadow-amber-500/15">
+                            <button onclick="openModal('modalEmitirCobranca')" class="btn-primary px-5 py-2.5 flex items-center gap-2">
                                 <i data-lucide="plus" class="w-4.5 h-4.5"></i> Nova Cobrança
                             </button>
                             <button onclick="showToastNotification('Link de pagamento gerado e copiado!', 'success')" class="px-4 py-3 rounded-2xl carbon-card hover:border-amber-500/50 font-bold text-xs transition flex items-center gap-2">
@@ -997,14 +1030,14 @@
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
                             <h2 class="text-3xl font-black flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
                                     <i data-lucide="trending-up" class="w-5 h-5"></i>
                                 </div>
                                 <span>BankCore Invest</span>
                             </h2>
                             <p class="text-xs opacity-70 mt-1">Módulo didático — simulação de CDB 104% do CDI. Não aplica saldo em conta.</p>
                         </div>
-                        <button onclick="showToastNotification('Aporte de capital nos investimentos liberado!', 'success')" class="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center gap-2">
+                        <button onclick="showToastNotification('Simulação: aporte não altera o ledger.', 'info')" class="btn-primary px-5 py-2.5 flex items-center gap-2">
                             <i data-lucide="plus-circle" class="w-4.5 h-4.5"></i> Novo Aporte
                         </button>
                     </div>
@@ -1139,7 +1172,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-inherit">
                         <div>
                             <h2 class="text-3xl font-black flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
                                     <i data-lucide="coins" class="w-5 h-5"></i>
                                 </div>
                                 <span>Empréstimos & Crédito Inteligente</span>
@@ -1200,8 +1233,8 @@
                                     <div class="text-3xl font-black text-emerald-500 font-mono mt-0.5" id="loanInstallmentValue">24x de R$ 706,12</div>
                                     <div class="text-[11px] opacity-60 mt-0.5">IOF e tarifas bancárias inclusas</div>
                                 </div>
-                                <button onclick="showToastNotification('Crédito Carbon contratado e depositado na conta corrente!', 'success')" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
-                                    Contratar Crédito Agora
+                                <button onclick="showToastNotification('Simulação: crédito não altera o ledger.', 'info')" class="btn-primary w-full sm:w-auto px-7 py-3">
+                                    Simular contratação
                                 </button>
                             </div>
                         </div>
@@ -1405,7 +1438,8 @@
     <!-- MODAL: RECIBO INTERATIVO & COMPROVANTE OFICIAL -->
     <div id="receiptModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(0,0,0,0.72);">
         <div class="carbon-card max-w-md w-full p-6 relative space-y-5">
-            <div id="receiptPrintableArea" class="p-6 space-y-4" style="background: #0B0B0C; color: #F6F1E8; border: 1px solid #2A2A2E; border-radius: 12px;">
+            <div id="receiptPrintableArea" class="p-7 space-y-5" style="background: #0B0B0C; color: #F6F1E8; border: 1px solid #2A2A2E; border-radius: 12px;">
+                <div style="height: 2px; background: #C4A35A; margin: -28px -28px 16px; border-radius: 12px 12px 0 0;"></div>
                 <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #2A2A2E;">
                     <div class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #C4A35A;">
@@ -1413,15 +1447,16 @@
                         </div>
                         <div>
                             <div class="text-base font-semibold leading-tight">Bank<span style="color: #C4A35A;">Core</span></div>
-                            <div class="text-[10px] uppercase font-mono" style="color: #9A958C;">Comprovante BankCore · ledger interno</div>
+                            <div class="text-[10px] uppercase font-mono" style="color: #9A958C;">Comprovante · ledger interno</div>
                         </div>
                     </div>
                     <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #C4A35A; border: 1px solid #C4A35A55;">Liquidado</span>
                 </div>
 
-                <div class="text-center py-2">
+                <div class="text-center py-3">
                     <div class="text-xs uppercase tracking-wide" style="color: #9A958C;">Valor da operação</div>
                     <div class="text-4xl font-semibold font-mono mt-1 font-amount" id="recValor">R$ 0,00</div>
+                    <div class="text-[11px] mt-2 font-medium" style="color: #9A958C;" id="recHolder">—</div>
                 </div>
 
                 <div class="space-y-2.5 text-xs py-3.5" style="border-top: 1px solid #2A2A2E; border-bottom: 1px solid #2A2A2E;">
@@ -1429,6 +1464,10 @@
                     <div class="flex justify-between"><span style="color: #9A958C;">Descrição</span><strong class="truncate max-w-[200px]" id="recDesc">---</strong></div>
                     <div class="flex justify-between"><span style="color: #9A958C;">Data/Hora</span><strong class="font-mono" id="recData">02/09/2026</strong></div>
                     <div class="flex justify-between"><span style="color: #9A958C;">Autenticação</span><strong class="font-mono text-xs" style="color: #C4A35A;" id="recAuth">AUT-9823482394</strong></div>
+                </div>
+                <div class="text-[10px] leading-relaxed" style="color: #9A958C;">
+                    Vortex Software · documento de demonstração. Não é comprovante SPI/BACEN.
+                    A liquidação ocorreu no livro-razão BankCore (partidas dobradas).
                 </div>
             </div>
 
@@ -1442,8 +1481,8 @@
     </div>
 
     <!-- MODAL: DDA PAGAR E GERENCIAR -->
-    <div id="modalDDA" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-lg w-full rounded-3xl p-7 relative shadow-2xl space-y-5">
+    <div id="modalDDA" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-lg w-full p-6 relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-inherit">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center">
@@ -1457,52 +1496,56 @@
                 <button onclick="closeModal('modalDDA')"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="divide-y divide-inherit max-h-72 overflow-y-auto space-y-1" id="ddaItemsList"></div>
-            <button onclick="closeModal('modalDDA')" class="w-full py-3 rounded-2xl carbon-card text-xs font-bold">Fechar</button>
+            <button onclick="closeModal('modalDDA')" class="btn-secondary w-full py-2.5 text-xs">Fechar</button>
         </div>
     </div>
 
     <!-- MODAL: FATURA DO CARTÃO EM PDF -->
-    <div id="invoiceModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 hidden">
-        <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto rounded-3xl p-7 relative shadow-2xl space-y-5">
-            <div id="invoicePrintableArea" class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 space-y-5 text-white">
-                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+    <div id="invoiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto p-6 relative space-y-5">
+            <div id="invoicePrintableArea" class="p-7 space-y-5" style="background: #0B0B0C; color: #F6F1E8; border: 1px solid #2A2A2E; border-radius: 12px;">
+                <div style="height: 2px; background: #C4A35A; margin: -28px -28px 16px; border-radius: 12px 12px 0 0;"></div>
+                <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #2A2A2E;">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-zinc-900 border border-amber-500/40 flex items-center justify-center">
-                            <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #C4A35A;">
+                            <i data-lucide="shield" class="w-5 h-5" style="color: #C4A35A;"></i>
                         </div>
                         <div>
-                            <div class="text-base font-black leading-tight">Bank<span class="text-amber-400">Core</span> Card</div>
-                            <div class="text-[10px] text-zinc-400 uppercase font-mono">Vortex Software • Carbon Black</div>
+                            <div class="text-base font-semibold leading-tight">Bank<span style="color:#C4A35A;">Core</span> Card</div>
+                            <div class="text-[10px] uppercase font-mono" style="color: #9A958C;">Fatura simulada · Vortex Software</div>
                         </div>
                     </div>
-                    <span class="text-xs font-black uppercase px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Fatura Fechada</span>
+                    <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #C4A35A; border: 1px solid #C4A35A55;">Simulado</span>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                <div class="p-5 rounded-xl flex items-center justify-between" style="border: 1px solid #2A2A2E;">
                     <div>
-                        <div class="text-xs uppercase font-extrabold text-zinc-500">Total da Fatura</div>
-                        <div class="text-3xl font-black text-amber-400 font-mono" id="invoiceModalValue">R$ 2.296,07</div>
-                        <div class="text-xs text-zinc-400 mt-1">Vencimento: <strong class="text-white">10/09/2026</strong></div>
+                        <div class="text-xs uppercase tracking-wide" style="color: #9A958C;">Total da fatura</div>
+                        <div class="text-3xl font-semibold font-mono font-amount" style="color: #C4A35A;" id="invoiceModalValue">R$ 2.296,07</div>
+                        <div class="text-xs mt-1" style="color: #9A958C;">Vencimento: <strong style="color:#F6F1E8;">10/09/2026</strong></div>
                     </div>
-                    <div class="text-right text-xs text-zinc-400">
-                        <div>Melhor dia: <strong>03</strong></div>
-                        <div>Utilizado: <strong>R$ 8.371,00</strong></div>
+                    <div class="text-right text-xs" style="color: #9A958C;">
+                        <div>Melhor dia: <strong style="color:#F6F1E8;">03</strong></div>
+                        <div>Utilizado: <strong style="color:#C42B2B;">R$ 8.371,00</strong></div>
                     </div>
                 </div>
 
-                <div class="pt-3 border-t border-zinc-800 space-y-2">
-                    <div class="text-xs uppercase font-extrabold text-zinc-500">Linha Digitável para Pagamento</div>
-                    <div class="text-xs font-mono text-zinc-300 bg-zinc-900 p-3 rounded-xl border border-zinc-800 break-all select-all">
+                <div class="pt-3 space-y-2" style="border-top: 1px solid #2A2A2E;">
+                    <div class="text-xs uppercase tracking-wide" style="color: #9A958C;">Linha digitável (demonstração)</div>
+                    <div class="text-xs font-mono p-3 rounded-lg break-all select-all" style="background:#141416; border: 1px solid #2A2A2E; color:#F6F1E8;">
                         00190.00009 02891.234567 89000.000018 1 98760000229607
                     </div>
+                </div>
+                <div class="text-[10px] leading-relaxed" style="color: #9A958C;">
+                    Módulo didático. Esta fatura não liquida no ledger BankCore.
                 </div>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-3">
-                <button onclick="downloadInvoicePDF()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
-                    <i data-lucide="download" class="w-4.5 h-4.5"></i> Baixar Fatura em PDF
+                <button onclick="downloadInvoicePDF()" class="btn-primary w-full sm:flex-1 py-3 flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Baixar fatura PDF
                 </button>
-                <button onclick="closeModal('invoiceModal')" class="px-5 py-3.5 rounded-2xl carbon-card font-bold text-xs transition">Fechar</button>
+                <button onclick="closeModal('invoiceModal')" class="btn-secondary px-5 py-3">Fechar</button>
             </div>
         </div>
     </div>
@@ -1559,8 +1602,8 @@
     </div>
 
     <!-- MODAL: PAGAR BOLETO -->
-    <div id="modalBoletoPay" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-7 relative shadow-2xl space-y-5">
+    <div id="modalBoletoPay" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-md w-full p-6 relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-inherit">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center">
@@ -1579,16 +1622,16 @@
                     <label class="block text-xs font-bold opacity-70 mb-1.5">Valor a Pagar (R$)</label>
                     <input type="number" step="0.01" min="0.01" value="350.00" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit text-base font-black font-mono">
                 </div>
-                <button type="submit" class="w-full py-3.5 rounded-2xl bg-blue-500 hover:bg-blue-400 text-white font-black text-xs uppercase tracking-wider transition">
-                    Confirmar Pagamento do Boleto
+                <button type="submit" class="btn-primary w-full py-3">
+                    Confirmar (simulado)
                 </button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: NOVA COBRANÇA -->
-    <div id="modalEmitirCobranca" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="carbon-card max-w-md w-full rounded-3xl p-7 relative shadow-2xl space-y-5">
+    <div id="modalEmitirCobranca" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-md w-full p-6 relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-inherit">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
@@ -1621,8 +1664,8 @@
                     <label class="block font-bold opacity-70 mb-1">Descrição do Serviço</label>
                     <input type="text" id="cobDesc" value="Desenvolvimento de Módulo Customizado" class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                 </div>
-                <button type="submit" class="w-full py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition">
-                    Emitir Boleto & Pix Copia e Cola
+                <button type="submit" class="btn-primary w-full py-3">
+                    Emitir (simulado)
                 </button>
             </form>
         </div>
@@ -2015,9 +2058,9 @@
             currentLoanMonths = m;
             document.querySelectorAll('.loan-term-btn').forEach(btn => {
                 if (btn.innerText === `${m}x`) {
-                    btn.className = 'loan-term-btn py-2.5 rounded-xl bg-amber-400 text-black font-black text-xs';
+                    btn.className = 'loan-term-btn py-2.5 rounded-lg btn-primary text-xs';
                 } else {
-                    btn.className = 'loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50';
+                    btn.className = 'loan-term-btn py-2.5 rounded-lg carbon-card text-xs font-semibold';
                 }
             });
             recalcLoan();
@@ -2145,6 +2188,8 @@
             const recValor = document.getElementById('recValor');
             recValor.innerText = (isCredit ? '+ ' : '− ') + 'R$ ' + tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             recValor.style.color = isCredit ? '#F6F1E8' : '#C42B2B';
+            const holderEl = document.getElementById('recHolder');
+            if (holderEl) holderEl.innerText = (currentAuthUser && currentAuthUser.full_name) ? currentAuthUser.full_name : 'Correntista BankCore';
             document.getElementById('recTipo').innerText = tx.transaction_type === 'BILL_PAYMENT' ? 'Pagamento de boleto' : (isCredit ? 'Pix recebido' : 'Pix enviado');
             document.getElementById('recDesc').innerText = tx.description;
             document.getElementById('recData').innerText = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -2182,7 +2227,7 @@
                 jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
-            showToastNotification('Fatura do cartão baixada em PDF!', 'success');
+            showToastNotification('Fatura simulada baixada em PDF.', 'success');
         }
 
         function exportStatementCSV() {
