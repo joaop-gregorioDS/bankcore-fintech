@@ -75,7 +75,7 @@ Nginx (porta 80)
 
 ## Ledger (o que o código faz)
 
-Implementação em `services/transactions-service/app/services/ledger.py`. Notas para entrevista: [`docs/ENTREVISTA.md`](docs/ENTREVISTA.md).
+Implementação em `services/transactions-service/app/services/ledger.py`. Detalhe: [`docs/LEDGER.md`](docs/LEDGER.md).
 
 1. **Centavos inteiros** (`BIGINT`). A API só converte para reais na borda.
 2. **Partidas dobradas.** Cada operação gera um par `ledger_entries` (DEBIT + CREDIT) do mesmo valor.
@@ -133,7 +133,7 @@ services/auth-service/    autenticação e diretório Pix
 services/transactions-service/
   app/services/ledger.py  partidas dobradas, lock, idempotência
 infra/nginx/              conf do gateway
-docs/ENTREVISTA.md        mapa código ↔ perguntas de entrevista
+docs/LEDGER.md            mapa afirmação → arquivo (ledger, JWT, Pix)
 ```
 
 ---

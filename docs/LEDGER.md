@@ -1,6 +1,6 @@
-# BankCore — o que o código realmente faz (entrevista)
+# BankCore — o que o runtime implementa
 
-Use isto junto com o guia de estudos. As respostas abaixo apontam para arquivos, não para o README antigo.
+Mapa afirmação → arquivo. Complementa o README; descreve o ledger que está no código, não o marketing da SPA.
 
 ## Partidas dobradas
 
