@@ -16,6 +16,38 @@ struct Wordmark: View {
     }
 }
 
+struct BrandMark: View {
+    var size: CGFloat = 48
+
+    var body: some View {
+        Image(systemName: "shield")
+            .font(.system(size: size * 0.42, weight: .medium))
+            .foregroundStyle(Palette.gold)
+            .frame(width: size, height: size)
+            .overlay(
+                RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
+                    .stroke(Palette.gold, lineWidth: max(1.2, size * 0.035))
+            )
+    }
+}
+
+enum AppVersion {
+    static var marketing: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.10.25"
+    }
+
+    static var line: String { "version \(marketing)" }
+}
+
+struct VersionLabel: View {
+    var body: some View {
+        Text(AppVersion.line)
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .foregroundStyle(Palette.mute)
+            .tracking(0.6)
+    }
+}
+
 struct CarbonCard<Content: View>: View {
     var padding: CGFloat = 16
     @ViewBuilder var content: Content
@@ -219,5 +251,189 @@ struct StatusBadge: View {
                     .stroke(Palette.status.opacity(0.35), lineWidth: 1)
             )
             .background(Palette.status.opacity(0.12), in: Capsule())
+    }
+}
+
+struct SimulatedBadge: View {
+    var body: some View {
+        Text("SIMULADO")
+            .font(.system(size: 9, weight: .semibold))
+            .tracking(0.6)
+            .foregroundStyle(Palette.gold)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .overlay(
+                Capsule().stroke(Palette.gold.opacity(0.45), lineWidth: 1)
+            )
+    }
+}
+
+struct InitialsAvatar: View {
+    let initials: String
+    var size: CGFloat = 44
+
+    var body: some View {
+        Text(initials)
+            .font(.system(size: size * 0.36, weight: .semibold))
+            .foregroundStyle(Palette.gold)
+            .frame(width: size, height: size)
+            .background(Palette.gold.opacity(0.12))
+            .overlay(
+                Circle().stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+            )
+            .clipShape(Circle())
+    }
+}
+
+struct ShortcutButton: View {
+    let title: String
+    let systemImage: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .fill(Palette.gold.opacity(0.12))
+                    Image(systemName: systemImage)
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundStyle(Palette.gold)
+                }
+                .frame(width: 56, height: 56)
+                Text(title)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Palette.ivory)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .frame(height: 28, alignment: .top)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct LimitBar: View {
+    let ratio: Double
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule().fill(Palette.line)
+                Capsule()
+                    .fill(Palette.gold)
+                    .frame(width: max(8, geo.size.width * ratio))
+            }
+        }
+        .frame(height: 6)
+    }
+}
+
+struct SectionTitle: View {
+    let text: String
+    var body: some View {
+        Text(text)
+            .font(.system(size: 20, weight: .semibold))
+            .foregroundStyle(Palette.ivory)
+    }
+}
+
+struct SettingsRow: View {
+    let icon: String
+    let title: String
+    var subtitle: String? = nil
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(Palette.gold)
+                    .frame(width: 28, alignment: .center)
+                    .padding(.top, 2)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Palette.ivory)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(TypeScale.label)
+                            .foregroundStyle(Palette.mute)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Palette.mute)
+            }
+            .padding(.vertical, 12)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct PlasticCard: View {
+    let card: MockCard
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                HStack(spacing: 0) {
+                    Text("Bank").foregroundStyle(.white)
+                    Text("Core").foregroundStyle(Palette.gold)
+                }
+                .font(.system(size: 13, weight: .semibold))
+                Spacer()
+                Text(card.name.uppercased())
+                    .font(.system(size: 10, weight: .semibold))
+                    .tracking(0.8)
+                    .foregroundStyle(Palette.gold)
+            }
+            Text(Money.reais(card.invoice))
+                .font(.system(size: 26, weight: .semibold).monospacedDigit())
+                .foregroundStyle(.white)
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Vencimento").font(TypeScale.micro).foregroundStyle(Palette.mute)
+                    Text(card.dueLabel).font(.system(size: 12, weight: .medium)).foregroundStyle(.white)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Compras").font(TypeScale.micro).foregroundStyle(Palette.mute)
+                    Text(card.period).font(.system(size: 12, weight: .medium)).foregroundStyle(.white)
+                }
+            }
+            HStack {
+                Text("•••• \(card.last4)")
+                    .font(.system(size: 13, design: .monospaced))
+                    .foregroundStyle(Palette.ivory.opacity(0.8))
+                Spacer()
+                Text(card.brand.uppercased())
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Palette.mute)
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, minHeight: 176, alignment: .leading)
+        .background(gradient)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private var gradient: LinearGradient {
+        switch card.theme {
+        case .black:
+            return LinearGradient(colors: [Color(hex: "#1A1A1C"), Color(hex: "#0D0D0E")], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case .platinum:
+            return LinearGradient(colors: [Color(hex: "#2A2A2E"), Color(hex: "#141416")], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case .virtual:
+            return LinearGradient(colors: [Color(hex: "#161618"), Color(hex: "#0B0B0C")], startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
     }
 }

@@ -42,11 +42,11 @@
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5DC2BE45555A2D6F50D4C371"
-               BuildableName = "BankCore.app"
-               BlueprintName = "BankCore"
-               ReferencedContainer = "container:BankCore.xcodeproj">
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "5DC2BE45555A2D6F50D4C371"
+            BuildableName = "BankCore.app"
+            BlueprintName = "BankCore"
+            ReferencedContainer = "container:BankCore.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -59,11 +59,11 @@
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5DC2BE45555A2D6F50D4C371"
-               BuildableName = "BankCore.app"
-               BlueprintName = "BankCore"
-               ReferencedContainer = "container:BankCore.xcodeproj">
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "5DC2BE45555A2D6F50D4C371"
+            BuildableName = "BankCore.app"
+            BlueprintName = "BankCore"
+            ReferencedContainer = "container:BankCore.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

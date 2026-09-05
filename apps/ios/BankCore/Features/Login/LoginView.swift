@@ -7,41 +7,111 @@ struct LoginView: View {
     @State private var password = ""
     @State private var fullName = ""
     @State private var email = ""
+    @State private var showForm = false
 
     private enum Mode { case login, register }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                header
+                hero
+                lastUserCard
+                quickActions
                 demoAccounts
-                formCard
+                promo
+                if showForm { formCard }
             }
             .padding(20)
-            .padding(.top, 28)
+            .padding(.top, 12)
+            .padding(.bottom, 28)
         }
-        .background(Palette.ink.ignoresSafeArea())
+        .background(
+            LinearGradient(
+                colors: [Color(hex: "#1A1610"), Palette.ink, Palette.ink],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        )
         .scrollDismissesKeyboard(.interactively)
+        .onAppear {
+            if let last = LastAccountStore.taxId {
+                taxId = last
+            }
+        }
     }
 
-    private var header: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "shield")
-                .font(.system(size: 22, weight: .medium))
-                .foregroundStyle(Palette.gold)
-                .frame(width: 48, height: 48)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(Palette.gold, lineWidth: 1)
-                )
-            Wordmark()
-            Text("Banking de demonstração · Vortex Software")
-                .font(TypeScale.body)
-                .foregroundStyle(Palette.mute)
-            DemoBanner()
+    private var hero: some View {
+        VStack(spacing: 14) {
+            BrandMark(size: 56)
+            VStack(spacing: 8) {
+                Wordmark(size: 34)
+                Text("Banking de demonstração · Vortex Software")
+                    .font(TypeScale.body)
+                    .foregroundStyle(Palette.mute)
+                DemoBanner()
+                VersionLabel()
+                    .padding(.top, 4)
+            }
         }
-        .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+    }
+
+    private var lastUserCard: some View {
+        let demo = preferredDemo
+        return Button {
+            Task { await app.loginDemo(demo) }
+        } label: {
+            HStack(spacing: 12) {
+                InitialsAvatar(initials: initials(demo.name), size: 48)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(demo.name)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Palette.ivory)
+                    Text("Ag. 0001-9 · \(TaxID.formatted(demo.taxId))")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(Palette.mute)
+                }
+                Spacer()
+                Image(systemName: "person.crop.rectangle.badge.plus")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Palette.gold)
+            }
+            .padding(14)
+            .background(Palette.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(app.isBusy)
+    }
+
+    private var quickActions: some View {
+        HStack {
+            Button {
+                showForm = true
+            } label: {
+                Label("Trocar conta", systemImage: "arrow.triangle.2.circlepath")
+                    .font(TypeScale.cta)
+                    .foregroundStyle(Palette.ivory)
+                    .frame(maxWidth: .infinity)
+            }
+            Button {
+                app.openPixAfterLogin = true
+                Task { await app.loginDemo(preferredDemo) }
+            } label: {
+                Label("Fazer Pix", systemImage: "arrow.left.arrow.right")
+                    .font(TypeScale.cta)
+                    .foregroundStyle(Palette.gold)
+                    .frame(maxWidth: .infinity)
+            }
+            .disabled(app.isBusy)
+        }
+        .padding(.vertical, 4)
     }
 
     private var demoAccounts: some View {
@@ -51,37 +121,69 @@ struct LoginView: View {
                     .font(TypeScale.label)
                     .foregroundStyle(Palette.mute)
                 HStack(spacing: 10) {
-                    demoButton(APIConfig.joao)
-                    demoButton(APIConfig.maria)
+                    demoChip(APIConfig.joao, "JP")
+                    demoChip(APIConfig.maria, "MS")
                 }
             }
         }
     }
 
-    private func demoButton(_ demo: APIConfig.DemoAccount) -> some View {
+    private func demoChip(_ demo: APIConfig.DemoAccount, _ initials: String) -> some View {
         Button {
             taxId = demo.taxId
             password = demo.password
             mode = .login
             Task { await app.loginDemo(demo) }
         } label: {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(demo.name)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Palette.ivory)
-                Text(TaxID.formatted(demo.taxId))
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(Palette.mute)
+            HStack(spacing: 10) {
+                InitialsAvatar(initials: initials, size: 36)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(demo.name)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Palette.ivory)
+                    Text(TaxID.formatted(demo.taxId))
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(Palette.mute)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
+            .padding(10)
             .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .stroke(Palette.line, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
         .disabled(app.isBusy)
+    }
+
+    private var promo: some View {
+        CarbonCard {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Pix real entre João e Maria")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Palette.ivory)
+                    Text("O avaliador entra, transfere R$ 1,00 e vê o comprovante no ledger interno.")
+                        .font(TypeScale.label)
+                        .foregroundStyle(Palette.mute)
+                }
+                Spacer()
+                Text("Simular")
+                    .font(TypeScale.cta)
+                    .foregroundStyle(Palette.ink)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Palette.gold)
+                    .clipShape(Capsule())
+                    .onTapGesture {
+                        app.openPixAfterLogin = true
+                        Task { await app.loginDemo(preferredDemo) }
+                    }
+            }
+        }
     }
 
     private var formCard: some View {
@@ -142,6 +244,15 @@ struct LoginView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
+    }
+
+    private var preferredDemo: APIConfig.DemoAccount {
+        if LastAccountStore.taxId == APIConfig.maria.taxId { return APIConfig.maria }
+        return APIConfig.joao
+    }
+
+    private func initials(_ name: String) -> String {
+        String(name.split(separator: " ").prefix(2).compactMap(\.first)).uppercased()
     }
 
     private var canLogin: Bool {

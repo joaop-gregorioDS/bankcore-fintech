@@ -12,12 +12,29 @@ final class AppState {
     var errorMessage: String?
     var selectedTab: MainTab = .home
     var presentedReceipt: LedgerTransaction?
+    var presentedHub: Hub?
     var isBalanceHidden = false
+    var toast: String?
+    var lastSeen: Date = .now
+    var openPixAfterLogin = false
 
     private let api = BankCoreAPI()
 
     enum MainTab: Hashable {
-        case home, pix, statement
+        case home, pix, statement, cards, profile
+    }
+
+    enum Hub: String, Identifiable {
+        case pay, invest, credit, more, notifications, invoice, dda
+        var id: String { rawValue }
+    }
+
+    var mock: MockCatalog {
+        MockCatalog(
+            taxId: session?.taxId ?? "",
+            fullName: session?.fullName ?? "Correntista BankCore",
+            accountNumber: account?.accountNumber ?? "—"
+        )
     }
 
     var isLoggedIn: Bool { session != nil }
@@ -78,13 +95,27 @@ final class AppState {
     }
 
     func logout() {
+        if let taxId = session?.taxId { LastAccountStore.taxId = taxId }
         KeychainStore.clear()
         session = nil
         account = nil
         statement = []
         presentedReceipt = nil
+        presentedHub = nil
         selectedTab = .home
         errorMessage = nil
+    }
+
+    func flash(_ message: String) {
+        toast = message
+        Task {
+            try? await Task.sleep(nanoseconds: 2_200_000_000)
+            if toast == message { toast = nil }
+        }
+    }
+
+    func simulate(_ message: String) {
+        flash(message)
     }
 
     func refresh() async {
@@ -148,9 +179,12 @@ final class AppState {
             next.email = profile.email
         }
         session = next
+        LastAccountStore.taxId = next.taxId
+        lastSeen = .now
         account = try await api.createOrGetAccount(userId: userId, token: token)
         statement = try await api.statement(accountId: account!.id, token: token)
         errorMessage = nil
-        selectedTab = .home
+        selectedTab = openPixAfterLogin ? .pix : .home
+        openPixAfterLogin = false
     }
 }

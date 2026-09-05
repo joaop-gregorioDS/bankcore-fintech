@@ -10,8 +10,9 @@ struct RootView: View {
                 ZStack {
                     Palette.ink.ignoresSafeArea()
                     VStack(spacing: 16) {
-                        mark
+                        BrandMark(size: 56)
                         Wordmark(size: 28)
+                        VersionLabel()
                         ProgressView()
                             .tint(Palette.gold)
                     }
@@ -30,17 +31,31 @@ struct RootView: View {
         )) { tx in
             ReceiptView(transaction: tx)
         }
-    }
-
-    private var mark: some View {
-        Image(systemName: "shield")
-            .font(.system(size: 22, weight: .medium))
-            .foregroundStyle(Palette.gold)
-            .frame(width: 48, height: 48)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Palette.gold, lineWidth: 1)
-            )
+        .sheet(item: Binding(
+            get: { app.presentedHub },
+            set: { app.presentedHub = $0 }
+        )) { hub in
+            HubSheet(hub: hub)
+        }
+        .overlay(alignment: .top) {
+            if let toast = app.toast {
+                Text(toast)
+                    .font(TypeScale.label)
+                    .foregroundStyle(Palette.ivory)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Palette.card)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(Palette.gold.opacity(0.4), lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .padding(.top, 56)
+                    .padding(.horizontal, 20)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: app.toast)
     }
 
     private func configureChrome() {
@@ -86,6 +101,12 @@ struct MainTabs: View {
             StatementView()
                 .tabItem { Label("Extrato", systemImage: "list.bullet.rectangle") }
                 .tag(AppState.MainTab.statement)
+            CardsView()
+                .tabItem { Label("Cartões", systemImage: "creditcard") }
+                .tag(AppState.MainTab.cards)
+            ProfileView()
+                .tabItem { Label("Perfil", systemImage: "person") }
+                .tag(AppState.MainTab.profile)
         }
     }
 }

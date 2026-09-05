@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct PixView: View {
     @Environment(AppState.self) private var app
@@ -15,6 +16,7 @@ struct PixView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     header
+                    pixActions
                     form
                     if confirming, let lookup {
                         confirmation(lookup)
@@ -46,6 +48,41 @@ struct PixView: View {
                 .foregroundStyle(Palette.gold)
                 .padding(.top, 4)
         }
+    }
+
+    private var pixActions: some View {
+        HStack(spacing: 10) {
+            pixChip("Minha chave", "person.text.rectangle") {
+                UIPasteboard.general.string = TaxID.digits(app.session?.taxId ?? "")
+                app.flash("Chave Pix (CPF) copiada.")
+            }
+            pixChip("QR Code", "qrcode") {
+                app.simulate("Leitor de QR é simulação de UX. Use o CPF da Maria: 12345678900.")
+            }
+            pixChip("Limites", "slider.horizontal.3") {
+                app.simulate("Limite Pix diurno \(Money.reais(app.mock.pixLimit)) · simulado.")
+            }
+        }
+    }
+
+    private func pixChip(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .foregroundStyle(Palette.gold)
+                Text(title)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Palette.ivory)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Palette.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(Palette.line, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private var form: some View {
