@@ -1,6 +1,8 @@
 # Design — Carbon Ledger (clientes)
 
-Não copiar marca C6. Copiar a **densidade** de um banco digital: tabs, saldo grande, um CTA, extrato com débito em vermelho.
+Não copiar marca BB nem C6. Copiar a **densidade** de um banco digital: tabs, saldo grande, um CTA, extrato com débito em vermelho.
+
+**Fonte da verdade de UX:** o iOS em `apps/ios` (`version 1.10.25`). Tokens abaixo; telas e mock em [`PORTFOLIO.md`](PORTFOLIO.md).
 
 ## Tokens
 
@@ -32,7 +34,9 @@ Ouro **não** pinta a tela inteira. Vermelho **só** em dinheiro saindo e “Sai
 4. **Extrato** — lista; débito vermelho; tap abre comprovante.
 5. **Comprovante** — titular, valor, tipo, data, autenticação, rodapé “ledger interno, não é SPI/BACEN”. Share sheet / print.
 
-Tema claro e escuro se der tempo; escuro primeiro no iOS/Android (banco digital), claro já é o da SPA.
+Tema claro e escuro se der tempo; **escuro primeiro** no iOS/Android/Tauri (banco digital). Claro já é o da SPA.
+
+Marca: quadrado arredondado ouro + escudo. Wordmark `Bank` + `Core` ouro. Versão: `version 1.10.25` no login e no perfil.
 
 ## Copy
 

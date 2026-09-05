@@ -4,7 +4,7 @@ Construir no **Windows** com Android Studio. API: `http://2.25.126.53`.
 
 ## Prompt para o chat
 
-> Leia `docs/clients/ANDROID.md`, `API.md` e `DESIGN.md`. Implemente o app em `apps/android` (Compose). v1: login → Pix → extrato → comprovante. Sem WebView da SPA.
+> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `ANDROID.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS. App Compose em `apps/android`, applicationId `br.vortex.bankcore`. API `http://2.25.126.53`. v1: login → Pix → extrato → comprovante. Home viva + módulos simulados + `version 1.10.25`. Sem WebView da SPA. Sem inventar endpoint.
 
 ## Stack
 
@@ -15,7 +15,7 @@ Construir no **Windows** com Android Studio. API: `http://2.25.126.53`.
 
 ## Telas
 
-Bottom nav: Início | Pix | Extrato. Mesmo contrato e tokens de `DESIGN.md` / `API.md`.
+Bottom nav: Início | Pix | Extrato | Cartões | Perfil. Contrato `API.md`, tokens `DESIGN.md`, UX `PORTFOLIO.md`.
 
 ## Pronto quando
 
