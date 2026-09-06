@@ -1,0 +1,35 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.env
+.grok/
+.venv
+env/
+venv/
+ENV/
+postgres_data/
+redis_data/
+*.log
+.DS_Store
+
+# Android
+apps/android/.gradle/
+apps/android/**/build/
+apps/android/local.properties
+*.iml
+.idea/
+
+# Desktop
+node_modules/
+apps/desktop/dist/
+apps/desktop/src-tauri/target/
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM

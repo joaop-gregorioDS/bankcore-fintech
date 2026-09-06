@@ -1,0 +1,38 @@
+export const CONFIG = {
+  appName: 'BankCore',
+  appVersion: '1.10.25',
+  apiBaseUrl: 'https://bankcore.vortexsoftware.tech',
+  company: {
+    tradeName: 'Vortex Software',
+    legalName: 'VORTEX SOFTWARE LTDA',
+    cnpj: '68.960.043/0001-52',
+    email: 'contato@vortexsoftware.tech',
+    website: 'https://vortexsoftware.tech',
+  },
+  demoUsers: [
+    {
+      id: 'lucas',
+      fullName: 'Lucas Mendes Rocha',
+      taxId: '98765432100',
+      password: 'teste123456',
+      initials: 'LM',
+      agency: '0001-9',
+      accountNumber: '77412-7',
+      segment: 'Vortex Carbon Black Corporate',
+      badge: 'PJ / Carbon Black',
+      email: 'contato@vortexsoftware.tech',
+    },
+    {
+      id: 'maria',
+      fullName: 'Maria Silva Santos',
+      taxId: '12345678900',
+      password: 'teste123456',
+      initials: 'MS',
+      agency: '0001-9',
+      accountNumber: '88921-3',
+      segment: 'Vortex Carbon Platinum',
+      badge: 'PF / Carbon Platinum',
+      email: 'maria.silva@vortexsoftware.tech',
+    },
+  ],
+};

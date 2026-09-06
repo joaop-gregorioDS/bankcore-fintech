@@ -1,0 +1,381 @@
+/* ===================================================================
+   BankCore Desktop — Carbon Ledger Design Tokens & Global Styles
+   Default Theme: LIGHT MODE (#F4F1EA)
+   Optional Theme: DARK MODE (#0B0B0C)
+   =================================================================== */
+
+:root {
+  /* LIGHT THEME (Default) */
+  --bg-canvas: #F4F1EA;
+  --bg-panel: #EAE5DB;
+  --bg-sidebar: #E7E1D5;
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #F9F7F2;
+  --bg-input: #F7F5F0;
+  --bg-card-hover: #F2EFE8;
+
+  --text-primary: #141416;
+  --text-secondary: #58534C;
+  --text-mute: #8C867D;
+  --text-ivory: #F6F1E8;
+
+  --accent-gold: #9A7B32;
+  --accent-gold-hover: #826625;
+  --accent-gold-text: #FFFFFF;
+  --accent-gold-soft: rgba(154, 123, 50, 0.12);
+  --accent-gold-border: rgba(154, 123, 50, 0.35);
+
+  --color-debit: #B42318;
+  --color-debit-hover: #981B12;
+  --color-debit-soft: rgba(180, 35, 24, 0.10);
+  --color-credit: #237446;
+  --color-credit-soft: rgba(35, 116, 70, 0.12);
+
+  --border-subtle: #E2DBD0;
+  --border-strong: #CFC5B6;
+
+  --shadow-sm: 0 2px 6px rgba(40, 30, 20, 0.04);
+  --shadow-md: 0 8px 24px rgba(40, 30, 20, 0.07);
+  --shadow-lg: 0 16px 40px rgba(40, 30, 20, 0.10);
+
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+  --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  /* DARK THEME */
+  --bg-canvas: #0B0B0C;
+  --bg-panel: #141416;
+  --bg-sidebar: #121214;
+  --bg-card: #1C1C1F;
+  --bg-card-subtle: #242428;
+  --bg-input: #17171A;
+  --bg-card-hover: #26262B;
+
+  --text-primary: #F6F1E8;
+  --text-secondary: #C4BFB5;
+  --text-mute: #9A958C;
+  --text-ivory: #F6F1E8;
+
+  --accent-gold: #C4A35A;
+  --accent-gold-hover: #D8B76E;
+  --accent-gold-text: #0B0B0C;
+  --accent-gold-soft: rgba(196, 163, 90, 0.16);
+  --accent-gold-border: rgba(196, 163, 90, 0.40);
+
+  --color-debit: #C42B2B;
+  --color-debit-hover: #DC3838;
+  --color-debit-soft: rgba(196, 43, 43, 0.15);
+  --color-credit: #3D7A5A;
+  --color-credit-soft: rgba(61, 122, 90, 0.15);
+
+  --border-subtle: #2A2A2E;
+  --border-strong: #3F3F46;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  overflow: hidden;
+}
+
+input, button, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+/* ===================================================================
+   DESKTOP APP LAYOUT (Sidebar + Main Content Viewport)
+   =================================================================== */
+
+#app {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-canvas);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Desktop Sidebar */
+.desktop-sidebar {
+  width: 250px;
+  height: 100%;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 50;
+  transition: var(--transition);
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #765B20 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.brand-icon-wrapper svg {
+  width: 18px;
+  height: 18px;
+  color: #FFFFFF;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.brand-title .bank {
+  color: var(--text-primary);
+}
+
+.brand-title .core {
+  color: var(--accent-gold);
+  margin-left: 1px;
+}
+
+.sidebar-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.app-version-badge {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-mute);
+  background-color: var(--bg-card);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Sidebar Navigation Items */
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.sidebar-nav .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.sidebar-nav .nav-item svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.sidebar-nav .nav-item:hover {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+
+.sidebar-nav .nav-item.active {
+  color: var(--accent-gold);
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  border-left: 3px solid var(--accent-gold);
+}
+
+.sidebar-nav .nav-item.active svg {
+  color: var(--accent-gold);
+}
+
+/* Sidebar Footer Profile Card */
+.sidebar-footer {
+  padding: 14px;
+  border-top: 1px solid var(--border-subtle);
+  background-color: var(--bg-panel);
+}
+
+.sidebar-user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.sidebar-user-card:hover {
+  background-color: var(--bg-card);
+}
+
+.sidebar-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-gold), #684F19);
+  color: #FFFFFF;
+  font-weight: 900;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-user-info {
+  flex: 1;
+  margin-left: 10px;
+  overflow: hidden;
+}
+
+.sidebar-user-name {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.sidebar-user-acc {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* Main Content Area */
+.app-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-canvas);
+}
+
+/* Content Topbar */
+.content-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  padding: 0 32px;
+  background-color: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.topbar-page-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Viewport for Views */
+.main-viewport {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+  padding: 24px 32px 48px;
+}
+
+/* Utility classes */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.hidden {
+  display: none !important;
+}

@@ -1,0 +1,4 @@
+-keepattributes *Annotation*, InnerClasses, Signature, Exception
+-keep class kotlinx.serialization.** { *; }
+-keepclassmembers class br.vortex.bankcore.** { *; }
+-keep class androidx.security.** { *; }

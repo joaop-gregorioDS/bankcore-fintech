@@ -1,0 +1,15 @@
+# Node
+node_modules/
+dist/
+dist-installer/
+.vite/
+
+# Rust / Tauri
+src-tauri/target/
+target/
+src-tauri/gen/
+*.bin
+
+# OS
+.DS_Store
+Thumbs.db

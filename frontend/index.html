@@ -1,0 +1,2559 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full light-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankCore | Web Banking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --ink: #0B0B0C;
+            --panel: #141416;
+            --surface: #1C1C1F;
+            --line: #2A2A2E;
+            --ivory: #F6F1E8;
+            --mute: #9A958C;
+            --gold: #C4A35A;
+            --gold-dim: #8A7340;
+            --debit: #C42B2B;
+            --credit: #F6F1E8;
+            --status: #3D7A5A;
+            --bg-body: #0B0B0C;
+            --bg-sidebar: #141416;
+            --bg-card: #1C1C1F;
+            --bg-card-subtle: #161618;
+            --bg-header: rgba(11, 11, 12, 0.92);
+            --border-color: #2A2A2E;
+            --border-subtle: #222226;
+            --text-main: #F6F1E8;
+            --text-muted: #9A958C;
+            --input-bg: #141416;
+            --input-border: #2A2A2E;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        html.light-theme {
+            --ink: #F4F1EA;
+            --panel: #FFFFFF;
+            --surface: #FFFFFF;
+            --line: #E4DFD4;
+            --ivory: #121212;
+            --mute: #6B6560;
+            --gold: #9A7B32;
+            --gold-dim: #7A6228;
+            --debit: #B42318;
+            --credit: #121212;
+            --status: #2F6B4F;
+            --bg-body: #F4F1EA;
+            --bg-sidebar: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --bg-card-subtle: #FAF8F3;
+            --bg-header: rgba(255, 255, 255, 0.92);
+            --border-color: #E4DFD4;
+            --border-subtle: #EDE8DE;
+            --text-main: #121212;
+            --text-muted: #6B6560;
+            --input-bg: #FAF8F3;
+            --input-border: #E4DFD4;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        .carbon-sidebar {
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+        }
+        .carbon-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+        }
+        html.light-theme .carbon-card {
+            box-shadow: 0 1px 0 rgba(18, 18, 18, 0.04);
+        }
+        .carbon-header {
+            background-color: var(--bg-header);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-item { position: relative; transition: background-color 0.15s ease, color 0.15s ease; border-radius: var(--radius-sm); }
+        .nav-item.active {
+            background-color: transparent;
+            color: var(--gold) !important;
+            font-weight: 600;
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.4rem;
+            bottom: 0.4rem;
+            width: 2px;
+            background-color: var(--gold);
+            border-radius: 0;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: #0B0B0C;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: var(--radius-sm);
+            transition: background-color 0.15s ease;
+        }
+        .btn-primary:hover { background: #d4b56e; }
+        html.light-theme .btn-primary:hover { background: #b08c3c; }
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 0.75rem;
+            border-radius: var(--radius-sm);
+        }
+        .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+        .field-input {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            border-radius: var(--radius-sm);
+        }
+        .field-input:focus { outline: none; border-color: var(--gold); }
+        .amount-debit { color: var(--debit); font-variant-numeric: tabular-nums; }
+        .amount-credit { color: var(--credit); font-variant-numeric: tabular-nums; }
+        .tx-icon-debit { background: rgba(196, 43, 43, 0.12); color: var(--debit); border: 1px solid rgba(196, 43, 43, 0.28); }
+        .tx-icon-credit { background: rgba(196, 163, 90, 0.12); color: var(--gold); border: 1px solid rgba(196, 163, 90, 0.28); }
+        .badge-status {
+            color: var(--status);
+            border: 1px solid color-mix(in srgb, var(--status) 35%, transparent);
+            background: color-mix(in srgb, var(--status) 12%, transparent);
+        }
+        .text-gold { color: var(--gold); }
+        .font-amount { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+        .card-theme-carbon { background: linear-gradient(160deg, #1a1a1c 0%, #0d0d0e 100%); border: 1px solid #C4A35A55; }
+        .card-theme-platinum { background: linear-gradient(160deg, #222226 0%, #121214 100%); border: 1px solid #C4A35A40; }
+
+        .sidebar-collapsed { width: 5rem !important; }
+        .sidebar-collapsed .sidebar-text,
+        .sidebar-collapsed .sidebar-balance,
+        .sidebar-collapsed .sidebar-user { display: none !important; }
+        .sidebar-collapsed .nav-item { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
+        .sidebar-collapsed .nav-item.active::before { left: 2px; }
+
+        html.font-scale-large { font-size: 112%; }
+
+        /* Hubs e modais ainda com classes Tailwind antigas herdam o Carbon Ledger */
+        .rounded-3xl { border-radius: var(--radius) !important; }
+        [class*="text-amber-"] { color: var(--gold) !important; }
+        .bg-amber-400, .bg-amber-500, .from-amber-400, .to-amber-500 {
+            background-color: var(--gold) !important;
+            background-image: none !important;
+            color: #0B0B0C !important;
+        }
+        [class*="bg-amber-400/"], [class*="bg-amber-500/"] {
+            background-color: color-mix(in srgb, var(--gold) 12%, transparent) !important;
+            color: var(--gold) !important;
+        }
+        [class*="border-amber-"] { border-color: color-mix(in srgb, var(--gold) 42%, transparent) !important; }
+        [class*="shadow-amber"] { box-shadow: none !important; }
+        [class*="text-emerald-"] { color: var(--status) !important; }
+        [class*="bg-emerald-"] { background-color: color-mix(in srgb, var(--status) 14%, transparent) !important; }
+        [class*="border-emerald-"] { border-color: color-mix(in srgb, var(--status) 32%, transparent) !important; }
+        [class*="text-rose-"] { color: var(--debit) !important; }
+        [class*="bg-rose-"] { background-color: color-mix(in srgb, var(--debit) 12%, transparent) !important; }
+        [class*="border-rose-"] { border-color: color-mix(in srgb, var(--debit) 32%, transparent) !important; }
+        [class*="text-blue-"] { color: var(--gold) !important; }
+        [class*="bg-blue-500"], [class*="bg-blue-600"] { background-color: color-mix(in srgb, var(--gold) 14%, transparent) !important; }
+        .bg-blue-500, .bg-blue-600 { background-color: var(--gold) !important; color: #0B0B0C !important; }
+        [class*="border-blue-"] { border-color: color-mix(in srgb, var(--gold) 35%, transparent) !important; }
+        [class*="hover:border-amber"]:hover,
+        [class*="hover:border-blue"]:hover,
+        [class*="hover:border-emerald"]:hover { border-color: var(--gold) !important; }
+        .icon-gold {
+            color: var(--gold);
+            border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+            background: color-mix(in srgb, var(--gold) 10%, transparent);
+        }
+        .pdf-no-print { display: block; }
+        @media print {
+            @page { size: A4; margin: 12mm; }
+            html, body {
+                background: #F4F1EA !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            body > *:not(#bankcore-pdf-host) { display: none !important; }
+            #bankcore-pdf-host {
+                position: static !important;
+                inset: auto !important;
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+                background: #F4F1EA !important;
+                z-index: 1 !important;
+                overflow: visible !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .pdf-no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased relative">
+
+    <!-- FLOATING TOAST POP-UP -->
+    <div id="toastContainer" class="fixed bottom-12 left-6 sm:left-72 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="carbon-card px-5 py-3.5 flex items-center gap-3 max-w-lg" id="toastCard">
+            <div id="toastIcon" class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+            </div>
+            <div class="pr-2">
+                <div class="text-sm font-semibold tracking-tight" id="toastTitle">Sucesso</div>
+                <div class="text-xs font-medium opacity-70 mt-0.5 leading-snug" id="toastMessage">Operação realizada com sucesso.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= AUTH SCREEN ================= -->
+    <div id="authView" class="min-h-full flex items-center justify-center p-4 sm:p-6" style="background: var(--ink);">
+        <div class="max-w-md w-full space-y-6">
+            <div class="text-center space-y-3">
+                <div class="inline-flex w-12 h-12 rounded-lg items-center justify-center" style="border: 1px solid var(--gold);">
+                    <i data-lucide="shield" class="w-6 h-6 text-gold"></i>
+                </div>
+                <h1 class="text-3xl font-semibold tracking-tight">Bank<span class="text-gold">Core</span></h1>
+                <p class="text-sm font-medium" style="color: var(--mute);">Web banking de demonstração · Vortex Software</p>
+                <p class="text-[11px] font-medium tracking-wide" style="color: var(--gold);">Ambiente de portfólio — login, Pix, extrato e PDF no ledger interno</p>
+            </div>
+
+            <div class="carbon-card p-5">
+                <div class="text-[11px] font-semibold tracking-wide mb-3" style="color: var(--mute);">Contas de demonstração</div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="fillDemo('98765432100', 'teste123456')" class="p-3 btn-secondary text-left transition group">
+                        <div class="text-xs font-semibold group-hover:text-gold">Lucas Mendes</div>
+                        <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">987.654.321-00</div>
+                        <div class="text-xs font-mono font-amount mt-1.5">R$ 18.450,80</div>
+                    </button>
+                    <button onclick="fillDemo('12345678900', 'teste123456')" class="p-3 btn-secondary text-left transition group">
+                        <div class="text-xs font-semibold group-hover:text-gold">Maria Silva</div>
+                        <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">123.456.789-00</div>
+                        <div class="text-xs font-mono font-amount mt-1.5">R$ 12.870,40</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="carbon-card p-6 space-y-5">
+                <div class="flex p-1" style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-xs font-semibold rounded-md transition btn-primary">Acessar conta</button>
+                    <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-xs font-semibold rounded-md transition" style="color: var(--mute);">Abrir conta</button>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">CPF do correntista</label>
+                        <input type="text" id="loginTaxId" required placeholder="00000000000" class="field-input w-full px-4 py-3 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Senha de acesso</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="field-input w-full px-4 py-3 text-sm">
+                    </div>
+                    <button type="submit" id="btnLoginSubmit" class="btn-primary w-full py-3 flex items-center justify-center gap-2">
+                        <span>Entrar</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Nome completo / razão social</label>
+                        <input type="text" id="regName" required placeholder="Nome e sobrenome" class="field-input w-full px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">CPF / CNPJ (apenas números)</label>
+                        <input type="text" id="regTaxId" required placeholder="00000000000" class="field-input w-full px-4 py-3 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">E-mail corporativo</label>
+                        <input type="email" id="regEmail" required placeholder="contato@empresa.com" class="field-input w-full px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Senha</label>
+                        <input type="password" id="regPassword" required minlength="8" placeholder="••••••••" class="field-input w-full px-4 py-3 text-sm">
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Criar conta</span>
+                    </button>
+                </form>
+
+                <div id="authAlert" class="mt-4 text-xs p-3 rounded-lg hidden text-center font-medium"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MAIN WEB BANKING INTERFACE ================= -->
+    <div id="appView" class="hidden h-full flex flex-row overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="mainSidebar" class="w-68 flex-shrink-0 carbon-sidebar flex flex-col justify-between z-30 select-none">
+            <div>
+                <!-- Brand Header -->
+                <div class="h-18 px-6 flex items-center justify-between border-b border-inherit">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="border: 1px solid var(--gold);">
+                            <i data-lucide="shield" class="w-4.5 h-4.5 text-gold"></i>
+                        </div>
+                        <div class="sidebar-text">
+                            <div class="text-base font-semibold leading-tight">Bank<span class="text-gold">Core</span></div>
+                            <div class="text-[10px] font-medium tracking-widest truncate" style="color: var(--mute);">VORTEX SOFTWARE</div>
+                        </div>
+                    </div>
+                    <button onclick="toggleSidebarCollapse()" class="opacity-60 hover:opacity-100 p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition" title="Recolher Menu">
+                        <i data-lucide="chevrons-left" class="w-5 h-5" id="sidebarToggleIcon"></i>
+                    </button>
+                </div>
+
+                <!-- User Balance Card in Sidebar -->
+                <div class="p-5 border-b border-inherit sidebar-balance">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="truncate text-xs font-bold opacity-80" id="sideUserName">Lucas Mendes</div>
+                        <button onclick="toggleBalanceVisibility()" class="opacity-60 hover:text-gold transition" title="Ocultar Saldo">
+                            <i id="sideEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="text-[11px] font-medium tracking-wide" style="color: var(--mute);">Saldo disponível</div>
+                    <div class="text-xl font-semibold font-amount tracking-tight flex items-baseline gap-1 mt-0.5" id="sideBalanceDisplay">
+                        <span class="text-xs font-normal opacity-60">R$</span> 18.450,80
+                    </div>
+                    <div class="mt-2.5 text-xs flex items-center justify-between" style="color: var(--mute);">
+                        <span>Limite Carbon</span>
+                        <strong class="text-gold font-mono font-semibold" id="sideLimitDisplay">R$ 50.000,00</strong>
+                    </div>
+                </div>
+
+                <!-- Navigation List -->
+                <nav class="p-3 space-y-1" id="sidebarNav">
+                    <button onclick="navigateTo('inicio')" id="nav-inicio" class="nav-item active w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Início">
+                        <i data-lucide="home" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Início</span>
+                    </button>
+                    <button onclick="navigateTo('extrato')" id="nav-extrato" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Extrato & Recibos">
+                        <i data-lucide="file-text" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Extrato & Recibos</span>
+                    </button>
+                    <button onclick="navigateTo('cartoes')" id="nav-cartoes" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Central de Cartões">
+                        <i data-lucide="credit-card" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Central de Cartões</span>
+                    </button>
+                    <button onclick="navigateTo('pix')" id="nav-pix" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Central Pix">
+                        <i data-lucide="qr-code" class="w-4.5 h-4.5 text-gold flex-shrink-0"></i> 
+                        <span class="sidebar-text">Central Pix</span>
+                    </button>
+                    <button onclick="navigateTo('pagar')" id="nav-pagar" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Central de Pagamentos">
+                        <i data-lucide="barcode" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Central de Pagamentos</span>
+                    </button>
+                    <button onclick="navigateTo('cobrancas')" id="nav-cobrancas" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Cobranças">
+                        <i data-lucide="receipt" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Cobranças</span>
+                    </button>
+                    <button onclick="navigateTo('invest')" id="nav-invest" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="BankCore Invest">
+                        <i data-lucide="trending-up" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">BankCore Invest</span>
+                    </button>
+                    <button onclick="navigateTo('credito')" id="nav-credito" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Empréstimos & Limites">
+                        <i data-lucide="coins" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Empréstimos & Limites</span>
+                    </button>
+
+                    <!-- MEU PERFIL & AJUSTES DEDICADO -->
+                    <button onclick="navigateTo('perfil')" id="nav-perfil" class="nav-item w-full px-4 py-2.5 text-left text-xs font-medium opacity-80 hover:opacity-100 flex items-center gap-3.5 transition" title="Meu Perfil & Ajustes">
+                        <i data-lucide="user" class="w-4.5 h-4.5 flex-shrink-0"></i> 
+                        <span class="sidebar-text">Meu Perfil & Ajustes</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Rodapé da Sidebar -->
+            <div class="p-4 border-t border-inherit">
+                <button onclick="logout()" class="w-full py-2.5 px-4 rounded-lg font-medium text-xs transition flex items-center justify-center gap-2 amount-debit" style="border: 1px solid color-mix(in srgb, var(--debit) 35%, transparent);" title="Sair da Sessão">
+                    <i data-lucide="log-out" class="w-4 h-4 flex-shrink-0"></i> 
+                    <span class="sidebar-text">Sair da Sessão</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <!-- TOPBAR -->
+            <header class="h-18 carbon-header backdrop-blur-md px-6 flex items-center justify-between flex-shrink-0 z-20">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebarCollapse()" class="p-2 rounded-lg carbon-card transition" title="Menu">
+                        <i data-lucide="menu" class="w-4.5 h-4.5"></i>
+                    </button>
+
+                    <div class="flex items-center gap-2 text-xs font-medium" style="color: var(--mute);">
+                        <span class="hover:opacity-100 cursor-pointer" onclick="navigateTo('inicio')">Início</span>
+                        <span>/</span>
+                        <span class="text-gold font-semibold capitalize" id="topBreadcrumb">Visão Geral</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 sm:gap-4 text-xs">
+                    
+                    <!-- BOTÃO ALTERNAR TEMA CLARO / ESCURO -->
+                    <button onclick="toggleTheme()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 text-gold" title="Alternar tema" id="btnThemeToggle">
+                        <i data-lucide="moon" class="w-4.5 h-4.5" id="iconTheme"></i>
+                        <span class="hidden md:inline font-medium text-[11px]" id="textThemeLabel">Escuro</span>
+                    </button>
+
+                    <button onclick="toggleFontScale()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 font-medium text-xs" title="Tamanho da fonte">
+                        <span class="font-semibold font-mono text-gold text-sm">A<sup class="text-[10px]">+</sup></span>
+                        <span class="hidden md:inline text-[11px] opacity-80" id="textScaleLabel">Fonte</span>
+                    </button>
+
+                    <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg carbon-card text-xs font-mono" style="color: var(--mute);">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-gold"></i>
+                        <span>Sessão <strong class="text-inherit" id="sessionTimer">14:59</strong></span>
+                    </div>
+
+                    <button onclick="navigateTo('perfil')" class="flex items-center gap-3 pl-3 border-l border-inherit hover:opacity-80 transition cursor-pointer text-left group">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-gold text-xs" style="border: 1px solid var(--gold);" id="topUserAvatar">LM</div>
+                        <div class="hidden xl:block">
+                            <div class="text-xs font-semibold leading-tight group-hover:text-gold transition" id="topUserName">Lucas Mendes</div>
+                            <div class="text-[11px] font-mono" style="color: var(--mute);" id="topUserCpf">987.654.321-00</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 opacity-50 group-hover:text-gold transition"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- SCROLLABLE VIEWS -->
+            <main class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
+
+                <!-- 1. VIEW: INÍCIO -->
+                <section id="view-inicio" class="view-panel space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-8 carbon-card p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="text-xs font-medium tracking-wide" style="color: var(--mute);">Saldo em conta corrente</div>
+                                    <span class="badge-status text-xs font-medium px-3 py-1 rounded-md flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full" style="background: var(--status);"></span> Conta ativa
+                                    </span>
+                                </div>
+                                <div class="flex items-baseline gap-2 mb-2">
+                                    <span class="text-2xl font-medium opacity-40">R$</span>
+                                    <h2 id="mainBalanceDisplay" class="text-5xl sm:text-6xl font-semibold font-amount tracking-tight">18.450,80</h2>
+                                </div>
+                                <div class="text-sm flex items-center gap-2 mb-6" style="color: var(--mute);">
+                                    <span>Limite Carbon disponível</span>
+                                    <strong class="text-gold font-mono text-base font-semibold" id="mainLimitDisplay">R$ 50.000,00</strong>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 border-t border-inherit flex flex-wrap items-center gap-3">
+                                <button onclick="navigateTo('pix')" class="btn-primary px-5 py-3 flex items-center gap-2">
+                                    <i data-lucide="qr-code" class="w-4 h-4"></i> Pix
+                                </button>
+                                <button onclick="openModal('depositModal')" class="btn-secondary px-5 py-3 flex items-center gap-2">
+                                    <i data-lucide="plus-circle" class="w-4 h-4 text-gold"></i> Depositar
+                                </button>
+                                <button onclick="navigateTo('extrato')" class="btn-secondary px-5 py-3 flex items-center gap-2">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i> Extrato
+                                </button>
+                                <button onclick="refreshDashboard()" class="btn-secondary p-3" title="Atualizar">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-4 carbon-card p-7 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs font-medium" style="color: var(--mute);">Cartão virtual</span>
+                                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-md" style="color: var(--gold); border: 1px solid var(--gold);" id="cardBadgeType">Carbon Black</span>
+                                </div>
+                                <div class="h-36 rounded-xl card-theme-carbon p-5 flex flex-col justify-between relative overflow-hidden text-white" id="miniCardTheme">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-semibold">Bank<span style="color:#C4A35A;">Core</span></span>
+                                        <i data-lucide="wifi" class="w-4 h-4 rotate-90 text-zinc-400"></i>
+                                    </div>
+                                    <div class="text-sm font-mono text-zinc-300 font-medium" id="miniCardNumber">•••• 4289</div>
+                                    <div class="flex items-center justify-between text-[11px] font-mono text-zinc-300 uppercase">
+                                        <span id="miniCardHolder">LUCAS MENDES ROCHA</span>
+                                        <span>12/29</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="navigateTo('cartoes')" class="btn-secondary mt-4 w-full py-2.5 text-xs">
+                                Central de cartões →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="carbon-card p-6 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-lg icon-gold flex items-center justify-center">
+                                <i data-lucide="qr-code" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">Chave Pix (CPF)</div>
+                                <div class="text-base font-semibold font-mono text-gold truncate mt-0.5" id="mainPixCpf">987.654.321-00</div>
+                            </div>
+                            <button onclick="copyPixKey()" class="p-2 rounded-lg text-gold transition" title="Copiar chave">
+                                <i data-lucide="copy" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+
+                        <div class="carbon-card rounded-3xl p-6 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-lg tx-icon-credit flex items-center justify-center">
+                                <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">Entradas no extrato</div>
+                                <div class="text-base font-semibold font-mono amount-credit mt-0.5" id="mainTotalIncome">+ R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <div class="carbon-card rounded-3xl p-6 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-lg tx-icon-debit flex items-center justify-center">
+                                <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">Saídas no extrato</div>
+                                <div class="text-base font-semibold font-mono amount-debit mt-0.5" id="mainTotalExpense">- R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="carbon-card p-6">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-lg font-semibold flex items-center gap-2.5">
+                                <span>Últimas movimentações</span>
+                                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md" style="border: 1px solid var(--gold); color: var(--gold);">Comprovante PDF</span>
+                            </h3>
+                            <button onclick="navigateTo('extrato')" class="text-xs font-medium text-gold hover:underline transition">
+                                Ver extrato completo →
+                            </button>
+                        </div>
+                        <div id="mainRecentTransactions" class="divide-y divide-inherit"></div>
+                    </div>
+                </section>
+
+                <!-- 2. VIEW: EXTRATO -->
+                <section id="view-extrato" class="view-panel hidden space-y-6">
+                    <div class="carbon-card p-7 sm:p-8">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-2xl font-semibold">Extrato e comprovantes</h2>
+                                <p class="text-xs mt-1" style="color: var(--mute);">Clique em um lançamento para abrir o comprovante e baixar o PDF</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button onclick="exportStatementPDF()" class="btn-primary px-4 py-2.5 flex items-center gap-2">
+                                    <i data-lucide="download" class="w-4 h-4"></i> Exportar extrato
+                                </button>
+                                <button onclick="refreshDashboard()" class="btn-secondary p-2.5" title="Atualizar">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="fullStatementList" class="divide-y divide-inherit"></div>
+                    </div>
+                </section>
+
+                <!-- 3. VIEW: CENTRAL DE CARTÕES -->
+                <section id="view-cartoes" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-5 carbon-card rounded-3xl p-7 flex flex-col justify-between space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-2xl font-semibold flex items-center gap-2">Limite único <span class="text-[10px] font-medium uppercase px-2 py-0.5 rounded-md" style="color: var(--mute); border: 1px solid var(--line);">Simulado</span></h2>
+                                <button onclick="showToastNotification('Gestão de limites de crédito aberta.', 'info')" class="text-xs font-extrabold text-blue-500 hover:underline transition">
+                                    Gerenciar limites
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div class="text-2xl font-black font-mono" id="cardLimitUsed">R$ 8.371,00</div>
+                                    <div class="text-xs opacity-70 font-medium mt-1">Utilizado</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-black text-blue-500 font-mono" id="cardLimitAvailable">R$ 12.260,00</div>
+                                    <div class="text-xs opacity-70 font-medium mt-1">Disponível</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="w-full bg-slate-200 dark:bg-zinc-800 h-3.5 rounded-full overflow-hidden p-0.5">
+                                    <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[40%] rounded-full shadow-sm" id="cardProgressLimit"></div>
+                                </div>
+                                <div class="flex justify-between text-xs opacity-70 font-mono mt-2">
+                                    <span>Limite Total: <strong id="cardLimitTotalText">R$ 20.631,00</strong></span>
+                                    <span>Renovação: <strong>10/Set</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-7 carbon-card rounded-3xl p-7 flex flex-col justify-between space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-2xl font-black">Meus cartões</h2>
+                                <span class="text-xs font-bold opacity-70 uppercase tracking-wider" id="cardMainLabel">Cartão Principal</span>
+                            </div>
+
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex flex-col sm:flex-row items-center justify-between gap-5">
+                                <div>
+                                    <div class="text-sm font-extrabold text-blue-500" id="cardNameSubtitle">Final 4289 • Carbon Black</div>
+                                    <div class="text-3xl font-black font-mono mt-1" id="cardInvoiceValue">R$ 2.296,07</div>
+                                    <div class="text-xs opacity-70 font-medium mt-1">Fatura vence em <strong class="text-inherit">10 de setembro</strong></div>
+                                </div>
+
+                                <div class="w-48 h-28 rounded-2xl card-theme-carbon p-4 flex flex-col justify-between shadow-xl flex-shrink-0 text-white" id="cardVisualBig">
+                                    <div class="flex justify-between items-center text-xs font-bold">
+                                        <span>Bank<span class="text-amber-400">Core</span></span>
+                                        <span class="text-[9px] font-mono text-amber-400 uppercase">VORTEX</span>
+                                    </div>
+                                    <div class="text-xs font-mono text-zinc-300 font-bold" id="cardVisualNumber">•••• •••• •••• 4289</div>
+                                    <div class="flex justify-between items-center text-[10px] font-mono text-zinc-300">
+                                        <span id="cardVisualHolder">LUCAS MENDES</span>
+                                        <span class="font-bold">VISA</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-zinc-700"></span>
+                                </div>
+                                <button onclick="openInvoiceModal()" class="text-sm font-black text-blue-500 hover:underline transition flex items-center gap-1">
+                                    <span>Ver faturas</span>
+                                    <i data-lucide="chevron-right" class="w-4.5 h-4.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+                        <button onclick="openInvoiceModal()" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="receipt" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Pagar fatura</span>
+                        </button>
+                        <button onclick="showToastNotification('Adicionado com sucesso ao Apple Wallet!', 'success')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="wallet" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Carteiras digitais</span>
+                        </button>
+                        <button onclick="generateVirtualCard()" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Cartões virtuais</span>
+                        </button>
+                        <button onclick="showToastNotification('Upgrade para Vortex Black Infinite liberado.', 'success')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Upgrade de cartão</span>
+                        </button>
+                        <button onclick="showToastNotification('Central de Adicionais aberta.', 'info')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="user-plus" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Adicionais</span>
+                        </button>
+                        <button onclick="toggleCardBlock()" id="btnCardBlock" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="lock" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Bloquear</span>
+                        </button>
+                        <button onclick="showToastNotification('Simulador de parcelamento de compras aberto.', 'info')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="calculator" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Parcelar compra</span>
+                        </button>
+                        <button onclick="showToastNotification('Mais opções de compras internacionais e segurança.', 'info')" class="p-4 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-2.5 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-bold">Ver mais</span>
+                        </button>
+                    </div>
+
+                    <div class="carbon-card rounded-3xl p-7 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                            <h2 class="text-xl font-black">Últimos lançamentos</h2>
+                            <span class="text-xs font-bold opacity-70">Fatura Atual • Setembro</span>
+                        </div>
+                        <div class="divide-y divide-inherit" id="cardTransactionsList"></div>
+                    </div>
+                </section>
+
+                <!-- 4. VIEW: CENTRAL PIX COMPLETA -->
+                <section id="view-pix" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
+                    <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                        <div>
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
+                                    <i data-lucide="qr-code" class="w-5 h-5"></i>
+                                </div>
+                                <span>Central Pix</span>
+                            </h2>
+                            <p class="text-xs opacity-70 mt-1">Pix interno entre correntistas BankCore. Limites, MED e QR Code são simulação de UX.</p>
+                        </div>
+                        <button onclick="showToastNotification('Central de Ajuda Pix disponível 24h via SPI BACEN.', 'info')" class="w-10 h-10 rounded-2xl carbon-card hover:border-amber-500/50 flex items-center justify-center transition" title="Ajuda Pix">
+                            <i data-lucide="help-circle" class="w-5 h-5 opacity-70"></i>
+                        </button>
+                    </div>
+
+                    <!-- Módulo Pagar -->
+                    <div class="space-y-4">
+                        <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Pagar</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div onclick="openModal('modalPixTransfer')" class="carbon-card p-6 cursor-pointer transition flex items-start gap-4 group" style="border-color: var(--gold);">
+                                <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-gold" style="border: 1px solid var(--gold);">
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-semibold group-hover:text-gold transition">Fazer um Pix</div>
+                                    <div class="text-xs mt-1 leading-snug" style="color: var(--mute);">Transfere no ledger interno por CPF. Debita origem e credita destino.</div>
+                                </div>
+                            </div>
+
+                            <div onclick="showToastNotification('Leitor de QR Code Pix ativo pela câmera!', 'info')" class="carbon-card rounded-3xl p-6 hover:border-blue-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="scan-line" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-extrabold group-hover:text-blue-500 transition">Ler QR Code</div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Pague escaneando um QR Code ou envie a foto da galeria.</div>
+                                </div>
+                            </div>
+
+                            <div onclick="openModal('modalPixTransfer')" class="carbon-card rounded-3xl p-6 hover:border-indigo-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="copy-check" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-extrabold group-hover:text-indigo-500 transition">Pix Copia e Cola</div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Cole o código do payload Pix para pagar na hora.</div>
+                                </div>
+                            </div>
+
+                            <div onclick="showToastNotification('Módulo Pix de Presente aberto com temas personalizados!', 'success')" class="carbon-card rounded-3xl p-6 hover:border-emerald-500/50 cursor-pointer transition flex items-start gap-4.5 group relative overflow-hidden">
+                                <div class="w-13 h-13 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="gift" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-base font-extrabold group-hover:text-emerald-500 transition">Pix de presente <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-500/20 border border-zinc-500/30 text-inherit">Simulado</span></div>
+                                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-black shadow-sm">Novo</span>
+                                    </div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Envie um Pix com cartão comemorativo personalizado.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo Receber -->
+                    <div class="space-y-4">
+                        <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Receber</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div onclick="showToastNotification('QR Code gerado para cobrança instantânea!', 'success')" class="carbon-card rounded-3xl p-6 hover:border-amber-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="qr-code" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-extrabold group-hover:text-amber-500 transition">Criar QR Code</div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Gere uma cobrança instantânea com valor fixo ou livre.</div>
+                                </div>
+                            </div>
+
+                            <div onclick="copyPixKey()" class="carbon-card rounded-3xl p-6 hover:border-blue-500/50 cursor-pointer transition flex items-start gap-4.5 group">
+                                <div class="w-13 h-13 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 transition">
+                                    <i data-lucide="key" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-base font-extrabold group-hover:text-blue-500 transition">Minhas Chaves Pix</div>
+                                    <div class="text-xs opacity-70 mt-1 leading-snug">Cadastre, consulte e compartilhe suas chaves da Vortex.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo Segurança BACEN -->
+                    <div class="space-y-4">
+                        <div class="text-xs font-black uppercase tracking-wider opacity-60 px-1">Consultar & Segurança BACEN</div>
+                        <div class="divide-y divide-inherit rounded-3xl carbon-card overflow-hidden">
+                            <div onclick="navigateTo('extrato')" class="p-5 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition group">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold group-hover:text-amber-500 transition">Extrato Pix</div>
+                                        <div class="text-xs opacity-70 mt-0.5">Acompanhe seus gastos, recebimentos e comprovantes de liquidação.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:opacity-100 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <div onclick="showToastNotification('Gestão de limites Pix diurno/noturno aberta!', 'info')" class="p-5 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition group">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold group-hover:text-emerald-500 transition">Meus Limites Pix</div>
+                                        <div class="text-xs opacity-70 mt-0.5">Ajuste os limites para horário comercial e limite noturno de segurança.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:opacity-100 transition flex-shrink-0 ml-2"></i>
+                            </div>
+
+                            <div onclick="showToastNotification('MED - Mecanismo Especial de Devolução do Banco Central pronto para abertura de chamado.', 'warning', 'MED BACEN')" class="p-5 flex items-center justify-between hover:bg-rose-500/10 cursor-pointer transition group">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-inherit group-hover:text-rose-500 transition">Informar golpe ou fraude (MED BACEN) <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-500/20 border border-zinc-500/30">Simulado</span></div>
+                                        <div class="text-xs opacity-70 mt-0.5">Use o Mecanismo Especial de Devolução para estorno em suspeitas de golpes.</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:text-rose-500 transition flex-shrink-0 ml-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. VIEW: CENTRAL DE PAGAMENTOS EXPANDIDA (PADRÃO BB iOS) -->
+                <section id="view-pagar" class="view-panel hidden space-y-8 max-w-4xl mx-auto">
+                    <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                        <div>
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
+                                    <i data-lucide="barcode" class="w-5 h-5"></i>
+                                </div>
+                                <span>Central de Pagamentos</span>
+                            </h2>
+                            <p class="text-xs opacity-70 mt-1">Simulação de UX — boletos, tributos, DDA e débitos automáticos não liquidam no ledger</p>
+                        </div>
+                    </div>
+
+                    <!-- Card Superior Saldo vs Agendamentos -->
+                    <div class="carbon-card rounded-3xl p-7 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <div class="text-xs font-bold opacity-70">Saldo disponível</div>
+                            <div class="text-3xl font-black text-blue-500 font-mono mt-1" id="payViewBalance">R$ 18.450,80</div>
+                            <div class="text-xs opacity-60 mt-1">Conta Corrente Vortex Software</div>
+                        </div>
+                        <div class="sm:text-right sm:border-l sm:border-inherit sm:pl-6">
+                            <div class="text-xs font-bold opacity-70">Agendamentos até 30/Set</div>
+                            <div class="text-3xl font-black text-rose-500 font-mono mt-1" id="payViewScheduled">- R$ 2.307,36</div>
+                            <div class="text-xs opacity-60 mt-1">Boletos programados para quitação</div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Botões Circulares -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <button onclick="openModal('modalBoletoPay')" class="p-5 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-3 transition">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center p-3">
+                                <i data-lucide="barcode" class="w-7 h-7"></i>
+                            </div>
+                            <span class="text-xs font-black">Pagamento</span>
+                        </button>
+                        <button onclick="navigateTo('pix')" class="p-5 rounded-3xl carbon-card hover:border-amber-500/50 flex flex-col items-center text-center gap-3 transition">
+                            <div class="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center p-3">
+                                <i data-lucide="qr-code" class="w-7 h-7"></i>
+                            </div>
+                            <span class="text-xs font-black">Pix</span>
+                        </button>
+                        <button onclick="openInvoiceModal()" class="p-5 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-3 transition">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center p-3">
+                                <i data-lucide="credit-card" class="w-7 h-7"></i>
+                            </div>
+                            <span class="text-xs font-black">Pagar fatura</span>
+                        </button>
+                        <button onclick="openModal('modalDDA')" class="p-5 rounded-3xl carbon-card hover:border-blue-500/50 flex flex-col items-center text-center gap-3 transition">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center p-3">
+                                <i data-lucide="calendar-check" class="w-7 h-7"></i>
+                            </div>
+                            <span class="text-xs font-black">Agenda DDA</span>
+                        </button>
+                    </div>
+
+                    <!-- Módulo Agenda de Boletos DDA -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                            <div>
+                                <h3 class="text-base font-black flex items-center gap-2">
+                                    <i data-lucide="calendar-check" class="w-5 h-5 text-blue-500"></i> Boletos Eletrônicos em Aberto (DDA CIP)
+                                </h3>
+                                <p class="text-xs opacity-60 mt-0.5">Capturados automaticamente pelo CNPJ/CPF da Vortex</p>
+                            </div>
+                            <button onclick="openModal('modalDDA')" class="text-xs font-bold text-blue-500 hover:underline">Ver Todos →</button>
+                        </div>
+                        <div class="divide-y divide-inherit" id="payDdaFullList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Módulo Débito Automático -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="refresh-cw" class="w-5 h-5 text-emerald-500"></i> Contas em Débito Automático
+                            </h3>
+                            <span class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">3 Contas Ativas</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                            <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex items-center justify-between">
+                                <div>
+                                    <div class="font-black">Enel Energia SP</div>
+                                    <div class="text-[11px] opacity-60">Débito todo dia 15</div>
+                                </div>
+                                <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 cursor-pointer" onchange="showToastNotification('Débito automático da Enel alterado.', 'info')">
+                            </div>
+                            <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex items-center justify-between">
+                                <div>
+                                    <div class="font-black">Sabesp Água PJ</div>
+                                    <div class="text-[11px] opacity-60">Débito todo dia 18</div>
+                                </div>
+                                <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 cursor-pointer" onchange="showToastNotification('Débito automático da Sabesp alterado.', 'info')">
+                            </div>
+                            <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex items-center justify-between">
+                                <div>
+                                    <div class="font-black">Claro Fibra 1Gbps</div>
+                                    <div class="text-[11px] opacity-60">Débito todo dia 22</div>
+                                </div>
+                                <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 cursor-pointer" onchange="showToastNotification('Débito automático da Claro alterado.', 'info')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gerenciar Pagamentos & Limites -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="sliders" class="w-5 h-5 text-amber-500"></i> Limites de Pagamento & Tributos
+                            </h3>
+                        </div>
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <div class="flex justify-between font-bold mb-1.5">
+                                    <span>Limite Diário para Boletos e Tributos (DARF / GPS / DAS)</span>
+                                    <strong class="text-amber-500 font-mono text-sm" id="payLimitValue">R$ 50.000,00</strong>
+                                </div>
+                                <input type="range" min="5000" max="100000" step="5000" value="50000" class="w-full accent-amber-500 cursor-pointer" oninput="document.getElementById('payLimitValue').innerText = 'R$ ' + parseFloat(this.value).toLocaleString('pt-BR', {minimumFractionDigits:2});">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. VIEW: COBRANÇAS COMPLETA -->
+                <section id="view-cobrancas" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-inherit">
+                        <div>
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
+                                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                                </div>
+                                <span>Gestão de Cobranças & Contratos</span>
+                            </h2>
+                            <p class="text-xs opacity-70 mt-1">Simulação de UX — emissão de faturas e links não grava no ledger</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openModal('modalEmitirCobranca')" class="btn-primary px-5 py-2.5 flex items-center gap-2">
+                                <i data-lucide="plus" class="w-4.5 h-4.5"></i> Nova Cobrança
+                            </button>
+                            <button onclick="showToastNotification('Link de pagamento gerado e copiado!', 'success')" class="px-4 py-3 rounded-2xl carbon-card hover:border-amber-500/50 font-bold text-xs transition flex items-center gap-2">
+                                <i data-lucide="link" class="w-4 h-4"></i> Link Rápido
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Métricas de Faturamento -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">Total Recebido (Mês)</div>
+                            <div class="text-2xl font-black text-emerald-500 font-mono mt-1" id="cobTotalReceived">R$ 12.700,00</div>
+                            <div class="text-[10px] opacity-60 mt-1">2 contratos quitados</div>
+                        </div>
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">A Vencer (Setembro)</div>
+                            <div class="text-2xl font-black text-amber-500 font-mono mt-1" id="cobPending">R$ 3.850,00</div>
+                            <div class="text-[10px] opacity-60 mt-1">Previsão até 30/Set</div>
+                        </div>
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">Em Atraso</div>
+                            <div class="text-2xl font-black text-rose-500 font-mono mt-1">R$ 0,00</div>
+                            <div class="text-[10px] opacity-60 mt-1 text-emerald-500 font-bold">Inadimplência Zero</div>
+                        </div>
+                        <div class="carbon-card rounded-3xl p-5">
+                            <div class="text-[11px] uppercase font-black opacity-60">Taxa de Liquidação</div>
+                            <div class="text-2xl font-black text-blue-500 font-mono mt-1">100%</div>
+                            <div class="text-[10px] opacity-60 mt-1">Pontualidade fiscal</div>
+                        </div>
+                    </div>
+
+                    <!-- Tabela Completa de Contratos -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-inherit">
+                            <h3 class="text-lg font-black">Histórico de Cobranças Emitidas</h3>
+                            <div class="flex items-center gap-2">
+                                <button onclick="filterCobrancas('all')" class="px-3 py-1.5 rounded-xl bg-amber-400 text-black text-xs font-black">Todos</button>
+                                <button onclick="filterCobrancas('paid')" class="px-3 py-1.5 rounded-xl carbon-card text-xs font-bold opacity-80 hover:opacity-100">Pagos</button>
+                                <button onclick="filterCobrancas('pending')" class="px-3 py-1.5 rounded-xl carbon-card text-xs font-bold opacity-80 hover:opacity-100">A Vencer</button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-inherit opacity-60 font-bold uppercase text-[11px]">
+                                        <th class="py-3.5 px-4">Sacado / Contrato</th>
+                                        <th class="py-3.5 px-4">Status</th>
+                                        <th class="py-3.5 px-4">Vencimento</th>
+                                        <th class="py-3.5 px-4 text-right">Valor</th>
+                                        <th class="py-3.5 px-4 text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-inherit" id="cobrancasTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. VIEW: BANKCORE INVEST COMPLETA -->
+                <section id="view-invest" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                        <div>
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
+                                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                </div>
+                                <span>BankCore Invest</span>
+                            </h2>
+                            <p class="text-xs opacity-70 mt-1">Módulo didático — simulação de CDB 104% do CDI. Não aplica saldo em conta.</p>
+                        </div>
+                        <button onclick="showToastNotification('Simulação: aporte não altera o ledger.', 'info')" class="btn-primary px-5 py-2.5 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-4.5 h-4.5"></i> Novo Aporte
+                        </button>
+                    </div>
+
+                    <!-- Painel da Carteira -->
+                    <div class="carbon-card rounded-3xl p-7 sm:p-9 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                <div class="text-xs uppercase font-black opacity-60">Patrimônio Investido</div>
+                                <div class="text-3xl font-black text-emerald-500 font-mono mt-1">R$ 45.890,20</div>
+                                <div class="text-[11px] text-emerald-500 font-bold mt-1">+ R$ 480,20 este mês</div>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                <div class="text-xs uppercase font-black opacity-60">Rendimento Acumulado</div>
+                                <div class="text-3xl font-black text-inherit font-mono mt-1">104% do CDI</div>
+                                <div class="text-[11px] opacity-60 mt-1">Taxa Selic Over</div>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                <div class="text-xs uppercase font-black opacity-60">Liquidez Imediata (D+0)</div>
+                                <div class="text-3xl font-black text-blue-500 font-mono mt-1">R$ 25.000,00</div>
+                                <div class="text-[11px] opacity-60 mt-1">Resgate 24h por dia</div>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico de Alocação -->
+                        <div class="pt-4 border-t border-inherit space-y-3">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span>Alocação da Carteira</span>
+                                <span class="opacity-70">65% Renda Fixa • 20% Tesouro • 15% Fundos</span>
+                            </div>
+                            <div class="w-full bg-slate-200 dark:bg-zinc-800 h-4 rounded-full overflow-hidden flex p-0.5 gap-1">
+                                <div class="bg-emerald-500 h-full w-[65%] rounded-full" title="Renda Fixa 65%"></div>
+                                <div class="bg-blue-500 h-full w-[20%] rounded-full" title="Tesouro 20%"></div>
+                                <div class="bg-amber-400 h-full w-[15%] rounded-full" title="Fundos 15%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vitrine de Produtos de Investimento -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-black">Produtos de Renda Fixa & Títulos Públicos</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-emerald-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">CDB BankCore Liquidez Diária</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Rentabilidade: 104% do CDI • Resgate D+0</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">FGC Protegido</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Aplicação mínima: <strong>R$ 100,00</strong></span>
+                                    <button onclick="showToastNotification('Aplicação em CDB iniciada com sucesso!', 'success')" class="px-4 py-2 rounded-xl bg-emerald-500 text-black font-black">Investir</button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-blue-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">LCA Sustentabilidade Agro</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Rentabilidade: 98% do CDI • Isento de IR</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-blue-500/10 text-blue-500 border border-blue-500/20">Isento IR</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Vencimento: <strong>12 meses</strong></span>
+                                    <button onclick="showToastNotification('Aplicação em LCA iniciada com sucesso!', 'success')" class="px-4 py-2 rounded-xl bg-blue-500 text-white font-black">Investir</button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-amber-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">Tesouro Direto Selic 2029</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Rentabilidade: Selic + 0,15% a.a.</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">Tesouro Nacional</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Aplicação mínima: <strong>R$ 150,00</strong></span>
+                                    <button onclick="showToastNotification('Aplicação no Tesouro Direto iniciada!', 'success')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-black">Investir</button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-sm font-black">Fundo Vortex Tech Global</div>
+                                        <div class="text-[11px] opacity-60 mt-0.5">Multimercado Ações de Tecnologia (Nasdaq)</div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">Alta Rentabilidade</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-inherit">
+                                    <span class="opacity-70">Rentabilidade 12m: <strong class="text-emerald-500">+ 24,8%</strong></span>
+                                    <button onclick="showToastNotification('Aplicação no Fundo Tech iniciada!', 'success')" class="px-4 py-2 rounded-xl bg-indigo-500 text-white font-black">Investir</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simulador de Rendimento -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-4">
+                        <div class="pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-amber-500"></i> Simulador de Rendimento em 12 Meses
+                            </h3>
+                        </div>
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <div class="flex justify-between font-bold mb-1.5">
+                                    <span>Valor do Aporte Simulado:</span>
+                                    <strong class="text-amber-500 font-mono text-base" id="simInvestAmount">R$ 10.000,00</strong>
+                                </div>
+                                <input type="range" min="1000" max="100000" step="1000" value="10000" class="w-full accent-amber-500 cursor-pointer" oninput="updateInvestSimulation(this.value)">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 pt-2">
+                                <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                    <div class="opacity-60">Rendimento no BankCore (104% CDI)</div>
+                                    <div class="text-xl font-black text-emerald-500 font-mono mt-0.5" id="simBankCoreTotal">R$ 11.144,00</div>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                    <div class="opacity-60">Rendimento na Poupança Antiga</div>
+                                    <div class="text-xl font-black opacity-60 font-mono mt-0.5" id="simPoupancaTotal">R$ 10.617,00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. VIEW: EMPRÉSTIMOS & LIMITES COMPLETA -->
+                <section id="view-credito" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                        <div>
+                            <h2 class="text-3xl font-black flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg icon-gold flex items-center justify-center">
+                                    <i data-lucide="coins" class="w-5 h-5"></i>
+                                </div>
+                                <span>Empréstimos & Crédito Inteligente</span>
+                            </h2>
+                            <p class="text-xs opacity-70 mt-1">Módulo didático — Tabela Price no browser. Não concede crédito real.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card de Linha Pré-Aprovada -->
+                    <div class="carbon-card rounded-3xl p-7 sm:p-9 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black uppercase px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Linha de Crédito Carbon Pré-Aprovada</span>
+                            <span class="text-xs opacity-70">Taxa especial: <strong class="text-amber-500">0,99% a.m.</strong></span>
+                        </div>
+                        <div class="p-7 rounded-3xl bg-black/5 dark:bg-zinc-900 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <div class="text-xs opacity-70">Valor Total Disponível</div>
+                                <div class="text-4xl font-black text-amber-500 font-mono mt-1" id="creditMaxDisplay">R$ 50.000,00</div>
+                            </div>
+                            <div class="sm:text-right text-xs opacity-70">
+                                <div>Carência: <strong class="text-inherit">90 dias para a 1ª parcela</strong></div>
+                                <div>Prazo flexível: <strong class="text-inherit">de 6x até 48x</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simulador Dinâmico de Parcelamento -->
+                    <div class="carbon-card rounded-3xl p-7 space-y-5">
+                        <div class="pb-3 border-b border-inherit">
+                            <h3 class="text-base font-black flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-amber-500"></i> Simulador de Contratação Imediata
+                            </h3>
+                        </div>
+
+                        <div class="space-y-5 text-xs">
+                            <div>
+                                <div class="flex justify-between font-bold mb-1.5">
+                                    <span>Valor do Empréstimo:</span>
+                                    <strong class="text-amber-500 font-mono text-base" id="loanAmountText">R$ 15.000,00</strong>
+                                </div>
+                                <input type="range" min="1000" max="50000" step="1000" value="15000" id="loanRangeInput" class="w-full accent-amber-500 cursor-pointer" oninput="recalcLoan()">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold opacity-70 mb-2">Selecione o Número de Parcelas:</label>
+                                <div class="grid grid-cols-5 gap-2">
+                                    <button onclick="setLoanMonths(6)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">6x</button>
+                                    <button onclick="setLoanMonths(12)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">12x</button>
+                                    <button onclick="setLoanMonths(24)" class="loan-term-btn py-2.5 rounded-xl bg-amber-400 text-black font-black text-xs">24x</button>
+                                    <button onclick="setLoanMonths(36)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">36x</button>
+                                    <button onclick="setLoanMonths(48)" class="loan-term-btn py-2.5 rounded-xl carbon-card font-black text-xs hover:border-amber-500/50">48x</button>
+                                </div>
+                            </div>
+
+                            <div class="p-5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <div class="text-xs opacity-60">Valor da Parcela Mensal</div>
+                                    <div class="text-3xl font-black text-emerald-500 font-mono mt-0.5" id="loanInstallmentValue">24x de R$ 706,12</div>
+                                    <div class="text-[11px] opacity-60 mt-0.5">IOF e tarifas bancárias inclusas</div>
+                                </div>
+                                <button onclick="showToastNotification('Simulação: crédito não altera o ledger.', 'info')" class="btn-primary w-full sm:w-auto px-7 py-3">
+                                    Simular contratação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modalidades de Crédito Corporativo -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-black">Soluções de Crédito para Empresas</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                            <div class="carbon-card rounded-3xl p-6 space-y-3">
+                                <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                                </div>
+                                <div class="text-sm font-black">Capital de Giro Rápido</div>
+                                <div class="opacity-70 leading-snug">Liquidez para fluxo de caixa e pagamento de fornecedores da empresa.</div>
+                            </div>
+                            <div class="carbon-card rounded-3xl p-6 space-y-3">
+                                <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center">
+                                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                                </div>
+                                <div class="text-sm font-black">Antecipação de Recebíveis</div>
+                                <div class="opacity-70 leading-snug">Receba hoje o valor de cobranças e contratos que venceriam nos próximos 90 dias.</div>
+                            </div>
+                            <div class="carbon-card rounded-3xl p-6 space-y-3">
+                                <div class="w-10 h-10 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center">
+                                    <i data-lucide="laptop" class="w-5 h-5"></i>
+                                </div>
+                                <div class="text-sm font-black">Financiamento de Equipamentos</div>
+                                <div class="opacity-70 leading-snug">Renove computadores, servidores e infraestrutura com taxas de fomento.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. VIEW DEDICADA: MEU PERFIL & AJUSTES -->
+                <section id="view-perfil" class="view-panel hidden space-y-8 max-w-5xl mx-auto">
+                    <div class="carbon-card rounded-3xl p-7 sm:p-9 relative overflow-hidden shadow-xl">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                            <div class="flex items-center gap-6">
+                                <div class="w-20 h-20 sm:w-22 sm:h-22 rounded-3xl bg-amber-500/15 border-2 border-amber-500/40 flex items-center justify-center font-black text-amber-500 text-3xl shadow-xl flex-shrink-0" id="perfilHeroAvatar">
+                                    JP
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-3">
+                                        <h2 class="text-2xl sm:text-3xl font-black tracking-tight" id="perfilHeroName">Lucas Mendes Rocha</h2>
+                                        <span class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5">
+                                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Verificado
+                                        </span>
+                                    </div>
+                                    <div class="text-sm opacity-70 font-mono mt-1" id="perfilHeroCpf">CPF: 987.654.321-00</div>
+                                    <div class="flex flex-wrap items-center gap-3 mt-2 text-xs">
+                                        <span class="text-amber-500 font-mono font-black" id="perfilHeroAcc">Ag. 0001-9 • Cc. 77412-7</span>
+                                        <span class="opacity-40">•</span>
+                                        <span class="font-bold opacity-80" id="perfilHeroSegment">Segmento: Vortex Carbon Black</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sm:text-right flex-shrink-0">
+                                <div class="text-[11px] uppercase font-black opacity-60">Status da Conta</div>
+                                <div class="text-sm font-black text-emerald-500 mt-0.5">Ativa & Protegida (SPI BACEN)</div>
+                                <div class="text-[11px] opacity-60 font-mono mt-1">São Paulo - SP • IP Seguro</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-7 space-y-6">
+                            <div class="carbon-card rounded-3xl p-7 space-y-5">
+                                <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                                    <h3 class="text-base font-black flex items-center gap-2.5">
+                                        <i data-lucide="user-check" class="w-5 h-5 text-amber-500"></i> Dados Cadastrais do Titular
+                                    </h3>
+                                    <span class="text-xs font-bold opacity-60 uppercase">Edição Imediata</span>
+                                </div>
+                                <form onsubmit="saveProfilePageData(event)" class="space-y-4 text-xs">
+                                    <div>
+                                        <label class="block font-bold opacity-70 mb-1.5">Nome Completo</label>
+                                        <input type="text" id="perfilInputName" value="Lucas Mendes Rocha" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500 focus:outline-none font-bold">
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block font-bold opacity-70 mb-1.5">CPF do Titular</label>
+                                            <input type="text" id="perfilInputCpf" value="987.654.321-00" readonly class="w-full px-4 py-3 rounded-2xl bg-black/10 dark:bg-zinc-950 border border-inherit opacity-70 font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold opacity-70 mb-1.5">Telefone / WhatsApp</label>
+                                            <input type="text" id="perfilInputPhone" value="(11) 98765-4321" class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit font-mono">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold opacity-70 mb-1.5">E-mail Corporativo</label>
+                                        <input type="email" id="perfilInputEmail" value="contato@vortexsoftware.tech" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500">
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold opacity-70 mb-1.5">Endereço Fiscal / Residencial</label>
+                                        <input type="text" id="perfilInputAddress" value="Av. Paulista, 1000 - Bela Vista, São Paulo - SP" class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                    </div>
+                                    <button type="submit" class="w-full py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/15">
+                                        Salvar Alterações Cadastrais
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-7 space-y-5">
+                                <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                                    <h3 class="text-base font-black flex items-center gap-2.5">
+                                        <i data-lucide="building-2" class="w-5 h-5 text-blue-500"></i> Dados da Empresa (Pessoa Jurídica)
+                                    </h3>
+                                    <span class="text-xs font-black uppercase px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-500 border border-blue-500/20">Contabilizei Conectada</span>
+                                </div>
+                                <div class="space-y-3.5 text-xs">
+                                    <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                        <div class="text-[11px] uppercase font-black opacity-60">Razão Social Oficial</div>
+                                        <div class="text-sm font-black mt-0.5">VORTEX SOFTWARE LTDA</div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3.5">
+                                        <div class="p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                            <div class="text-[11px] uppercase font-black opacity-60">Nome Fantasia</div>
+                                            <div class="text-sm font-black text-amber-500 mt-0.5">Vortex Software</div>
+                                        </div>
+                                        <div class="p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                            <div class="text-[11px] uppercase font-black opacity-60">Regime Tributário</div>
+                                            <div class="text-sm font-black mt-0.5">Simples Nacional</div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                        <div class="text-[11px] uppercase font-black opacity-60">Atividade Principal (CNAE)</div>
+                                        <div class="text-xs font-semibold opacity-80 mt-0.5">6201-5/01 - Desenvolvimento de programas de computador sob encomenda</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 space-y-6">
+                            <div class="carbon-card rounded-3xl p-7 space-y-5">
+                                <div class="pb-3 border-b border-inherit">
+                                    <h3 class="text-base font-black flex items-center gap-2.5">
+                                        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i> Segurança & 2FA
+                                    </h3>
+                                </div>
+                                <div class="space-y-3.5 text-xs">
+                                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                        <div>
+                                            <div class="font-black">Biometria / Face ID</div>
+                                            <div class="text-xs opacity-60 mt-0.5">Autenticar compras por biometria</div>
+                                        </div>
+                                        <input type="checkbox" checked class="accent-emerald-500 w-5 h-5 cursor-pointer">
+                                    </div>
+                                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                                        <div>
+                                            <div class="font-black">Token Virtual 2FA</div>
+                                            <div class="text-xs opacity-60 mt-0.5">Validação temporal em 2 fatores</div>
+                                        </div>
+                                        <span class="text-xs font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">Ativo</span>
+                                    </div>
+                                    <button onclick="showToastNotification('Formulário de alteração de senha de 8 dígitos aberto.', 'info')" class="w-full py-3 rounded-2xl carbon-card hover:border-amber-500/40 text-xs font-bold transition">
+                                        Alterar Senha de Acesso
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="carbon-card rounded-3xl p-7 space-y-5">
+                                <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                                    <h3 class="text-base font-black flex items-center gap-2.5">
+                                        <i data-lucide="smartphone" class="w-5 h-5 text-indigo-500"></i> Dispositivos Conectados
+                                    </h3>
+                                </div>
+                                <div class="divide-y divide-inherit text-xs">
+                                    <div class="py-3 flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <i data-lucide="laptop" class="w-5 h-5 opacity-70"></i>
+                                            <div>
+                                                <div class="font-black">Web Banking (Esta Sessão)</div>
+                                                <div class="text-xs opacity-60 font-mono">Chrome 128 • Windows 11</div>
+                                            </div>
+                                        </div>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    </div>
+                                    <div class="py-3 flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <i data-lucide="smartphone" class="w-5 h-5 opacity-70"></i>
+                                            <div>
+                                                <div class="font-black">iPhone 16 Pro Max</div>
+                                                <div class="text-xs opacity-60 font-mono">App iOS • Visto há 15min</div>
+                                            </div>
+                                        </div>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-zinc-600"></span>
+                                    </div>
+                                </div>
+                                <button onclick="showToastNotification('Todas as outras sessões foram desconectadas.', 'warning')" class="w-full py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold border border-rose-500/20 transition">
+                                    Encerrar Outras Sessões
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL: RECIBO INTERATIVO & COMPROVANTE OFICIAL -->
+    <div id="receiptModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(18,18,18,0.45);">
+        <div class="max-w-md w-full p-5 relative space-y-4" style="background: #F4F1EA; border: 1px solid #E4DFD4; border-radius: 12px; box-shadow: 0 16px 40px rgba(18,18,18,0.12);">
+            <div id="receiptPrintableArea" class="p-6 space-y-5" style="background: #F4F1EA; color: #121212;">
+                <div style="height: 2px; background: #9A7B32; margin: -24px -24px 18px;"></div>
+                <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #E4DFD4;">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #9A7B32;">
+                            <i data-lucide="shield" class="w-5 h-5" style="color: #9A7B32;"></i>
+                        </div>
+                        <div>
+                            <div class="text-base font-semibold leading-tight">Bank<span style="color: #9A7B32;">Core</span></div>
+                            <div class="text-[10px] uppercase tracking-wide" style="color: #6B6560;">Comprovante · ledger interno</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #9A7B32; border: 1px solid #9A7B3255;">Liquidado</span>
+                </div>
+
+                <div class="text-center py-3">
+                    <div class="text-xs uppercase tracking-wide" style="color: #6B6560;">Valor da operação</div>
+                    <div class="text-4xl font-semibold font-mono mt-1 font-amount" id="recValor">R$ 0,00</div>
+                    <div class="text-[11px] mt-2 font-medium" style="color: #6B6560;" id="recHolder">—</div>
+                </div>
+
+                <div class="space-y-2.5 text-xs py-3.5" style="border-top: 1px solid #E4DFD4; border-bottom: 1px solid #E4DFD4;">
+                    <div class="flex justify-between"><span style="color: #6B6560;">Tipo</span><strong id="recTipo">Transferência Pix</strong></div>
+                    <div class="flex justify-between"><span style="color: #6B6560;">Descrição</span><strong class="truncate max-w-[200px]" id="recDesc">---</strong></div>
+                    <div class="flex justify-between"><span style="color: #6B6560;">Data/Hora</span><strong class="font-mono" id="recData">02/09/2026</strong></div>
+                    <div class="flex justify-between"><span style="color: #6B6560;">Autenticação</span><strong class="font-mono text-xs" style="color: #9A7B32;" id="recAuth">AUT-9823482394</strong></div>
+                </div>
+                <div class="text-[10px] leading-relaxed" style="color: #6B6560;">
+                    Vortex Software · documento de demonstração. Não é comprovante SPI/BACEN.
+                    A liquidação ocorreu no livro-razão BankCore (partidas dobradas).
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="downloadReceiptPDF()" class="btn-primary flex-1 py-3 flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
+                </button>
+                <button onclick="closeModal('receiptModal')" class="btn-secondary px-5 py-3">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="statementPrintableArea" style="position:fixed;left:0;top:0;width:720px;padding:36px;background:#F4F1EA;color:#121212;font-family:'Plus Jakarta Sans',sans-serif;z-index:-1;pointer-events:none;opacity:0;"></div>
+
+    <!-- MODAL: DDA PAGAR E GERENCIAR -->
+    <div id="modalDDA" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-lg w-full p-6 relative space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center">
+                        <i data-lucide="barcode" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black">Boletos Eletrônicos (DDA)</h3>
+                        <div class="text-xs opacity-60 font-mono" id="ddaSubtitle">Emitidos para o titular</div>
+                    </div>
+                </div>
+                <button onclick="closeModal('modalDDA')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="divide-y divide-inherit max-h-72 overflow-y-auto space-y-1" id="ddaItemsList"></div>
+            <button onclick="closeModal('modalDDA')" class="btn-secondary w-full py-2.5 text-xs">Fechar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: FATURA DO CARTÃO EM PDF -->
+    <div id="invoiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden" style="background: rgba(18,18,18,0.45);">
+        <div class="carbon-card max-w-lg w-full max-h-[92vh] overflow-y-auto p-6 relative space-y-5">
+            <div id="invoicePrintableArea" class="p-7 space-y-5" style="background: #F4F1EA; color: #121212; border: 1px solid #E4DFD4; border-radius: 12px;">
+                <div style="height: 2px; background: #9A7B32; margin: -28px -28px 16px; border-radius: 12px 12px 0 0;"></div>
+                <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #E4DFD4;">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="border: 1px solid #9A7B32;">
+                            <i data-lucide="shield" class="w-5 h-5" style="color: #9A7B32;"></i>
+                        </div>
+                        <div>
+                            <div class="text-base font-semibold leading-tight">Bank<span style="color:#9A7B32;">Core</span> Card</div>
+                            <div class="text-[10px] uppercase tracking-wide" style="color: #6B6560;">Fatura simulada · Vortex Software</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-md" style="color: #9A7B32; border: 1px solid #9A7B3255;">Simulado</span>
+                </div>
+
+                <div class="p-5 rounded-xl flex items-center justify-between" style="border: 1px solid #E4DFD4;">
+                    <div>
+                        <div class="text-xs uppercase tracking-wide" style="color: #6B6560;">Total da fatura</div>
+                        <div class="text-3xl font-semibold font-mono font-amount" style="color: #9A7B32;" id="invoiceModalValue">R$ 2.296,07</div>
+                        <div class="text-xs mt-1" style="color: #6B6560;">Vencimento: <strong style="color:#121212;">10/09/2026</strong></div>
+                    </div>
+                    <div class="text-right text-xs" style="color: #6B6560;">
+                        <div>Melhor dia: <strong style="color:#121212;">03</strong></div>
+                        <div>Utilizado: <strong style="color:#B42318;">R$ 8.371,00</strong></div>
+                    </div>
+                </div>
+
+                <div class="pt-3 space-y-2" style="border-top: 1px solid #E4DFD4;">
+                    <div class="text-xs uppercase tracking-wide" style="color: #6B6560;">Linha digitável (demonstração)</div>
+                    <div class="text-xs font-mono p-3 rounded-lg break-all select-all" style="background:#FAF8F3; border: 1px solid #E4DFD4; color:#121212;">
+                        00190.00009 02891.234567 89000.000018 1 98760000229607
+                    </div>
+                </div>
+                <div class="text-[10px] leading-relaxed" style="color: #6B6560;">
+                    Módulo didático. Esta fatura não liquida no ledger BankCore.
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-3">
+                <button onclick="downloadInvoicePDF()" class="btn-primary w-full sm:flex-1 py-3 flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Baixar fatura PDF
+                </button>
+                <button onclick="closeModal('invoiceModal')" class="btn-secondary px-5 py-3">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DEPOSITAR FUNDOS -->
+    <div id="depositModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-md w-full p-6 relative">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-gold"></i> Depositar (demonstração)
+                </h3>
+                <button onclick="closeModal('depositModal')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleDeposit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Valor do depósito (R$)</label>
+                    <input type="number" step="0.01" min="1.00" id="depositAmount" value="5000.00" required class="field-input w-full px-4 py-3 text-base font-semibold font-amount">
+                </div>
+                <div id="depositAlert" class="text-xs p-3 rounded-lg hidden text-center font-medium"></div>
+                <button type="submit" class="btn-primary w-full py-3">
+                    Creditar conta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: TRANSFERÊNCIA PIX -->
+    <div id="modalPixTransfer" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-md w-full p-6 relative">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold flex items-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5 text-gold"></i> Enviar Pix
+                </h3>
+                <button onclick="closeModal('modalPixTransfer')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handlePixTransfer(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Chave Pix de destino (CPF)</label>
+                    <input type="text" id="pixDestKey" required placeholder="00000000000" class="field-input w-full px-4 py-3 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Valor (R$)</label>
+                    <input type="number" step="0.01" min="0.01" id="pixAmountInput" value="150.00" required class="field-input w-full px-4 py-3 text-base font-mono font-semibold font-amount">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Descrição</label>
+                    <input type="text" id="pixDescInput" value="Pagamento Pix Web Banking" class="field-input w-full px-4 py-3 text-sm">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3">
+                    Confirmar Pix
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PAGAR BOLETO -->
+    <div id="modalBoletoPay" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-md w-full p-6 relative space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center">
+                        <i data-lucide="barcode" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-black">Pagamento de Boleto</h3>
+                </div>
+                <button onclick="closeModal('modalBoletoPay')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handlePayBoleto(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold opacity-70 mb-1.5">Linha Digitável (47 dígitos)</label>
+                    <input type="text" value="23793.38128 60000.120004 06330.412345 9 98760000035000" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit text-xs font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold opacity-70 mb-1.5">Valor a Pagar (R$)</label>
+                    <input type="number" step="0.01" min="0.01" value="350.00" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit text-base font-black font-mono">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3">
+                    Confirmar (simulado)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVA COBRANÇA -->
+    <div id="modalEmitirCobranca" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" style="background: rgba(0,0,0,0.72);">
+        <div class="carbon-card max-w-md w-full p-6 relative space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-inherit">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-black">Emitir Nova Cobrança PJ</h3>
+                </div>
+                <button onclick="closeModal('modalEmitirCobranca')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleEmitirCobranca(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold opacity-70 mb-1">Nome do Cliente / Empresa</label>
+                    <input type="text" id="cobClientName" required placeholder="Ex: Nexus Cloud Tecnologia" class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <div>
+                    <label class="block font-bold opacity-70 mb-1">CPF ou CNPJ</label>
+                    <input type="text" id="cobClientDoc" required placeholder="00.000.000/0001-00" class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit font-mono">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold opacity-70 mb-1">Valor (R$)</label>
+                        <input type="number" step="0.01" min="1.00" id="cobAmount" value="1500.00" required class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit font-mono font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="block font-bold opacity-70 mb-1">Vencimento</label>
+                        <input type="date" id="cobDueDate" value="2026-09-25" required class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold opacity-70 mb-1">Descrição do Serviço</label>
+                    <input type="text" id="cobDesc" value="Desenvolvimento de Módulo Customizado" class="w-full px-4 py-2.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3">
+                    Emitir (simulado)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SPA LOGIC -->
+    <script>
+        let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
+        let currentAccount = null;
+        let isBalanceHidden = false;
+        let isSidebarCollapsed = false;
+        let isFontScaleLarge = localStorage.getItem('bankcore_font_large') === 'true';
+        let currentTheme = localStorage.getItem('bankcore_theme') || 'light';
+        let sessionSeconds = 3600;
+        let toastTimeout = null;
+        let currentLoanMonths = 24;
+        let sessionTimerHandle = null;
+
+        function taxIdDigits(value) {
+            return String(value || '').replace(/\D/g, '');
+        }
+
+        function authHeaders(extra) {
+            const headers = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+            if (currentAuthUser && currentAuthUser.token) {
+                headers['Authorization'] = 'Bearer ' + currentAuthUser.token;
+            }
+            return headers;
+        }
+
+        async function readApiError(res) {
+            try {
+                const body = await res.json();
+                if (typeof body.detail === 'string') return body.detail;
+                if (Array.isArray(body.detail)) {
+                    return body.detail.map(function (d) { return d.msg || JSON.stringify(d); }).join('; ');
+                }
+                return 'Falha na operação.';
+            } catch (e) {
+                return 'Falha na operação.';
+            }
+        }
+
+        function applyTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('bankcore_theme', theme);
+            const html = document.documentElement;
+            const icon = document.getElementById('iconTheme');
+            const label = document.getElementById('textThemeLabel');
+
+            if (theme === 'light') {
+                html.classList.add('light-theme');
+                if (icon) icon.setAttribute('data-lucide', 'moon');
+                if (label) label.innerText = 'Escuro';
+            } else {
+                html.classList.remove('light-theme');
+                if (icon) icon.setAttribute('data-lucide', 'sun');
+                if (label) label.innerText = 'Claro';
+            }
+            lucide.createIcons();
+        }
+
+        function toggleTheme() {
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            showToastNotification(`Tema ${nextTheme === 'light' ? 'Claro' : 'Escuro'} ativado com sucesso!`, 'info');
+        }
+
+        function toggleFontScale() {
+            isFontScaleLarge = !isFontScaleLarge;
+            localStorage.setItem('bankcore_font_large', isFontScaleLarge);
+            const html = document.documentElement;
+            const label = document.getElementById('textScaleLabel');
+
+            if (isFontScaleLarge) {
+                html.classList.add('font-scale-large');
+                if (label) label.innerText = 'A+ Ativo';
+                showToastNotification('Tamanho de fonte ampliado em 112%!', 'info');
+            } else {
+                html.classList.remove('font-scale-large');
+                if (label) label.innerText = 'Fonte';
+                showToastNotification('Tamanho de fonte restaurado ao padrão.', 'info');
+            }
+        }
+
+        function formatCPF(v) {
+            if (!v) return '—';
+            v = String(v).replace(/\D/g, "");
+            if (v.length === 11) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+            if (v.length === 14) return v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+            return v;
+        }
+
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('mainSidebar');
+            const icon = document.getElementById('sidebarToggleIcon');
+            isSidebarCollapsed = !isSidebarCollapsed;
+
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('sidebar-collapsed');
+                if (icon) icon.setAttribute('data-lucide', 'chevrons-right');
+            } else {
+                sidebar.classList.remove('sidebar-collapsed');
+                if (icon) icon.setAttribute('data-lucide', 'chevrons-left');
+            }
+            lucide.createIcons();
+        }
+
+        function showToastNotification(message, type = 'success', title = '') {
+            const container = document.getElementById('toastContainer');
+            const toastCard = document.getElementById('toastCard');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+
+            const titles = { success: 'Sucesso', info: 'Informação', warning: 'Aviso', error: 'Atenção' };
+            const iconNames = { success: 'check-circle', info: 'info', warning: 'alert-triangle', error: 'alert-circle' };
+            const accent = {
+                success: 'var(--gold)',
+                info: 'var(--ivory)',
+                warning: 'var(--gold-dim)',
+                error: 'var(--debit)'
+            };
+
+            toastTitle.innerText = title || titles[type];
+            toastMessage.innerText = message;
+            toastCard.className = 'carbon-card px-5 py-3.5 flex items-center gap-3 max-w-lg';
+            toastCard.style.borderColor = accent[type] || 'var(--gold)';
+            toastIcon.className = 'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0';
+            toastIcon.style.color = accent[type] || 'var(--gold)';
+            toastIcon.style.border = '1px solid ' + (accent[type] || 'var(--gold)');
+            toastIcon.innerHTML = `<i data-lucide="${iconNames[type]}" class="w-6 h-6"></i>`;
+
+            lucide.createIcons();
+
+            container.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            container.classList.add('translate-y-0', 'opacity-100');
+
+            toastTimeout = setTimeout(() => {
+                container.classList.remove('translate-y-0', 'opacity-100');
+                container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 4000);
+        }
+
+        function initApp() {
+            applyTheme(currentTheme);
+            if (isFontScaleLarge) document.documentElement.classList.add('font-scale-large');
+
+            lucide.createIcons();
+            startLiveClock();
+            startSessionTimer();
+
+            if (currentAuthUser) {
+                showApp();
+            } else {
+                showAuth();
+            }
+        }
+
+        function switchAuthTab(tab) {
+            const isLogin = tab === 'login';
+            document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+            document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+            const loginBtn = document.getElementById('tabLogin');
+            const regBtn = document.getElementById('tabRegister');
+            loginBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-md transition' + (isLogin ? ' btn-primary' : '');
+            regBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-md transition' + (!isLogin ? ' btn-primary' : '');
+            loginBtn.style.color = isLogin ? '' : 'var(--mute)';
+            regBtn.style.color = !isLogin ? '' : 'var(--mute)';
+            hideAlert('authAlert');
+        }
+
+        function fillDemo(taxId, password) {
+            document.getElementById('loginTaxId').value = taxId;
+            document.getElementById('loginPassword').value = password;
+            switchAuthTab('login');
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const payload = {
+                tax_id: taxIdDigits(document.getElementById('regTaxId').value),
+                full_name: document.getElementById('regName').value.trim(),
+                email: document.getElementById('regEmail').value.trim(),
+                password: document.getElementById('regPassword').value
+            };
+            try {
+                showAlert('authAlert', 'Criando conta...', 'text-gold');
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error(await readApiError(res));
+                document.getElementById('loginTaxId').value = payload.tax_id;
+                document.getElementById('loginPassword').value = payload.password;
+                switchAuthTab('login');
+                await handleLogin({ preventDefault: function () {} });
+            } catch (err) {
+                showAlert('authAlert', err.message, 'amount-debit');
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('authView').classList.remove('hidden');
+            document.getElementById('appView').classList.add('hidden');
+        }
+
+        function mockCardRow(name, meta, amount) {
+            return `<div class="py-3.5 flex items-center justify-between" style="border-bottom:1px solid var(--border-subtle);">
+                <div><div class="text-sm font-semibold">${name}</div><div class="text-xs" style="color:var(--mute);">${meta}</div></div>
+                <div class="text-right text-sm font-semibold font-mono font-amount amount-debit">− R$ ${amount}</div>
+            </div>`;
+        }
+        function mockDdaRow(name, due, amount) {
+            return `<div class="py-3.5 flex items-center justify-between" style="border-bottom:1px solid var(--border-subtle);">
+                <div><div class="text-xs font-semibold">${name}</div><div class="text-xs font-mono" style="color:var(--mute);">Vencimento ${due}</div></div>
+                <div class="text-right"><div class="text-xs font-semibold font-mono">${amount}</div>
+                <button type="button" onclick="showToastNotification('Simulação: boleto não liquida no ledger.', 'info')" class="text-xs font-medium text-gold hover:underline mt-1">Pagar</button></div>
+            </div>`;
+        }
+        function mockCobRow(client, desc, paid, date, amount) {
+            const badge = paid
+                ? '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md" style="color:var(--status);border:1px solid color-mix(in srgb, var(--status) 35%, transparent);">Pago</span>'
+                : '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md" style="color:var(--gold);border:1px solid var(--gold);">A vencer</span>';
+            return `<tr style="border-bottom:1px solid var(--border-subtle);">
+                <td class="py-3.5 px-3"><div class="font-semibold text-sm">${client}</div><div class="text-xs" style="color:var(--mute);">${desc}</div></td>
+                <td class="py-3.5 px-3">${badge}</td>
+                <td class="py-3.5 px-3 font-mono text-xs" style="color:var(--mute);">${date}</td>
+                <td class="py-3.5 px-3 text-right font-semibold font-mono text-sm">${amount}</td>
+                <td class="py-3.5 px-3 text-center"><button type="button" onclick="showToastNotification('Simulação: 2ª via.', 'info')" class="text-gold"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
+            </tr>`;
+        }
+
+        async function showApp() {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('appView').classList.remove('hidden');
+
+            const taxId = taxIdDigits(currentAuthUser.tax_id);
+            const isLucas = taxId === '98765432100';
+            const isMaria = taxId === '12345678900';
+            const fullName = currentAuthUser.full_name || (isLucas ? 'Lucas Mendes Rocha' : isMaria ? 'Maria Silva Santos' : 'Correntista BankCore');
+            const cpfFormatted = formatCPF(taxId);
+            const nameParts = fullName.split(/\s+/).filter(Boolean);
+            const initials = (nameParts.slice(0, 2).map(function (p) { return p[0]; }).join('') || 'BC').toUpperCase();
+            const accNumber = isLucas ? '77412-7' : isMaria ? '88921-3' : '—';
+
+            document.getElementById('sideUserName').innerText = fullName;
+            document.getElementById('topUserName').innerText = fullName;
+            document.getElementById('topUserCpf').innerText = cpfFormatted;
+            document.getElementById('topUserAvatar').innerText = initials;
+            document.getElementById('mainPixCpf').innerText = cpfFormatted;
+
+            document.getElementById('perfilHeroAvatar').innerText = initials;
+            document.getElementById('perfilHeroName').innerText = fullName;
+            document.getElementById('perfilHeroCpf').innerText = 'CPF: ' + cpfFormatted;
+            document.getElementById('perfilHeroAcc').innerText = `Ag. 0001-9 • Cc. ${accNumber}`;
+            document.getElementById('perfilHeroSegment').innerText = isLucas ? 'Segmento: Vortex Carbon Black Corporate' : isMaria ? 'Segmento: Vortex Carbon Platinum' : 'Segmento: BankCore Demo';
+            document.getElementById('perfilInputName').value = fullName;
+            document.getElementById('perfilInputCpf').value = cpfFormatted;
+            document.getElementById('perfilInputEmail').value = isLucas ? 'contato@vortexsoftware.tech' : isMaria ? 'maria.silva@vortexsoftware.tech' : '';
+
+            if (isLucas) {
+                document.getElementById('sideLimitDisplay').innerText = 'R$ 50.000,00';
+                document.getElementById('mainLimitDisplay').innerText = 'R$ 50.000,00';
+                document.getElementById('creditMaxDisplay').innerText = 'R$ 50.000,00';
+                document.getElementById('cardBadgeType').innerText = 'Carbon Black';
+                document.getElementById('miniCardNumber').innerText = '•••• 4289';
+                document.getElementById('miniCardHolder').innerText = 'LUCAS MENDES ROCHA';
+                document.getElementById('cardNameSubtitle').innerText = 'Final 4289 • Carbon Black';
+                document.getElementById('cardInvoiceValue').innerText = 'R$ 2.296,07';
+                document.getElementById('cardVisualNumber').innerText = '•••• •••• •••• 4289';
+                document.getElementById('cardVisualHolder').innerText = 'LUCAS MENDES';
+                document.getElementById('cardLimitUsed').innerText = 'R$ 8.371,00';
+                document.getElementById('cardLimitAvailable').innerText = 'R$ 12.260,00';
+                document.getElementById('cardLimitTotalText').innerText = 'R$ 20.631,00';
+                document.getElementById('cardTransactionsList').innerHTML =
+                    mockCardRow('AWS Amazon Web Services', 'Crédito · 6x · 01/Set', '1.240,00') +
+                    mockCardRow('Figma Inc.', 'Assinatura anual · 30/Ago', '184,90') +
+                    mockCardRow('Latam Airlines', 'SP–FLN · 28/Ago', '890,40') +
+                    mockCardRow('iFood Benefícios', 'Corporativo · 27/Ago', '320,00') +
+                    mockCardRow('Apple.com/bill', 'iCloud+ · 25/Ago', '42,90');
+                document.getElementById('ddaSubtitle').innerText = 'Agenda simulada · Vortex Software';
+                const ddaHtml =
+                    mockDdaRow('Amazon Web Services', '10/09/2026', 'R$ 650,00') +
+                    mockDdaRow('Contabilizei Tecnologia', '15/09/2026', 'R$ 189,00') +
+                    mockDdaRow('Vivo Fibra Empresas', '20/09/2026', 'R$ 249,90') +
+                    mockDdaRow('Google Workspace Business', '22/09/2026', 'R$ 72,00') +
+                    mockDdaRow('Serasa Experian PJ', '28/09/2026', 'R$ 119,90');
+                document.getElementById('ddaItemsList').innerHTML = ddaHtml;
+                document.getElementById('payDdaFullList').innerHTML = ddaHtml;
+                document.getElementById('cobrancasTableBody').innerHTML =
+                    mockCobRow('TechCorp Solutions LTDA', 'Contrato software enterprise', true, '01/09/2026', 'R$ 8.500,00') +
+                    mockCobRow('André Morais', 'Licença SaaS mensal', false, '16/09/2026', 'R$ 850,00') +
+                    mockCobRow('Alpha Logística', 'API de rastreamento', true, '28/08/2026', 'R$ 4.200,00') +
+                    mockCobRow('Nexus Cloud', 'Módulo customizado', false, '25/09/2026', 'R$ 1.500,00') +
+                    mockCobRow('Studio Harmonia', 'Manutenção anual', true, '12/08/2026', 'R$ 2.180,00');
+            } else if (isMaria) {
+                document.getElementById('sideLimitDisplay').innerText = 'R$ 35.000,00';
+                document.getElementById('mainLimitDisplay').innerText = 'R$ 35.000,00';
+                document.getElementById('creditMaxDisplay').innerText = 'R$ 35.000,00';
+                document.getElementById('cardBadgeType').innerText = 'Carbon Platinum';
+                document.getElementById('miniCardNumber').innerText = '•••• 8821';
+                document.getElementById('miniCardHolder').innerText = 'MARIA SILVA SANTOS';
+                document.getElementById('cardNameSubtitle').innerText = 'Final 8821 • Carbon Platinum';
+                document.getElementById('cardInvoiceValue').innerText = 'R$ 1.480,30';
+                document.getElementById('cardVisualNumber').innerText = '•••• •••• •••• 8821';
+                document.getElementById('cardVisualHolder').innerText = 'MARIA SILVA';
+                document.getElementById('cardLimitUsed').innerText = 'R$ 4.210,00';
+                document.getElementById('cardLimitAvailable').innerText = 'R$ 15.790,00';
+                document.getElementById('cardLimitTotalText').innerText = 'R$ 20.000,00';
+                document.getElementById('cardTransactionsList').innerHTML =
+                    mockCardRow('Latam Airlines Brasil', 'SP–RJ · 5x · 29/Ago', '890,00') +
+                    mockCardRow('Farmácia Droga Raia', 'Crédito · 28/Ago', '186,40') +
+                    mockCardRow('Uber *Trip', 'Deslocamento · 27/Ago', '54,90') +
+                    mockCardRow('Netflix.com', 'Assinatura · 25/Ago', '55,90') +
+                    mockCardRow('Padaria Bella Vista', 'Débito · 24/Ago', '42,30');
+                document.getElementById('ddaSubtitle').innerText = 'Agenda simulada · Maria Silva Santos';
+                const ddaHtml =
+                    mockDdaRow('Condomínio Edifício Paulista', '08/09/2026', 'R$ 650,00') +
+                    mockDdaRow('Unimed Saúde Corporativo', '12/09/2026', 'R$ 890,00') +
+                    mockDdaRow('Enel Energia', '18/09/2026', 'R$ 312,45') +
+                    mockDdaRow('Claro Residencial', '22/09/2026', 'R$ 129,90');
+                document.getElementById('ddaItemsList').innerHTML = ddaHtml;
+                document.getElementById('payDdaFullList').innerHTML = ddaHtml;
+
+                document.getElementById('cobrancasTableBody').innerHTML =
+                    mockCobRow('Finanças & Gestão Integrada', 'Consultoria financeira', true, '28/08/2026', 'R$ 4.200,00') +
+                    mockCobRow('Studio Harmonia', 'Projeto de identidade', false, '18/09/2026', 'R$ 1.280,00') +
+                    mockCobRow('Ateliê Norte', 'Licença trimestral', true, '10/08/2026', 'R$ 960,00') +
+                    mockCobRow('Clínica Prime', 'Honorários agosto', false, '20/09/2026', 'R$ 740,00');
+            } else {
+                document.getElementById('sideLimitDisplay').innerText = 'R$ 10.000,00';
+                document.getElementById('mainLimitDisplay').innerText = 'R$ 10.000,00';
+                document.getElementById('creditMaxDisplay').innerText = 'R$ 10.000,00';
+                document.getElementById('cardBadgeType').innerText = 'Carbon';
+                document.getElementById('miniCardNumber').innerText = '•••• ••••';
+                document.getElementById('miniCardHolder').innerText = fullName.toUpperCase().slice(0, 22);
+                document.getElementById('cardNameSubtitle').innerText = 'Cartão virtual de demonstração';
+                document.getElementById('cardInvoiceValue').innerText = 'R$ 0,00';
+                document.getElementById('cardVisualNumber').innerText = '•••• •••• •••• ••••';
+                document.getElementById('cardVisualHolder').innerText = fullName.split(' ')[0].toUpperCase();
+                document.getElementById('cardLimitUsed').innerText = 'R$ 0,00';
+                document.getElementById('cardLimitAvailable').innerText = 'R$ 10.000,00';
+                document.getElementById('cardLimitTotalText').innerText = 'R$ 10.000,00';
+                document.getElementById('cardTransactionsList').innerHTML =
+                    mockCardRow('Mercado Livre', 'Crédito · 01/Set', '219,90') +
+                    mockCardRow('Posto Ipiranga', 'Débito · 30/Ago', '180,00') +
+                    mockCardRow('Spotify', 'Assinatura · 28/Ago', '21,90');
+                document.getElementById('ddaSubtitle').innerText = 'Agenda simulada';
+                const ddaHtmlNew =
+                    mockDdaRow('Conta de energia', '12/09/2026', 'R$ 210,00') +
+                    mockDdaRow('Internet fibra', '18/09/2026', 'R$ 99,90');
+                document.getElementById('ddaItemsList').innerHTML = ddaHtmlNew;
+                document.getElementById('payDdaFullList').innerHTML = ddaHtmlNew;
+                document.getElementById('cobrancasTableBody').innerHTML =
+                    mockCobRow('Cliente demonstração', 'Serviço avulso', false, '30/09/2026', 'R$ 1.200,00') +
+                    mockCobRow('Projeto piloto', 'Setup inicial', true, '05/09/2026', 'R$ 3.000,00');
+            }
+
+            await loadOrCreateAccount();
+            if (currentAccount && currentAccount.account_number) {
+                document.getElementById('perfilHeroAcc').innerText = `Ag. 0001-9 • Cc. ${currentAccount.account_number}`;
+            }
+            await loadStatement();
+            recalcLoan();
+            navigateTo('inicio');
+            lucide.createIcons();
+        }
+
+        function recalcLoan() {
+            const amount = parseFloat(document.getElementById('loanRangeInput').value);
+            document.getElementById('loanAmountText').innerText = 'R$ ' + amount.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            
+            // Taxa 0.99% a.m. Price formula
+            const rate = 0.0099;
+            const installment = (amount * rate) / (1 - Math.pow(1 + rate, -currentLoanMonths));
+            document.getElementById('loanInstallmentValue').innerText = `${currentLoanMonths}x de R$ ${installment.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
+
+        function setLoanMonths(m) {
+            currentLoanMonths = m;
+            document.querySelectorAll('.loan-term-btn').forEach(btn => {
+                if (btn.innerText === `${m}x`) {
+                    btn.className = 'loan-term-btn py-2.5 rounded-lg btn-primary text-xs';
+                } else {
+                    btn.className = 'loan-term-btn py-2.5 rounded-lg carbon-card text-xs font-semibold';
+                }
+            });
+            recalcLoan();
+        }
+
+        function updateInvestSimulation(val) {
+            const amount = parseFloat(val);
+            document.getElementById('simInvestAmount').innerText = 'R$ ' + amount.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            const bankcoreVal = amount * 1.1144; // 104% do CDI
+            const poupancaVal = amount * 1.0617; // 6.17% poupança
+            document.getElementById('simBankCoreTotal').innerText = 'R$ ' + bankcoreVal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            document.getElementById('simPoupancaTotal').innerText = 'R$ ' + poupancaVal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+
+        function handleEmitirCobranca(e) {
+            e.preventDefault();
+            const client = document.getElementById('cobClientName').value;
+            const amount = parseFloat(document.getElementById('cobAmount').value);
+            closeModal('modalEmitirCobranca');
+            showToastNotification(`Simulação: cobrança de R$ ${amount.toFixed(2).replace('.',',')} para ${client} não grava no ledger.`, 'info', 'UX simulada');
+        }
+
+        function filterCobrancas(status) {
+            showToastNotification(`Filtro de cobranças aplicado: ${status}`, 'info');
+        }
+
+        function saveProfilePageData(e) {
+            e.preventDefault();
+            const newName = document.getElementById('perfilInputName').value.trim();
+            if (newName && currentAuthUser) {
+                currentAuthUser.full_name = newName;
+                localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
+                showApp();
+                showToastNotification('Dados cadastrais da Vortex Software atualizados com sucesso!', 'success');
+            }
+        }
+
+        async function loadOrCreateAccount() {
+            try {
+                const res = await fetch('/accounts/', {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ user_id: currentAuthUser.id })
+                });
+
+                if (!res.ok) throw new Error(await readApiError(res));
+                currentAccount = await res.json();
+            } catch (err) {
+                currentAccount = null;
+                showToastNotification(err.message || 'Não foi possível carregar a conta.', 'error');
+            }
+            updateAccountUI();
+        }
+
+        function updateAccountUI() {
+            const balance = currentAccount ? currentAccount.balance_reais : 0;
+            const formatted = balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            
+            document.getElementById('sideBalanceDisplay').innerHTML = isBalanceHidden ? '••••••' : `<span class="text-xs opacity-60 font-normal">R$</span> ${formatted}`;
+            document.getElementById('mainBalanceDisplay').innerText = isBalanceHidden ? '••••••' : formatted;
+            
+            const payBalance = document.getElementById('payViewBalance');
+            if (payBalance) payBalance.innerText = isBalanceHidden ? '••••••' : `R$ ${formatted}`;
+        }
+
+        async function loadStatement() {
+            const mainContainer = document.getElementById('mainRecentTransactions');
+            const fullContainer = document.getElementById('fullStatementList');
+
+            try {
+                if (!currentAccount) return;
+                const res = await fetch(`/accounts/${currentAccount.id}/statement`, {
+                    headers: authHeaders()
+                });
+                if (res.ok) {
+                    const txs = await res.json();
+                    window._currentTransactions = txs;
+                    if (txs.length > 0) {
+                        let totalIncome = 0;
+                        let totalExpense = 0;
+                        const renderItem = (tx, idx) => {
+                            const isCredit = tx.direction === 'CREDIT';
+                            if (isCredit) totalIncome += tx.amount_reais;
+                            else totalExpense += tx.amount_reais;
+
+                            const d = new Date(tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z');
+                            const formatted = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                            return `
+                                <div onclick="openReceiptByIndex(${idx})" class="py-3.5 px-2 cursor-pointer transition flex items-center justify-between group" style="border-bottom: 1px solid var(--border-subtle);">
+                                    <div class="flex items-center gap-3.5">
+                                        <div class="w-9 h-9 rounded-lg ${isCredit ? 'tx-icon-credit' : 'tx-icon-debit'} flex items-center justify-center">
+                                            <i data-lucide="${isCredit ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold group-hover:text-gold transition flex items-center gap-1.5">
+                                                <span>${tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado')}</span>
+                                                <i data-lucide="file-text" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition"></i>
+                                            </div>
+                                            <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">${formatted} · ${tx.idempotency_key.substring(0, 12)}…</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right font-mono font-semibold text-xs font-amount ${isCredit ? 'amount-credit' : 'amount-debit'}">
+                                        ${isCredit ? '+' : '−'} R$ ${tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+                            `;
+                        };
+                        mainContainer.innerHTML = txs.slice(0, 4).map((tx, idx) => renderItem(tx, idx)).join('');
+                        fullContainer.innerHTML = txs.map((tx, idx) => renderItem(tx, idx)).join('');
+                        document.getElementById('mainTotalIncome').innerText = '+ R$ ' + totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        document.getElementById('mainTotalExpense').innerText = '- R$ ' + totalExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        lucide.createIcons();
+                        return;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function openReceiptByIndex(idx) {
+            if (!window._currentTransactions || !window._currentTransactions[idx]) return;
+            const tx = window._currentTransactions[idx];
+            const isCredit = tx.direction === 'CREDIT';
+            const d = new Date(tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z');
+
+            const recValor = document.getElementById('recValor');
+            recValor.innerText = (isCredit ? '+ ' : '− ') + 'R$ ' + tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            recValor.style.color = isCredit ? '#121212' : '#B42318';
+            const holderEl = document.getElementById('recHolder');
+            if (holderEl) holderEl.innerText = (currentAuthUser && currentAuthUser.full_name) ? currentAuthUser.full_name : 'Correntista BankCore';
+            document.getElementById('recTipo').innerText = tx.transaction_type === 'BILL_PAYMENT' ? 'Pagamento de boleto' : (isCredit ? 'Pix recebido' : 'Pix enviado');
+            document.getElementById('recDesc').innerText = tx.description;
+            document.getElementById('recData').innerText = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+            document.getElementById('recAuth').innerText = 'AUT-' + tx.idempotency_key.toUpperCase();
+
+            openModal('receiptModal');
+            lucide.createIcons();
+        }
+
+        function downloadReceiptPDF() {
+            const element = document.getElementById('receiptPrintableArea');
+            const opt = {
+                margin:       10,
+                filename:     `Comprovante_BankCore_${Date.now()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#F4F1EA' },
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+            showToastNotification('Comprovante BankCore baixado em PDF.', 'success');
+        }
+
+        function openInvoiceModal() {
+            openModal('invoiceModal');
+            lucide.createIcons();
+        }
+
+        function downloadInvoicePDF() {
+            const element = document.getElementById('invoicePrintableArea');
+            const opt = {
+                margin:       10,
+                filename:     `Fatura_Cartao_BankCore_${Date.now()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#F4F1EA' },
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+            showToastNotification('Fatura simulada baixada em PDF.', 'success');
+        }
+
+        function moneyBr(n) {
+            return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        function escapeHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+            });
+        }
+
+        function exportStatementPDF() {
+            const txs = window._currentTransactions;
+            if (!txs || txs.length === 0) {
+                showToastNotification('Nenhuma movimentação para exportar.', 'warning');
+                return;
+            }
+            const name = (currentAuthUser && currentAuthUser.full_name) || 'Correntista';
+            const cpf = formatCPF(currentAuthUser && currentAuthUser.tax_id);
+            const acc = currentAccount && currentAccount.account_number ? currentAccount.account_number : '-';
+            const now = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+            let income = 0, expense = 0;
+            const rows = txs.map(function (tx) {
+                const isCredit = tx.direction === 'CREDIT';
+                if (isCredit) income += tx.amount_reais; else expense += tx.amount_reais;
+                const d = new Date(tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z');
+                const when = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                const color = isCredit ? '#121212' : '#B42318';
+                const sign = isCredit ? '+' : '-';
+                const desc = escapeHtml(tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado'));
+                return '<tr>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;">' + when + '</td>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;">' + desc + '</td>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:11px;color:#6B6560;">' + (isCredit ? 'Credito' : 'Debito') + '</td>' +
+                    '<td style="padding:8px 6px;border-bottom:1px solid #E4DFD4;font-size:12px;font-weight:600;text-align:right;color:' + color + ';">' + sign + ' R$ ' + moneyBr(tx.amount_reais) + '</td>' +
+                    '</tr>';
+            }).join('');
+
+            const old = document.getElementById('bankcore-pdf-host');
+            if (old) old.remove();
+
+            const sheet =
+                '<div style="max-width:720px;margin:0 auto;background:#F4F1EA;color:#121212;padding:8px 8px 24px;font-family:Arial,Helvetica,sans-serif;">' +
+                '<div style="height:3px;background:#9A7B32;margin-bottom:20px;"></div>' +
+                '<table style="width:100%;margin-bottom:20px;"><tr>' +
+                '<td style="vertical-align:top;"><div style="font-size:22px;font-weight:700;">Bank<span style="color:#9A7B32;">Core</span></div>' +
+                '<div style="font-size:11px;color:#6B6560;margin-top:4px;">EXTRATO DA CONTA CORRENTE</div></td>' +
+                '<td style="vertical-align:top;text-align:right;font-size:11px;color:#6B6560;line-height:1.55;">' +
+                escapeHtml(name) + '<br>CPF ' + escapeHtml(cpf) + '<br>Ag. 0001-9 · Cc. ' + escapeHtml(acc) + '<br>Emitido em ' + escapeHtml(now) +
+                '</td></tr></table>' +
+                '<table style="width:100%;border-collapse:collapse;">' +
+                '<thead><tr>' +
+                '<th style="text-align:left;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Data</th>' +
+                '<th style="text-align:left;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Descricao</th>' +
+                '<th style="text-align:left;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Tipo</th>' +
+                '<th style="text-align:right;font-size:10px;color:#6B6560;padding-bottom:8px;border-bottom:1px solid #E4DFD4;">Valor</th>' +
+                '</tr></thead><tbody>' + rows + '</tbody></table>' +
+                '<table style="width:100%;margin-top:18px;"><tr>' +
+                '<td style="text-align:right;font-size:12px;">Entradas <b>+ R$ ' + moneyBr(income) + '</b> &nbsp;&nbsp; Saidas <b style="color:#B42318;">- R$ ' + moneyBr(expense) + '</b></td>' +
+                '</tr></table>' +
+                '<p style="margin-top:28px;font-size:10px;line-height:1.5;color:#6B6560;">Vortex Software · documento de demonstracao. Nao e extrato BACEN. Os lancamentos refletem o livro-razao BankCore.</p>' +
+                '</div>';
+
+            const host = document.createElement('div');
+            host.id = 'bankcore-pdf-host';
+            host.style.cssText = 'position:fixed;inset:0;background:#F4F1EA;z-index:2147483647;overflow:auto;padding:28px 20px 88px;box-sizing:border-box;';
+            host.innerHTML = sheet +
+                '<div class="pdf-no-print" style="position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:center;gap:12px;">' +
+                '<button type="button" id="pdfPrintBtn" class="btn-primary" style="padding:12px 22px;">Salvar como PDF</button>' +
+                '<button type="button" id="pdfCloseBtn" class="btn-secondary" style="padding:12px 22px;">Fechar</button>' +
+                '</div>';
+            document.body.appendChild(host);
+
+            function closePdfHost() {
+                window.removeEventListener('afterprint', closePdfHost);
+                if (host.parentNode) host.remove();
+            }
+            document.getElementById('pdfCloseBtn').onclick = closePdfHost;
+            document.getElementById('pdfPrintBtn').onclick = function () { window.print(); };
+            window.addEventListener('afterprint', closePdfHost);
+
+            showToastNotification('Na janela de impressao, em Destino escolha Salvar como PDF.', 'info');
+            setTimeout(function () { window.print(); }, 200);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const tax_id = document.getElementById('loginTaxId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                showAlert('authAlert', 'Autenticando correntista...', 'text-gold');
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tax_id, password })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Falha ao autenticar.');
+                }
+
+                const data = await res.json();
+                const tokenParts = data.access_token.split('.');
+                const payload = JSON.parse(atob(tokenParts[1]));
+                currentAuthUser = {
+                    id: payload.sub,
+                    tax_id: payload.tax_id || taxIdDigits(tax_id),
+                    full_name: payload.name || '',
+                    token: data.access_token
+                };
+
+                localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
+                hideAlert('authAlert');
+                showApp();
+                showToastNotification(`Bem-vindo ao BankCore, ${currentAuthUser.full_name}!`, 'success');
+            } catch (err) {
+                showAlert('authAlert', err.message, 'amount-debit');
+            }
+        }
+
+        async function handleDeposit(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            const idempotency_key = 'dep_' + Date.now();
+
+            try {
+                if (!currentAccount) throw new Error('Conta não carregada.');
+                showAlert('depositAlert', 'Processando depósito no ledger...', 'text-gold');
+                const res = await fetch('/transactions/deposit', {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        account_id: currentAccount.id,
+                        amount_reais: amount,
+                        idempotency_key: idempotency_key
+                    })
+                });
+                if (!res.ok) throw new Error(await readApiError(res));
+
+                closeModal('depositModal');
+                await refreshDashboard();
+                showToastNotification(`Depósito de R$ ${amount.toFixed(2).replace('.',',')} adicionado!`, 'success');
+            } catch (err) {
+                showAlert('depositAlert', err.message, 'amount-debit');
+                showToastNotification(err.message || 'Falha no depósito.', 'error');
+            }
+        }
+
+        async function handlePixTransfer(e) {
+            e.preventDefault();
+            const dest = document.getElementById('pixDestKey').value;
+            const amount = parseFloat(document.getElementById('pixAmountInput').value);
+            const desc = document.getElementById('pixDescInput').value;
+
+            try {
+                if (!currentAccount) throw new Error('Conta não carregada.');
+                const res = await fetch('/transactions/pix', {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        source_account_id: currentAccount.id,
+                        destination_key: dest,
+                        amount_reais: amount,
+                        idempotency_key: 'pix_' + Date.now(),
+                        description: desc
+                    })
+                });
+                if (!res.ok) throw new Error(await readApiError(res));
+                closeModal('modalPixTransfer');
+                await refreshDashboard();
+                showToastNotification(`Pix de R$ ${amount.toFixed(2).replace('.',',')} enviado com sucesso!`, 'success');
+            } catch (err) {
+                showToastNotification(err.message || 'Falha no Pix.', 'error');
+            }
+        }
+
+        async function handlePayBoleto(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('boletoAmountInput').value);
+            closeModal('modalBoletoPay');
+            showToastNotification(`Simulação: boleto de R$ ${amount.toFixed(2).replace('.',',')} não altera o ledger.`, 'info', 'UX simulada');
+        }
+
+        function generateVirtualCard() {
+            const num = '4289 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
+            showToastNotification(`Novo cartão virtual gerado: ${num}`, 'success', 'Cartão Virtual Ativo');
+        }
+
+        function toggleCardBlock() {
+            showToastNotification('Cartão virtual bloqueado/desbloqueado com sucesso.', 'info');
+        }
+
+        function navigateTo(viewName) {
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const target = document.getElementById('view-' + viewName);
+            const navBtn = document.getElementById('nav-' + viewName);
+
+            if (target) target.classList.remove('hidden');
+            if (navBtn) navBtn.classList.add('active');
+
+            const breadcrumbMap = {
+                'inicio': 'Visão Geral',
+                'extrato': 'Extrato & Recibos',
+                'cartoes': 'Central de Cartões',
+                'pix': 'Central Pix',
+                'pagar': 'Central de Pagamentos',
+                'cobrancas': 'Cobranças & Faturamento',
+                'invest': 'BankCore Invest',
+                'credito': 'Empréstimos & Crédito',
+                'perfil': 'Meu Perfil & Ajustes'
+            };
+            document.getElementById('topBreadcrumb').innerText = breadcrumbMap[viewName] || viewName;
+            lucide.createIcons();
+        }
+
+        function copyPixKey() {
+            const key = taxIdDigits(currentAuthUser && currentAuthUser.tax_id);
+            if (!key) {
+                showToastNotification('Chave Pix indisponível nesta sessão.', 'warning');
+                return;
+            }
+            navigator.clipboard.writeText(key);
+            showToastNotification('Chave Pix (CPF) copiada para a área de transferência!', 'success');
+        }
+
+        function toggleBalanceVisibility() {
+            isBalanceHidden = !isBalanceHidden;
+            const iconName = isBalanceHidden ? 'eye-off' : 'eye';
+            document.getElementById('sideEyeIcon').setAttribute('data-lucide', iconName);
+            updateAccountUI();
+            lucide.createIcons();
+            showToastNotification(isBalanceHidden ? 'Saldo ocultado.' : 'Saldo visível.', 'info');
+        }
+
+        function refreshDashboard() {
+            loadOrCreateAccount();
+            loadStatement();
+            showToastNotification('Dados atualizados em tempo real.', 'info');
+        }
+
+        function startLiveClock() {
+            function update() {
+                const now = new Date();
+                const str = now.toLocaleString('pt-BR', { 
+                    timeZone: 'America/Sao_Paulo',
+                    weekday: 'short', day: '2-digit', month: 'short',
+                    hour: '2-digit', minute: '2-digit'
+                });
+                const el = document.getElementById('liveClockDisplay');
+                if (el) el.innerText = str.charAt(0).toUpperCase() + str.slice(1);
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        function startSessionTimer() {
+            if (sessionTimerHandle) clearInterval(sessionTimerHandle);
+            sessionSeconds = 3600;
+            sessionTimerHandle = setInterval(() => {
+                if (sessionSeconds > 0) {
+                    sessionSeconds--;
+                    const min = String(Math.floor(sessionSeconds / 60)).padStart(2, '0');
+                    const sec = String(sessionSeconds % 60).padStart(2, '0');
+                    const el = document.getElementById('sessionTimer');
+                    if (el) el.innerText = `${min}:${sec}`;
+                    if (sessionSeconds === 0) {
+                        logout();
+                        showToastNotification('Sessão expirada. Entre novamente.', 'warning');
+                    }
+                }
+            }, 1000);
+        }
+
+        function logout() {
+            localStorage.removeItem('bankcore_user');
+            currentAuthUser = null;
+            currentAccount = null;
+            showAuth();
+            showToastNotification('Sessão encerrada.', 'info');
+        }
+
+        function openModal(id) { 
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden'); 
+            lucide.createIcons();
+        }
+        function closeModal(id) { 
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden'); 
+        }
+
+        function showAlert(id, msg, cls) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.className = `text-xs p-3.5 rounded-2xl text-center font-bold ${cls}`;
+                el.innerText = msg;
+                el.classList.remove('hidden');
+            }
+        }
+
+        function hideAlert(id) { 
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden'); 
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
