@@ -13,6 +13,13 @@ redis_data/
 *.log
 .DS_Store
 
+# Android
+apps/android/.gradle/
+apps/android/**/build/
+apps/android/local.properties
+*.iml
+.idea/
+
 # Xcode
 xcuserdata/
 *.xcuserstate
