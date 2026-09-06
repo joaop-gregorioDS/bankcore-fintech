@@ -15,7 +15,7 @@ enum ReceiptDocument {
         Autenticação: AUT-\(transaction.idempotencyKey.uppercased())
         Status: \(transaction.status)
 
-        Vortex Software · documento de demonstração. Não é comprovante SPI/BACEN.
+        Vortex Software LTDA · documento de demonstração. Não é comprovante SPI/BACEN.
         A liquidação ocorreu no livro-razão BankCore (partidas dobradas).
         """
     }
@@ -80,7 +80,7 @@ enum ReceiptDocument {
             stroke(line, y: y, width: page.width)
             y += 16
             draw(
-                "Vortex Software · documento de demonstração. Não é comprovante SPI/BACEN. A liquidação ocorreu no livro-razão BankCore (partidas dobradas).",
+                "Vortex Software LTDA · documento de demonstração. Não é comprovante SPI/BACEN. A liquidação ocorreu no livro-razão BankCore (partidas dobradas).",
                 at: CGPoint(x: 28, y: y),
                 font: .systemFont(ofSize: 9, weight: .regular),
                 color: mute,

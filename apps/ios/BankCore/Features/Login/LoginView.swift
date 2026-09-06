@@ -25,14 +25,7 @@ struct LoginView: View {
             .padding(.top, 12)
             .padding(.bottom, 28)
         }
-        .background(
-            LinearGradient(
-                colors: [Color(hex: "#1A1610"), Palette.ink, Palette.ink],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-        )
+        .background(Palette.ink.ignoresSafeArea())
         .scrollDismissesKeyboard(.interactively)
         .onAppear {
             if let last = LastAccountStore.taxId {
@@ -46,7 +39,7 @@ struct LoginView: View {
             BrandMark(size: 56)
             VStack(spacing: 8) {
                 Wordmark(size: 34)
-                Text("Banking de demonstração · Vortex Software")
+                Text("Banking de demonstração · \(BrandCopy.legalName)")
                     .font(TypeScale.body)
                     .foregroundStyle(Palette.mute)
                 DemoBanner()
@@ -121,7 +114,7 @@ struct LoginView: View {
                     .font(TypeScale.label)
                     .foregroundStyle(Palette.mute)
                 HStack(spacing: 10) {
-                    demoChip(APIConfig.joao, "LM")
+                    demoChip(APIConfig.lucas, "LM")
                     demoChip(APIConfig.maria, "MS")
                 }
             }
@@ -173,7 +166,7 @@ struct LoginView: View {
                 Spacer()
                 Text("Simular")
                     .font(TypeScale.cta)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.onGold)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(Palette.gold)
@@ -210,7 +203,7 @@ struct LoginView: View {
                 } else {
                     CarbonField(label: "Nome completo", text: $fullName, placeholder: "Nome e sobrenome")
                     CarbonField(label: "CPF (apenas números)", text: $taxId, placeholder: "00000000000", keyboard: .numberPad, mono: true)
-                    CarbonField(label: "E-mail", text: $email, placeholder: "contato@empresa.com", keyboard: .emailAddress)
+                    CarbonField(label: "E-mail", text: $email, placeholder: "contato@vortexsoftware.tech", keyboard: .emailAddress)
                     CarbonField(label: "Senha (mínimo 8)", text: $password, placeholder: "••••••••", isSecure: true)
                     GoldButton(title: "Criar conta", systemImage: "checkmark", isLoading: app.isBusy, enabled: canRegister) {
                         Task {
@@ -239,7 +232,7 @@ struct LoginView: View {
                 .font(TypeScale.cta)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-                .foregroundStyle(mode == value ? Palette.ink : Palette.mute)
+                .foregroundStyle(mode == value ? Palette.onGold : Palette.mute)
                 .background(mode == value ? Palette.gold : Color.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
@@ -248,7 +241,7 @@ struct LoginView: View {
 
     private var preferredDemo: APIConfig.DemoAccount {
         if LastAccountStore.taxId == APIConfig.maria.taxId { return APIConfig.maria }
-        return APIConfig.joao
+        return APIConfig.lucas
     }
 
     private func initials(_ name: String) -> String {

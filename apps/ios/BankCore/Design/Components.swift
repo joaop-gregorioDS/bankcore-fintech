@@ -77,7 +77,7 @@ struct GoldButton: View {
             HStack(spacing: 8) {
                 if isLoading {
                     ProgressView()
-                        .tint(Palette.ink)
+                        .tint(Palette.onGold)
                 } else if let systemImage {
                     Image(systemName: systemImage)
                 }
@@ -87,7 +87,7 @@ struct GoldButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .foregroundStyle(Palette.ink)
+            .foregroundStyle(Palette.onGold)
             .background(enabled && !isLoading ? Palette.gold : Palette.gold.opacity(0.35))
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }

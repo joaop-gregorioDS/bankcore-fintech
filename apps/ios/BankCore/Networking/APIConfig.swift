@@ -1,12 +1,10 @@
 import Foundation
 
 enum APIConfig {
-    /// Demo VPS is HTTP. Info.plist ATS exception is for this IP; NSAllowsArbitraryLoads
-    /// is lab-only because ATS exception domains do not apply to raw IP addresses.
     static let host = "bankcore.vortexsoftware.tech"
     static let baseURL = URL(string: "https://bankcore.vortexsoftware.tech")!
 
-    static let joao = DemoAccount(
+    static let lucas = DemoAccount(
         name: "Lucas Mendes",
         taxId: "98765432100",
         password: "teste123456"

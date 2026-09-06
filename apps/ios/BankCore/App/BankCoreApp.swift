@@ -8,7 +8,7 @@ struct BankCoreApp: App {
         WindowGroup {
             RootView()
                 .environment(appState)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(appState.preferredScheme)
                 .tint(Palette.gold)
                 .task { await appState.bootstrap() }
         }

@@ -29,7 +29,7 @@ struct ReceiptView: View {
             .onAppear { preparePDF() }
         }
         .presentationDetents([.large])
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
     }
 
     private var holder: String { app.session?.fullName ?? "Correntista BankCore" }
@@ -91,7 +91,7 @@ struct ReceiptView: View {
                 .overlay(alignment: .top) { Rectangle().fill(Palette.paperLine).frame(height: 1) }
                 .overlay(alignment: .bottom) { Rectangle().fill(Palette.paperLine).frame(height: 1) }
 
-                Text("Vortex Software · documento de demonstração. Não é comprovante SPI/BACEN. A liquidação ocorreu no livro-razão BankCore (partidas dobradas).")
+                Text("\(BrandCopy.legalName) · documento de demonstração. Não é comprovante SPI/BACEN. A liquidação ocorreu no livro-razão BankCore (partidas dobradas).")
                     .font(.system(size: 10))
                     .foregroundStyle(Palette.paperMute)
                     .fixedSize(horizontal: false, vertical: true)
@@ -132,7 +132,7 @@ struct ReceiptView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.onGold)
                     .background(Palette.gold)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }

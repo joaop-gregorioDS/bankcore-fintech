@@ -2,17 +2,19 @@ import SwiftUI
 import UIKit
 
 enum Palette {
-    static let ink = Color(hex: "#0B0B0C")
-    static let panel = Color(hex: "#141416")
-    static let card = Color(hex: "#1C1C1F")
-    static let ivory = Color(hex: "#F6F1E8")
-    static let mute = Color(hex: "#9A958C")
-    static let gold = Color(hex: "#C4A35A")
-    static let goldDim = Color(hex: "#8A7340")
-    static let debit = Color(hex: "#C42B2B")
-    static let status = Color(hex: "#3D7A5A")
-    static let line = Color(hex: "#2A2A2E")
-    static let input = Color(hex: "#141416")
+    static let ink = Color(light: "#F4F1EA", dark: "#0B0B0C")
+    static let panel = Color(light: "#FFFFFF", dark: "#141416")
+    static let card = Color(light: "#FFFFFF", dark: "#1C1C1F")
+    static let ivory = Color(light: "#121212", dark: "#F6F1E8")
+    static let mute = Color(light: "#6B6560", dark: "#9A958C")
+    static let gold = Color(light: "#9A7B32", dark: "#C4A35A")
+    static let goldDim = Color(light: "#7A6228", dark: "#8A7340")
+    static let debit = Color(light: "#B42318", dark: "#C42B2B")
+    static let status = Color(light: "#2F6B4F", dark: "#3D7A5A")
+    static let line = Color(light: "#E4DFD4", dark: "#2A2A2E")
+    static let input = Color(light: "#FAF8F3", dark: "#141416")
+    /// Text on the gold CTA — always carbon, in light and dark.
+    static let onGold = Color(hex: "#0B0B0C")
 
     static let paper = Color(hex: "#F4F1EA")
     static let paperInk = Color(hex: "#121212")
@@ -21,13 +23,17 @@ enum Palette {
     static let paperLine = Color(hex: "#E4DFD4")
     static let paperDebit = Color(hex: "#B42318")
 
-    static let uiInk = UIColor(red: 11 / 255, green: 11 / 255, blue: 12 / 255, alpha: 1)
-    static let uiCard = UIColor(red: 28 / 255, green: 28 / 255, blue: 31 / 255, alpha: 1)
-    static let uiIvory = UIColor(red: 246 / 255, green: 241 / 255, blue: 232 / 255, alpha: 1)
-    static let uiMute = UIColor(red: 154 / 255, green: 149 / 255, blue: 140 / 255, alpha: 1)
-    static let uiGold = UIColor(red: 196 / 255, green: 163 / 255, blue: 90 / 255, alpha: 1)
-    static let uiLine = UIColor(red: 42 / 255, green: 42 / 255, blue: 46 / 255, alpha: 1)
-    static let uiDebit = UIColor(red: 196 / 255, green: 43 / 255, blue: 43 / 255, alpha: 1)
+    static let uiInk = UIColor.adaptive(light: "#F4F1EA", dark: "#0B0B0C")
+    static let uiCard = UIColor.adaptive(light: "#FFFFFF", dark: "#1C1C1F")
+    static let uiIvory = UIColor.adaptive(light: "#121212", dark: "#F6F1E8")
+    static let uiMute = UIColor.adaptive(light: "#6B6560", dark: "#9A958C")
+    static let uiGold = UIColor.adaptive(light: "#9A7B32", dark: "#C4A35A")
+    static let uiLine = UIColor.adaptive(light: "#E4DFD4", dark: "#2A2A2E")
+    static let uiDebit = UIColor.adaptive(light: "#B42318", dark: "#C42B2B")
+}
+
+enum BrandCopy {
+    static let legalName = "Vortex Software LTDA"
 }
 
 extension Color {
@@ -41,6 +47,31 @@ extension Color {
             green: Double((value & 0x00FF00) >> 8) / 255,
             blue: Double(value & 0x0000FF) / 255
         )
+    }
+
+    init(light: String, dark: String) {
+        self.init(uiColor: .adaptive(light: light, dark: dark))
+    }
+}
+
+extension UIColor {
+    static func hex(_ hex: String) -> UIColor {
+        var raw = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if raw.hasPrefix("#") { raw.removeFirst() }
+        var value: UInt64 = 0
+        Scanner(string: raw).scanHexInt64(&value)
+        return UIColor(
+            red: CGFloat((value & 0xFF0000) >> 16) / 255,
+            green: CGFloat((value & 0x00FF00) >> 8) / 255,
+            blue: CGFloat(value & 0x0000FF) / 255,
+            alpha: 1
+        )
+    }
+
+    static func adaptive(light: String, dark: String) -> UIColor {
+        UIColor { traits in
+            traits.userInterfaceStyle == .dark ? .hex(dark) : .hex(light)
+        }
     }
 }
 

@@ -52,7 +52,7 @@ struct HomeView: View {
                         .frame(width: 32, height: 32)
                     Text("\(app.mock.notifications.count)")
                         .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(Palette.ink)
+                        .foregroundStyle(Palette.onGold)
                         .padding(.horizontal, 4)
                         .padding(.vertical, 1)
                         .background(Palette.gold)
@@ -155,7 +155,7 @@ struct HomeView: View {
                     app.presentedHub = .invest
                 }
                 .font(TypeScale.cta)
-                .foregroundStyle(Palette.ink)
+                .foregroundStyle(Palette.onGold)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(Palette.gold)

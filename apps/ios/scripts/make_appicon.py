@@ -1,7 +1,6 @@
-"""App icon = login BrandMark: gold rounded square + shield on Carbon ink."""
+"""App icon = web login mark on cream (light Carbon Ledger)."""
 from __future__ import annotations
 
-import math
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -9,8 +8,9 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "BankCore" / "Assets.xcassets" / "AppIcon.appiconset" / "AppIcon.png"
 
-INK = (11, 11, 12)
-GOLD = (196, 163, 90)
+# Light theme from the web login: cream field, gold mark.
+CREAM = (244, 241, 234)  # #F4F1EA
+GOLD = (154, 123, 50)    # #9A7B32
 SIZE = 1024
 
 
@@ -43,19 +43,17 @@ def shield_path(cx: float, cy: float, w: float, h: float) -> list[tuple[float, f
     return pts
 
 
-def stroke_path(draw: ImageDraw.ImageDraw, pts: list[tuple[float, float]], width: int) -> None:
-    draw.line(pts, fill=GOLD, width=width, joint="curve")
-    # round line caps
+def stroke_path(draw: ImageDraw.ImageDraw, pts: list[tuple[float, float]], width: int, color) -> None:
+    draw.line(pts, fill=color, width=width, joint="curve")
     r = width / 2
     for x, y in (pts[0], pts[-1]):
-        draw.ellipse((x - r, y - r, x + r, y + r), fill=GOLD)
+        draw.ellipse((x - r, y - r, x + r, y + r), fill=color)
 
 
 def main() -> None:
-    img = Image.new("RGB", (SIZE, SIZE), INK)
+    img = Image.new("RGB", (SIZE, SIZE), CREAM)
     draw = ImageDraw.Draw(img)
 
-    # Login mark: rounded square, inset so the iOS squircle does not clip the stroke.
     inset = 188
     radius = 118
     box = (inset, inset, SIZE - inset, SIZE - inset)
@@ -63,7 +61,7 @@ def main() -> None:
     draw.rounded_rectangle(box, radius=radius, outline=GOLD, width=stroke)
 
     path = shield_path(SIZE / 2, SIZE / 2 + 6, 300, 340)
-    stroke_path(draw, path, 22)
+    stroke_path(draw, path, 22, GOLD)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     img.save(OUT, "PNG")

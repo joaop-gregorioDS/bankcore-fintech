@@ -6,7 +6,7 @@ struct MockCatalog {
     let fullName: String
     let accountNumber: String
 
-    var isJoao: Bool { taxId == APIConfig.joao.taxId }
+    var isLucas: Bool { taxId == APIConfig.lucas.taxId }
     var isMaria: Bool { taxId == APIConfig.maria.taxId }
 
     var firstName: String {
@@ -27,21 +27,21 @@ struct MockCatalog {
     }
 
     var segment: String {
-        if isJoao { return "Vortex Carbon Black Corporate" }
+        if isLucas { return "Vortex Carbon Black Corporate" }
         if isMaria { return "Vortex Carbon Platinum" }
         return "BankCore Demo"
     }
 
     var email: String {
-        if isJoao { return "contato@vortexsoftware.tech" }
+        if isLucas { return "contato@vortexsoftware.tech" }
         if isMaria { return "maria.silva@vortexsoftware.tech" }
         return "correntista@bankcore.demo"
     }
 
-    var pixLimit: Double { isJoao ? 50_000 : (isMaria ? 35_000 : 10_000) }
+    var pixLimit: Double { isLucas ? 50_000 : (isMaria ? 35_000 : 10_000) }
 
     var cards: [MockCard] {
-        if isJoao {
+        if isLucas {
             return [
                 MockCard(
                     name: "Carbon Black",
@@ -108,7 +108,7 @@ struct MockCatalog {
     var primaryCard: MockCard { cards[0] }
 
     var cardPurchases: [MockPurchase] {
-        if isJoao {
+        if isLucas {
             return [
                 MockPurchase(merchant: "AWS Amazon Web Services", detail: "Crédito · 6x · 01/Set", amount: 1_240),
                 MockPurchase(merchant: "Figma Inc.", detail: "Assinatura anual · 30/Ago", amount: 184.90),
@@ -130,7 +130,7 @@ struct MockCatalog {
     }
 
     var dda: [MockBill] {
-        if isJoao {
+        if isLucas {
             return [
                 MockBill(payee: "Amazon Web Services", due: "10/09/2026", amount: 650),
                 MockBill(payee: "Contabilizei Tecnologia", due: "15/09/2026", amount: 189),
@@ -155,7 +155,7 @@ struct MockCatalog {
     }
 
     var investments: [MockInvestment] {
-        if isJoao {
+        if isLucas {
             return [
                 MockInvestment(name: "CDB Vortex 102% CDI", amount: 12_400, yield: "+1,12% m."),
                 MockInvestment(name: "Tesouro Selic 2029", amount: 8_200, yield: "+0,89% m."),
@@ -176,7 +176,7 @@ struct MockCatalog {
     var investTotal: Double { investments.reduce(0) { $0 + $1.amount } }
 
     var creditLimit: Double { pixLimit }
-    var creditUsed: Double { isJoao ? 0 : 0 }
+    var creditUsed: Double { isLucas ? 0 : 0 }
 
     var notifications: [MockNotice] {
         [
@@ -274,6 +274,15 @@ enum LastAccountStore {
 
     static var taxId: String? {
         get { UserDefaults.standard.string(forKey: key) }
+        set { UserDefaults.standard.set(newValue, forKey: key) }
+    }
+}
+
+enum AppearanceStore {
+    private static let key = "bankcore.usesDarkAppearance"
+
+    static var isDark: Bool {
+        get { UserDefaults.standard.bool(forKey: key) }
         set { UserDefaults.standard.set(newValue, forKey: key) }
     }
 }

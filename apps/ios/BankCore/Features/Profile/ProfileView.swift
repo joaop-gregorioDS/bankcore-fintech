@@ -11,6 +11,22 @@ struct ProfileView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         SectionTitle(text: "Configurações")
                             .padding(.bottom, 8)
+                        Toggle(isOn: Binding(
+                            get: { app.usesDarkAppearance },
+                            set: { app.usesDarkAppearance = $0 }
+                        )) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Modo escuro")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(Palette.ivory)
+                                Text("O app abre no modo claro. Ative só se quiser a paleta carbon.")
+                                    .font(TypeScale.label)
+                                    .foregroundStyle(Palette.mute)
+                            }
+                        }
+                        .tint(Palette.gold)
+                        .padding(.vertical, 10)
+                        divider
                         SettingsRow(icon: "gearshape", title: "Geral", subtitle: "Notificações, acesso ao app e preferências da tela de login.") {
                             app.simulate("Simulação: ajustes gerais.")
                         }
@@ -20,7 +36,7 @@ struct ProfileView: View {
                         }
                         divider
                         SettingsRow(icon: "checkmark.shield", title: "Privacidade", subtitle: "Ledger interno de demonstração. Não há SPI/DICT.") {
-                            app.simulate("Documento de portfólio · Vortex Software.")
+                            app.simulate("Documento de portfólio · \(BrandCopy.legalName).")
                         }
                         divider
                         SettingsRow(icon: "accessibility", title: "Acessibilidade", subtitle: "Saldo ocultável e números tabulares já ativos neste app.") {
@@ -64,7 +80,7 @@ struct ProfileView: View {
                                 Text(AppVersion.line)
                                     .font(.system(size: 13, weight: .medium, design: .monospaced))
                                     .foregroundStyle(Palette.gold)
-                                Text("Vortex Software · bundle br.vortex.bankcore")
+                                Text("\(BrandCopy.legalName) · bundle br.vortex.bankcore")
                                     .font(TypeScale.micro)
                                     .foregroundStyle(Palette.mute)
                             }

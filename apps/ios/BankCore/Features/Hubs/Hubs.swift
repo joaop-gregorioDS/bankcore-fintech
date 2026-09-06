@@ -26,7 +26,7 @@ struct HubSheet: View {
             }
         }
         .presentationDetents(hub == .notifications || hub == .more ? [.medium, .large] : [.large])
-        .preferredColorScheme(.dark)
+        .presentationBackground(Palette.ink)
     }
 }
 

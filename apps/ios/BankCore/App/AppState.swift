@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftUI
 
 @Observable
 @MainActor
@@ -17,6 +18,11 @@ final class AppState {
     var toast: String?
     var lastSeen: Date = .now
     var openPixAfterLogin = false
+    var usesDarkAppearance = AppearanceStore.isDark {
+        didSet { AppearanceStore.isDark = usesDarkAppearance }
+    }
+
+    var preferredScheme: ColorScheme { usesDarkAppearance ? .dark : .light }
 
     private let api = BankCoreAPI()
 
@@ -43,8 +49,9 @@ final class AppState {
         isRestoring = true
         defer { isRestoring = false }
         #if DEBUG
-        if ProcessInfo.processInfo.environment["BANKCORE_DEMO"] == "joao" {
-            await loginDemo(APIConfig.joao)
+        if ProcessInfo.processInfo.environment["BANKCORE_DEMO"] == "lucas"
+            || ProcessInfo.processInfo.environment["BANKCORE_DEMO"] == "joao" {
+            await loginDemo(APIConfig.lucas)
             return
         }
         if ProcessInfo.processInfo.environment["BANKCORE_DEMO"] == "maria" {
