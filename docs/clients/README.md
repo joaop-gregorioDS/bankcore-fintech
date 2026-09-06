@@ -27,6 +27,8 @@ Um chat = um app até o happy path: **login → Pix → extrato → comprovante*
 - Extrato com crédito/débito.
 - Compartilhar / exportar comprovante.
 - `version 1.10.25` no login e no perfil.
+- Modo **claro por padrão**; escuro só se o usuário ligar no perfil.
+- Ícone cream `#F4F1EA` + marca ouro `#9A7B32` (login web).
 
 Fora da v1 (mock local, selo **Simulado**, iguais ao iOS / SPA): cartões, DDA, invest, crédito.
 

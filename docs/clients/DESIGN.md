@@ -34,9 +34,9 @@ Ouro **não** pinta a tela inteira. Vermelho **só** em dinheiro saindo e “Sai
 4. **Extrato** — lista; débito vermelho; tap abre comprovante.
 5. **Comprovante** — titular, valor, tipo, data, autenticação, rodapé “ledger interno, não é SPI/BACEN”. Share sheet / print.
 
-Tema claro e escuro se der tempo; **escuro primeiro** no iOS/Android/Tauri (banco digital). Claro já é o da SPA.
+**Modo claro por padrão** (fundo `#F4F1EA`, ouro `#9A7B32`), igual à SPA. Escuro só com toggle no perfil. Ícone do app: cream + escudo ouro (ver `apps/ios/.../AppIcon.png`).
 
-Marca: quadrado arredondado ouro + escudo. Wordmark `Bank` + `Core` ouro. Versão: `version 1.10.25` no login e no perfil.
+Marca: quadrado arredondado ouro + escudo. Wordmark `Bank` + `Core` ouro. Versão: `version 1.10.25` no login e no perfil. Razão social: Vortex Software LTDA.
 
 ## Copy
 

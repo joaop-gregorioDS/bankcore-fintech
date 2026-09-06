@@ -26,7 +26,7 @@ Ordem no Windows: **Tauri primeiro** (prova a API fora do browser, mais rápido)
 | :--- | :--- | :--- |
 | API + ledger | `services/` | VPS, JWT, Pix interno, extrato |
 | SPA browser | `frontend/` | Carbon Ledger no Nginx |
-| iOS SwiftUI | `apps/ios` | **Feito** — `version 1.10.25`, commit `4a6f9f0` |
+| iOS SwiftUI | `apps/ios` | **Feito** — `version 1.10.25`, HTTPS, modo claro padrão |
 | Desktop Tauri | `apps/desktop` | A construir no Windows |
 | Android Compose | `apps/android` | A construir no Windows |
 
@@ -51,24 +51,29 @@ Referência visual viva: `apps/ios` (Login, Home, Pix, Extrato, Cartões, Perfil
 
 ## Consistência visual (obrigatório)
 
-Paleta **escura primeiro** no Android e no Tauri (a SPA pode continuar clara; os apps de portfólio seguem o iOS).
+**Modo claro é o padrão** em iOS, Android e Tauri — igual à SPA em https://bankcore.vortexsoftware.tech (`#F4F1EA`). Escuro só se o usuário ligar um controle em Perfil → Configurações (“Modo escuro”). Não seguir o tema do sistema no primeiro launch.
 
-| Papel | Escuro | Uso |
+Use a coluna **Claro** no arranque. A coluna Escuro existe para o toggle.
+
+| Papel | Claro (padrão) | Escuro (opcional) |
 | :--- | :--- | :--- |
-| Fundo | `#0B0B0C` | tela |
-| Painel | `#141416` | header |
-| Card | `#1C1C1F` | cartões, campos |
-| Texto | `#F6F1E8` | ivory |
-| Mudo | `#9A958C` | labels |
-| Ouro | `#C4A35A` | **um** CTA por tela, acentos, marca |
-| Débito / Sair | `#C42B2B` | dinheiro saindo e botão Sair **somente** |
-| Status | `#3D7A5A` | conta ativa |
-| Linha | `#2A2A2E` | bordas |
+| Fundo | `#F4F1EA` | `#0B0B0C` |
+| Painel / header | `#FFFFFF` | `#141416` |
+| Card | `#FFFFFF` | `#1C1C1F` |
+| Texto | `#121212` | `#F6F1E8` |
+| Mudo | `#6B6560` | `#9A958C` |
+| Ouro (1 CTA) | `#9A7B32` | `#C4A35A` |
+| Débito / Sair | `#B42318` | `#C42B2B` |
+| Status | `#2F6B4F` | `#3D7A5A` |
+| Linha | `#E4DFD4` | `#2A2A2E` |
+| Texto no CTA ouro | `#0B0B0C` sempre | idem |
 
 Regras:
 
 - Ouro **não** pinta a tela inteira. Sem azul BB, sem amarelo BB, sem clone C6.
-- Marca: quadrado arredondado ouro + **escudo** (igual à login iOS / ícone). Wordmark `Bank` ivory + `Core` ouro.
+- Marca: quadrado arredondado ouro + **escudo**. Wordmark `Bank` (texto) + `Core` ouro.
+- **Ícone do app (Android launcher / Tauri .ico):** fundo cream `#F4F1EA` + marca ouro `#9A7B32` (mesmo contraste da login web). Referência: `apps/ios/BankCore/Assets.xcassets/AppIcon.appiconset/AppIcon.png`.
+- Razão social: **Vortex Software LTDA**. E-mail institucional: `contato@vortexsoftware.tech`.
 - Tipografia do sistema (Roboto no Android, Inter ou Plus Jakarta no Tauri). Saldo = único número extra-grande. Valores com tabular nums. `pt-BR`.
 - Selo **SIMULADO** (cápsula ouro, 9–10px) em tudo que não grava no ledger.
 - Copy do comprovante: “Comprovante BankCore · ledger interno”. Nunca “SPI BACEN” como integração real.
@@ -106,6 +111,7 @@ Copiar **estrutura**, não marca.
 
 - Iniciais, Ag. `0001-9` · Cc. `{account_number}`, visto em, segmento.
 - Configurações + Segurança (UX).
+- Toggle **Modo escuro** (desligado por padrão; persiste a escolha).
 - Bloco **Sobre o app**: `version 1.10.25` + bundle.
 - **SAIR DO APP** em vermelho.
 
@@ -142,11 +148,11 @@ Senha demo: `teste123456`. Agência sempre `0001-9`.
 
 **Chat Tauri** (`apps/desktop`)
 
-> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `DESKTOP.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). Scaffold Tauri 2 em `apps/desktop`. Cliente HTTP de `https://bankcore.vortexsoftware.tech` (ou `http://2.25.126.53` em lab). v1: login → Pix → extrato → comprovante. Depois: home com grade, cartões/DDA/invest simulados, `version 1.10.25` no login e no perfil. Sem empacotar `frontend/index.html`. Sem inventar endpoint. Visual Carbon Ledger (escuro).
+> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `DESKTOP.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). Scaffold Tauri 2 em `apps/desktop`. Cliente HTTPS de `https://bankcore.vortexsoftware.tech`. v1: login Lucas → Pix → extrato → comprovante. Home viva + simulados + `version 1.10.25`. **Modo claro por padrão**; escuro só no toggle do perfil. Ícone cream `#F4F1EA` + escudo ouro `#9A7B32` (igual à login web). Sem empacotar `frontend/index.html`. Sem inventar endpoint.
 
 **Chat Android** (`apps/android`)
 
-> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `ANDROID.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). App Compose em `apps/android`, applicationId `br.vortex.bankcore`. Cliente da API `https://bankcore.vortexsoftware.tech` (ou `http://2.25.126.53` em lab). JWT no EncryptedPrefs/Keystore. v1: login → Pix → extrato → comprovante. Home com densidade do iOS, módulos simulados com selo, `version 1.10.25`. Sem WebView da SPA. Sem inventar endpoint. Cleartext só no debug, se usar o IP da demo.
+> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `ANDROID.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). App Compose em `apps/android`, applicationId `br.vortex.bankcore`. API `https://bankcore.vortexsoftware.tech`. JWT no EncryptedPrefs/Keystore. v1: login Lucas → Pix → extrato → comprovante. Home viva + simulados + `version 1.10.25`. **Modo claro por padrão**; escuro só no toggle do perfil. Launcher cream `#F4F1EA` + escudo ouro `#9A7B32`. Sem WebView da SPA. Sem inventar endpoint.
 
 ---
 
@@ -156,7 +162,7 @@ Senha demo: `teste123456`. Agência sempre `0001-9`.
 - Sem token → o app não chama rota financeira (API 401 se chamar).
 - `version 1.10.25` visível no login e no perfil.
 - Cartões/DDA/invest com selo Simulado; Pix/extrato sem selo.
-- Visual Carbon Ledger, não um clone de banco de varejo.
+- Visual Carbon Ledger **claro por padrão**; ícone cream + ouro como a login web; não um clone de banco de varejo.
 
 ## Fora de escopo nestes chats
 

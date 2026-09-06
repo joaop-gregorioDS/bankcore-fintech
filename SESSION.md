@@ -1,10 +1,10 @@
 # BankCore — sessão (Mac iOS + handoff Windows)
 
-Atualizado em 2026-09-05.
+Atualizado em 2026-09-06.
 
 ## Estratégia
 
-A maneira adequada de construir Android e Tauri: **GitHub como fonte da verdade**. No Windows, `git pull` e ler `docs/clients/PORTFOLIO.md`. Um chat = um app. iOS é a referência de UX. Não colar o histórico deste chat no Windows.
+GitHub é a fonte da verdade. No Windows: `git pull origin main` e ler `docs/clients/PORTFOLIO.md`. Um chat = um app. iOS é a referência de UX.
 
 - Estratégia: [`docs/clients/PORTFOLIO.md`](docs/clients/PORTFOLIO.md)
 - Contrato: [`docs/clients/API.md`](docs/clients/API.md)
@@ -17,31 +17,22 @@ Ordem: **Tauri** (`apps/desktop`) → **Android** (`apps/android`).
 - Repo: `~/bankcore-fintech`
 - Remote: `https://github.com/joaop-gregorioDS/bankcore-fintech`
 - Branch: `main`
-- iOS no GitHub: `4a6f9f0` — `feat(ios): home viva, ícone do escudo e version 1.10.25`
+- API: `https://bankcore.vortexsoftware.tech`
 
 ## iOS (este Mac)
 
 - Pasta: `apps/ios/BankCore.xcodeproj`
 - Bundle: `br.vortex.bankcore`
-- Versão: **1.10.25** (build 11025)
-- API: `https://bankcore.vortexsoftware.tech` (lab: `http://2.25.126.53`)
-- JWT no Keychain; Pix/extrato reais; cartões/DDA/invest simulados
-- Aparelho: iPhone 11 Pro Max (Signing → Team; confiar certificado na primeira instalação)
+- Versão: **1.10.25**
+- **Claro por padrão**; escuro só no toggle do perfil
+- Ícone cream `#F4F1EA` + escudo ouro `#9A7B32`
+- Demo: Lucas Mendes Rocha `98765432100` / Maria `12345678900` / `teste123456`
+- Razão social: Vortex Software LTDA
 
-Contas: Lucas `98765432100` / Maria `12345678900` / `teste123456`.
+## Windows
 
-## Windows (próximos chats)
+Prompts em `docs/clients/PORTFOLIO.md`. Mesmas regras de tema, ícone e HTTPS.
 
-Prompts prontos em `docs/clients/PORTFOLIO.md` (seção “Prompts para colar no Windows”).
+## Retomar no Mac
 
-1. `git clone` ou `git pull origin main`
-2. Chat Tauri: ler PORTFOLIO + DESKTOP + API + DESIGN → `apps/desktop`
-3. Chat Android: ler PORTFOLIO + ANDROID + API + DESIGN → `apps/android`
-
-## Retomar este chat no Mac
-
-Grok TUI: `/resume` — sessão `01a0693e-ea0c-7132-adc7-63565813fec4` (cwd home).
-
-Prompt se o `/resume` não estiver à mão:
-
-> Continue BankCore em ~/bankcore-fintech. Leia SESSION.md e docs/clients/PORTFOLIO.md. iOS 1.10.25 já está no GitHub (4a6f9f0). Android e Tauri são no Windows.
+Grok TUI: `/resume` — sessão `01a0693e-ea0c-7132-adc7-63565813fec4`.
