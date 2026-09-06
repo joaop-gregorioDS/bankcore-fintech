@@ -1,0 +1,19 @@
+[package]
+name = "bankcore-desktop"
+version = "1.10.25"
+description = "BankCore Desktop"
+authors = ["Vortex Software LTDA"]
+edition = "2021"
+
+[lib]
+name = "bankcore_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-store = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

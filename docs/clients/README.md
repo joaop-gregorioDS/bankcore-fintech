@@ -7,7 +7,7 @@ O backend (`services/`) e a SPA (`frontend/`) já existem. Três clientes do **m
 | Cliente | Pasta | Stack | Onde | Estado |
 | :--- | :--- | :--- | :--- | :--- |
 | iOS | `apps/ios` | SwiftUI, iOS 17+ | Mac M1 Air + Xcode | **Feito** `version 1.10.25` |
-| Desktop | `apps/desktop` | Tauri 2 + HTML/JS Carbon Ledger | Windows | A fazer |
+| Desktop | `apps/desktop` | Tauri 2 + HTML/JS Carbon Ledger | Windows | **Feito** `version 1.10.25` |
 | Android | `apps/android` | Kotlin + Jetpack Compose | Windows (Android Studio) | A fazer |
 
 ## Ordem

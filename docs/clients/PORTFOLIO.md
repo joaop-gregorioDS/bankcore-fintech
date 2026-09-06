@@ -27,7 +27,7 @@ Ordem no Windows: **Tauri primeiro** (prova a API fora do browser, mais rápido)
 | API + ledger | `services/` | VPS, JWT, Pix interno, extrato |
 | SPA browser | `frontend/` | Carbon Ledger no Nginx |
 | iOS SwiftUI | `apps/ios` | **Feito** — `version 1.10.25`, HTTPS, modo claro padrão |
-| Desktop Tauri | `apps/desktop` | A construir no Windows |
+| Desktop Tauri | `apps/desktop` | **Feito** — `version 1.10.25`, Tauri 2 nativo Windows |
 | Android Compose | `apps/android` | A construir no Windows |
 
 Caminho do avaliador (igual nos três): **login Lucas → Pix R$ 1,00 para `12345678900` → extrato (débito Lucas / crédito Maria) → comprovante**. Sem JWT, `POST /accounts/` e `POST /transactions/*` → **401**.

@@ -1,0 +1,267 @@
+/* ===================================================================
+   BankCore Desktop — Carbon Ledger Design Tokens & Global Styles
+   Default Theme: LIGHT MODE (#F4F1EA)
+   Optional Theme: DARK MODE (#0B0B0C)
+   =================================================================== */
+
+:root {
+  /* LIGHT THEME (Default) */
+  --bg-canvas: #F4F1EA;
+  --bg-panel: #ECE7DC;
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #F9F7F2;
+  --bg-input: #F7F5F0;
+  --bg-card-hover: #F2EFE8;
+
+  --text-primary: #141416;
+  --text-secondary: #58534C;
+  --text-mute: #8C867D;
+  --text-ivory: #F6F1E8;
+
+  --accent-gold: #9A7B32;
+  --accent-gold-hover: #826625;
+  --accent-gold-text: #FFFFFF;
+  --accent-gold-soft: rgba(154, 123, 50, 0.12);
+  --accent-gold-border: rgba(154, 123, 50, 0.35);
+
+  --color-debit: #B42318;
+  --color-debit-hover: #981B12;
+  --color-debit-soft: rgba(180, 35, 24, 0.10);
+  --color-credit: #237446;
+  --color-credit-soft: rgba(35, 116, 70, 0.12);
+
+  --border-subtle: #E2DBD0;
+  --border-strong: #CFC5B6;
+
+  --shadow-sm: 0 2px 6px rgba(40, 30, 20, 0.04);
+  --shadow-md: 0 8px 24px rgba(40, 30, 20, 0.07);
+  --shadow-lg: 0 16px 40px rgba(40, 30, 20, 0.10);
+
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+  --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  /* DARK THEME */
+  --bg-canvas: #0B0B0C;
+  --bg-panel: #141416;
+  --bg-card: #1C1C1F;
+  --bg-card-subtle: #242428;
+  --bg-input: #17171A;
+  --bg-card-hover: #26262B;
+
+  --text-primary: #F6F1E8;
+  --text-secondary: #C4BFB5;
+  --text-mute: #9A958C;
+  --text-ivory: #F6F1E8;
+
+  --accent-gold: #C4A35A;
+  --accent-gold-hover: #D8B76E;
+  --accent-gold-text: #0B0B0C;
+  --accent-gold-soft: rgba(196, 163, 90, 0.16);
+  --accent-gold-border: rgba(196, 163, 90, 0.40);
+
+  --color-debit: #C42B2B;
+  --color-debit-hover: #DC3838;
+  --color-debit-soft: rgba(196, 43, 43, 0.15);
+  --color-credit: #3D7A5A;
+  --color-credit-soft: rgba(61, 122, 90, 0.15);
+
+  --border-subtle: #2A2A2E;
+  --border-strong: #3F3F46;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  overflow: hidden;
+}
+
+input, button, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+/* App Desktop Container */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-canvas);
+  position: relative;
+}
+
+/* Custom Desktop Topbar */
+.desktop-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 20px;
+  background-color: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+.desktop-topbar * {
+  -webkit-app-region: no-drag;
+}
+
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon-wrapper {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #765B20 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.brand-icon-wrapper svg {
+  width: 17px;
+  height: 17px;
+  color: #FFFFFF;
+}
+
+.brand-title {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.brand-title .bank {
+  color: var(--text-primary);
+}
+
+.brand-title .core {
+  color: var(--accent-gold);
+  margin-left: 1px;
+}
+
+.app-version-badge {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-mute);
+  background-color: var(--bg-canvas);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  margin-left: 6px;
+}
+
+/* Main Content Area */
+.main-viewport {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+/* Bottom / Navigation Bar */
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 60px;
+  padding: 0 16px;
+  background-color: var(--bg-panel);
+  border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 18px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.nav-item svg {
+  width: 20px;
+  height: 20px;
+  transition: var(--transition);
+}
+
+.nav-item:hover {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  color: var(--accent-gold);
+  background-color: var(--accent-gold-soft);
+}
+
+.nav-item.active svg {
+  transform: translateY(-1px);
+}
+
+/* Utility classes */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.hidden {
+  display: none !important;
+}
