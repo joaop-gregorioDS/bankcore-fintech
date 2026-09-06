@@ -10,7 +10,7 @@ Sem token → **401** `{ "detail": "Token de acesso ausente." }`
 ### `POST /auth/login`
 
 ```json
-{ "tax_id": "33548376835", "password": "teste123456" }
+{ "tax_id": "98765432100", "password": "teste123456" }
 ```
 
 Resposta 200:

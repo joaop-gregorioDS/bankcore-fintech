@@ -7,11 +7,11 @@ SETTLEMENT_ACCOUNT_ID = uuid.UUID("00000000-0000-4000-8000-000000000001")
 SETTLEMENT_USER_ID = uuid.UUID("00000000-0000-4000-8000-000000000000")
 SETTLEMENT_ACCOUNT_NUMBER = "00000-0"
 
-JOAO_USER_ID = uuid.UUID("0f2dba40-cad0-45ab-9901-eaf9ecd72f5e")
+LUCAS_USER_ID = uuid.UUID("0f2dba40-cad0-45ab-9901-eaf9ecd72f5e")
 MARIA_USER_ID = uuid.UUID("a7b8c9d0-e1f2-4a3b-9c4d-5e6f708192a3")
 
 DEMO_WELCOME_CENTS = {
-    "33548376835": 1_845_080,
+    "98765432100": 1_845_080,
     "12345678900": 1_287_040,
 }
 
@@ -57,7 +57,7 @@ async def seed_demo_accounts(db: AsyncSession) -> None:
     await seed_settlement_account(db)
 
     specs = [
-        (JOAO_USER_ID, "77412-7", DEMO_WELCOME_CENTS["33548376835"]),
+        (LUCAS_USER_ID, "77412-7", DEMO_WELCOME_CENTS["98765432100"]),
         (MARIA_USER_ID, "88921-3", DEMO_WELCOME_CENTS["12345678900"]),
     ]
     for user_id, acc_num, cents in specs:

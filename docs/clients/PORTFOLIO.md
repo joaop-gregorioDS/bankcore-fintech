@@ -30,7 +30,7 @@ Ordem no Windows: **Tauri primeiro** (prova a API fora do browser, mais rápido)
 | Desktop Tauri | `apps/desktop` | A construir no Windows |
 | Android Compose | `apps/android` | A construir no Windows |
 
-Caminho do avaliador (igual nos três): **login João → Pix R$ 1,00 para `12345678900` → extrato (débito João / crédito Maria) → comprovante**. Sem JWT, `POST /accounts/` e `POST /transactions/*` → **401**.
+Caminho do avaliador (igual nos três): **login Lucas → Pix R$ 1,00 para `12345678900` → extrato (débito Lucas / crédito Maria) → comprovante**. Sem JWT, `POST /accounts/` e `POST /transactions/*` → **401**.
 
 ---
 
@@ -42,7 +42,7 @@ docs/clients/API.md         ← contrato HTTP (não inventar rota)
 docs/clients/DESIGN.md      ← tokens Carbon Ledger
 docs/clients/DESKTOP.md     ← só no chat Tauri
 docs/clients/ANDROID.md     ← só no chat Android
-apps/ios/BankCore/Mock/MockCatalog.swift  ← dados simulados João/Maria
+apps/ios/BankCore/Mock/MockCatalog.swift  ← dados simulados Lucas/Maria
 ```
 
 Referência visual viva: `apps/ios` (Login, Home, Pix, Extrato, Cartões, Perfil, Hubs).
@@ -84,7 +84,7 @@ Copiar **estrutura**, não marca.
 
 - Marca geométrica centralizada + wordmark + faixa de portfólio + `version 1.10.25`.
 - Cartão do correntista (iniciais) + atalhos Trocar conta / Fazer Pix.
-- Dois chips demo: João / Maria.
+- Dois chips demo: Lucas / Maria.
 - Formulário (Acessar / Abrir conta) acessível; não precisa estar aberto o tempo todo.
 
 **Depois do login — abas**
@@ -126,11 +126,11 @@ HTTP claro só para `2.25.126.53` (lab). Android: cleartext no flavor debug. Nã
 
 ---
 
-## Catálogo mock (João ≠ Maria)
+## Catálogo mock (Lucas ≠ Maria)
 
 Espelhar `apps/ios/BankCore/Mock/MockCatalog.swift`. Números fixos, não aleatórios a cada abertura.
 
-**João** (`33548376835`) — Carbon Black `•••• 4289`, fatura R$ 2.296,07, limite usado R$ 8.371 / disponível R$ 12.260, DDA AWS+Contabilizei+Vivo+Workspace+Serasa, Invest ~R$ 23.750, crédito R$ 50.000, segmento Vortex Carbon Black Corporate.
+**Lucas** (`98765432100`) — Carbon Black `•••• 4289`, fatura R$ 2.296,07, limite usado R$ 8.371 / disponível R$ 12.260, DDA AWS+Contabilizei+Vivo+Workspace+Serasa, Invest ~R$ 23.750, crédito R$ 50.000, segmento Vortex Carbon Black Corporate.
 
 **Maria** (`12345678900`) — Carbon Platinum `•••• 8821`, fatura R$ 1.480,30, limite 4.210 / 15.790, DDA condomínio+Unimed+Enel+Claro, Invest menor, crédito R$ 35.000, segmento Vortex Carbon Platinum.
 
@@ -152,7 +152,7 @@ Senha demo: `teste123456`. Agência sempre `0001-9`.
 
 ## Pronto quando (cada app)
 
-- Login João, Pix R$ 1,00 para `12345678900`, débito no extrato do João e crédito no da Maria.
+- Login Lucas, Pix R$ 1,00 para `12345678900`, débito no extrato do Lucas e crédito no da Maria.
 - Sem token → o app não chama rota financeira (API 401 se chamar).
 - `version 1.10.25` visível no login e no perfil.
 - Cartões/DDA/invest com selo Simulado; Pix/extrato sem selo.

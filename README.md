@@ -24,10 +24,10 @@ Ambiente de laboratório em HTTP (IP da VPS).
 
 | Titular | CPF | Senha |
 | :--- | :--- | :--- |
-| João Paulo Gregorio de Souza | `33548376835` | `teste123456` |
+| Lucas Mendes Rocha | `98765432100` | `teste123456` |
 | Maria Silva Santos | `12345678900` | `teste123456` |
 
-**Caminho do avaliador (2 minutos):** login → Pix para o CPF da outra conta → extrato → comprovante PDF. Também dá para **Abrir conta** com um CPF novo e Pixar para João ou Maria.
+**Caminho do avaliador (2 minutos):** login → Pix para o CPF da outra conta → extrato → comprovante PDF. Também dá para **Abrir conta** com um CPF novo e Pixar para Lucas ou Maria.
 
 Rotas financeiras exigem JWT. Sem token, `POST /accounts/` e `POST /transactions/*` respondem **401**.
 
@@ -141,4 +141,4 @@ docs/clients/             specs iOS (Mac), Android e Tauri
 
 ## Licença
 
-MIT © João Paulo Gregorio de Souza · Vortex Software
+MIT © Lucas Mendes Rocha · Vortex Software

@@ -33,8 +33,8 @@ struct MockCatalog {
     }
 
     var email: String {
-        if isJoao { return "joao.paulo@vortexsoftware.com.br" }
-        if isMaria { return "maria.silva@vortexsoftware.com.br" }
+        if isJoao { return "contato@vortexsoftware.tech" }
+        if isMaria { return "maria.silva@vortexsoftware.tech" }
         return "correntista@bankcore.demo"
     }
 
@@ -46,7 +46,7 @@ struct MockCatalog {
                 MockCard(
                     name: "Carbon Black",
                     last4: "4289",
-                    holder: "JOAO PAULO",
+                    holder: "LUCAS MENDES",
                     invoice: 2_296.07,
                     dueLabel: "10 de setembro",
                     period: "30/Jul a 31/Ago",
@@ -59,7 +59,7 @@ struct MockCatalog {
                 MockCard(
                     name: "Carbon Virtual",
                     last4: "7712",
-                    holder: "JOAO PAULO",
+                    holder: "LUCAS MENDES",
                     invoice: 412.90,
                     dueLabel: "10 de setembro",
                     period: "Fatura virtual",

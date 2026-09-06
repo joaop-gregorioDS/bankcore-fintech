@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
+<html lang="pt-BR" class="h-full light-theme">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -241,9 +241,9 @@
             <div class="carbon-card p-5">
                 <div class="text-[11px] font-semibold tracking-wide mb-3" style="color: var(--mute);">Contas de demonstração</div>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="fillDemo('33548376835', 'teste123456')" class="p-3 btn-secondary text-left transition group">
-                        <div class="text-xs font-semibold group-hover:text-gold">João Paulo</div>
-                        <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">335.483.768-35</div>
+                    <button onclick="fillDemo('98765432100', 'teste123456')" class="p-3 btn-secondary text-left transition group">
+                        <div class="text-xs font-semibold group-hover:text-gold">Lucas Mendes</div>
+                        <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">987.654.321-00</div>
                         <div class="text-xs font-mono font-amount mt-1.5">R$ 18.450,80</div>
                     </button>
                     <button onclick="fillDemo('12345678900', 'teste123456')" class="p-3 btn-secondary text-left transition group">
@@ -328,7 +328,7 @@
                 <!-- User Balance Card in Sidebar -->
                 <div class="p-5 border-b border-inherit sidebar-balance">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="truncate text-xs font-bold opacity-80" id="sideUserName">João Paulo</div>
+                        <div class="truncate text-xs font-bold opacity-80" id="sideUserName">Lucas Mendes</div>
                         <button onclick="toggleBalanceVisibility()" class="opacity-60 hover:text-gold transition" title="Ocultar Saldo">
                             <i id="sideEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -416,8 +416,8 @@
                     
                     <!-- BOTÃO ALTERNAR TEMA CLARO / ESCURO -->
                     <button onclick="toggleTheme()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 text-gold" title="Alternar tema" id="btnThemeToggle">
-                        <i data-lucide="sun" class="w-4.5 h-4.5" id="iconTheme"></i>
-                        <span class="hidden md:inline font-medium text-[11px]" id="textThemeLabel">Claro</span>
+                        <i data-lucide="moon" class="w-4.5 h-4.5" id="iconTheme"></i>
+                        <span class="hidden md:inline font-medium text-[11px]" id="textThemeLabel">Escuro</span>
                     </button>
 
                     <button onclick="toggleFontScale()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 font-medium text-xs" title="Tamanho da fonte">
@@ -435,10 +435,10 @@
                     </a>
 
                     <button onclick="navigateTo('perfil')" class="flex items-center gap-3 pl-3 border-l border-inherit hover:opacity-80 transition cursor-pointer text-left group">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-gold text-xs" style="border: 1px solid var(--gold);" id="topUserAvatar">JP</div>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-gold text-xs" style="border: 1px solid var(--gold);" id="topUserAvatar">LM</div>
                         <div class="hidden xl:block">
-                            <div class="text-xs font-semibold leading-tight group-hover:text-gold transition" id="topUserName">João Paulo</div>
-                            <div class="text-[11px] font-mono" style="color: var(--mute);" id="topUserCpf">335.483.768-35</div>
+                            <div class="text-xs font-semibold leading-tight group-hover:text-gold transition" id="topUserName">Lucas Mendes</div>
+                            <div class="text-[11px] font-mono" style="color: var(--mute);" id="topUserCpf">987.654.321-00</div>
                         </div>
                         <i data-lucide="chevron-right" class="w-4 h-4 opacity-50 group-hover:text-gold transition"></i>
                     </button>
@@ -498,7 +498,7 @@
                                     </div>
                                     <div class="text-sm font-mono text-zinc-300 font-medium" id="miniCardNumber">•••• 4289</div>
                                     <div class="flex items-center justify-between text-[11px] font-mono text-zinc-300 uppercase">
-                                        <span id="miniCardHolder">JOAO PAULO SOUZA</span>
+                                        <span id="miniCardHolder">LUCAS MENDES ROCHA</span>
                                         <span>12/29</span>
                                     </div>
                                 </div>
@@ -516,7 +516,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="text-[11px] font-medium" style="color: var(--mute);">Chave Pix (CPF)</div>
-                                <div class="text-base font-semibold font-mono text-gold truncate mt-0.5" id="mainPixCpf">335.483.768-35</div>
+                                <div class="text-base font-semibold font-mono text-gold truncate mt-0.5" id="mainPixCpf">987.654.321-00</div>
                             </div>
                             <button onclick="copyPixKey()" class="p-2 rounded-lg text-gold transition" title="Copiar chave">
                                 <i data-lucide="copy" class="w-5 h-5"></i>
@@ -633,7 +633,7 @@
                                     </div>
                                     <div class="text-xs font-mono text-zinc-300 font-bold" id="cardVisualNumber">•••• •••• •••• 4289</div>
                                     <div class="flex justify-between items-center text-[10px] font-mono text-zinc-300">
-                                        <span id="cardVisualHolder">JOAO PAULO</span>
+                                        <span id="cardVisualHolder">LUCAS MENDES</span>
                                         <span class="font-bold">VISA</span>
                                     </div>
                                 </div>
@@ -1302,12 +1302,12 @@
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-3">
-                                        <h2 class="text-2xl sm:text-3xl font-black tracking-tight" id="perfilHeroName">João Paulo Gregorio de Souza</h2>
+                                        <h2 class="text-2xl sm:text-3xl font-black tracking-tight" id="perfilHeroName">Lucas Mendes Rocha</h2>
                                         <span class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5">
                                             <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Verificado
                                         </span>
                                     </div>
-                                    <div class="text-sm opacity-70 font-mono mt-1" id="perfilHeroCpf">CPF: 335.483.768-35</div>
+                                    <div class="text-sm opacity-70 font-mono mt-1" id="perfilHeroCpf">CPF: 987.654.321-00</div>
                                     <div class="flex flex-wrap items-center gap-3 mt-2 text-xs">
                                         <span class="text-amber-500 font-mono font-black" id="perfilHeroAcc">Ag. 0001-9 • Cc. 77412-7</span>
                                         <span class="opacity-40">•</span>
@@ -1335,12 +1335,12 @@
                                 <form onsubmit="saveProfilePageData(event)" class="space-y-4 text-xs">
                                     <div>
                                         <label class="block font-bold opacity-70 mb-1.5">Nome Completo</label>
-                                        <input type="text" id="perfilInputName" value="João Paulo Gregorio de Souza" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500 focus:outline-none font-bold">
+                                        <input type="text" id="perfilInputName" value="Lucas Mendes Rocha" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500 focus:outline-none font-bold">
                                     </div>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block font-bold opacity-70 mb-1.5">CPF do Titular</label>
-                                            <input type="text" id="perfilInputCpf" value="335.483.768-35" readonly class="w-full px-4 py-3 rounded-2xl bg-black/10 dark:bg-zinc-950 border border-inherit opacity-70 font-mono">
+                                            <input type="text" id="perfilInputCpf" value="987.654.321-00" readonly class="w-full px-4 py-3 rounded-2xl bg-black/10 dark:bg-zinc-950 border border-inherit opacity-70 font-mono">
                                         </div>
                                         <div>
                                             <label class="block font-bold opacity-70 mb-1.5">Telefone / WhatsApp</label>
@@ -1349,7 +1349,7 @@
                                     </div>
                                     <div>
                                         <label class="block font-bold opacity-70 mb-1.5">E-mail Corporativo</label>
-                                        <input type="email" id="perfilInputEmail" value="joao.paulo@vortexsoftware.com.br" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500">
+                                        <input type="email" id="perfilInputEmail" value="contato@vortexsoftware.tech" required class="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit focus:border-amber-500">
                                     </div>
                                     <div>
                                         <label class="block font-bold opacity-70 mb-1.5">Endereço Fiscal / Residencial</label>
@@ -1371,7 +1371,7 @@
                                 <div class="space-y-3.5 text-xs">
                                     <div class="p-4 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
                                         <div class="text-[11px] uppercase font-black opacity-60">Razão Social Oficial</div>
-                                        <div class="text-sm font-black mt-0.5">JOAO PAULO GREGORIO DE SOUZA DESENVOLVIMENTO DE SOFTWARE LTDA</div>
+                                        <div class="text-sm font-black mt-0.5">VORTEX SOFTWARE DESENVOLVIMENTO DE SOFTWARE LTDA</div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3.5">
                                         <div class="p-3.5 rounded-2xl bg-black/5 dark:bg-zinc-900 border border-inherit">
@@ -1703,7 +1703,7 @@
         let isBalanceHidden = false;
         let isSidebarCollapsed = false;
         let isFontScaleLarge = localStorage.getItem('bankcore_font_large') === 'true';
-        let currentTheme = localStorage.getItem('bankcore_theme') || 'dark';
+        let currentTheme = localStorage.getItem('bankcore_theme') || 'light';
         let sessionSeconds = 3600;
         let toastTimeout = null;
         let currentLoanMonths = 24;
@@ -1932,13 +1932,13 @@
             document.getElementById('appView').classList.remove('hidden');
 
             const taxId = taxIdDigits(currentAuthUser.tax_id);
-            const isJoao = taxId === '33548376835';
+            const isLucas = taxId === '98765432100';
             const isMaria = taxId === '12345678900';
-            const fullName = currentAuthUser.full_name || (isJoao ? 'João Paulo Gregorio de Souza' : isMaria ? 'Maria Silva Santos' : 'Correntista BankCore');
+            const fullName = currentAuthUser.full_name || (isLucas ? 'Lucas Mendes Rocha' : isMaria ? 'Maria Silva Santos' : 'Correntista BankCore');
             const cpfFormatted = formatCPF(taxId);
             const nameParts = fullName.split(/\s+/).filter(Boolean);
             const initials = (nameParts.slice(0, 2).map(function (p) { return p[0]; }).join('') || 'BC').toUpperCase();
-            const accNumber = isJoao ? '77412-7' : isMaria ? '88921-3' : '—';
+            const accNumber = isLucas ? '77412-7' : isMaria ? '88921-3' : '—';
 
             document.getElementById('sideUserName').innerText = fullName;
             document.getElementById('topUserName').innerText = fullName;
@@ -1950,22 +1950,22 @@
             document.getElementById('perfilHeroName').innerText = fullName;
             document.getElementById('perfilHeroCpf').innerText = 'CPF: ' + cpfFormatted;
             document.getElementById('perfilHeroAcc').innerText = `Ag. 0001-9 • Cc. ${accNumber}`;
-            document.getElementById('perfilHeroSegment').innerText = isJoao ? 'Segmento: Vortex Carbon Black Corporate' : isMaria ? 'Segmento: Vortex Carbon Platinum' : 'Segmento: BankCore Demo';
+            document.getElementById('perfilHeroSegment').innerText = isLucas ? 'Segmento: Vortex Carbon Black Corporate' : isMaria ? 'Segmento: Vortex Carbon Platinum' : 'Segmento: BankCore Demo';
             document.getElementById('perfilInputName').value = fullName;
             document.getElementById('perfilInputCpf').value = cpfFormatted;
-            document.getElementById('perfilInputEmail').value = isJoao ? 'joao.paulo@vortexsoftware.com.br' : isMaria ? 'maria.silva@vortexsoftware.com.br' : '';
+            document.getElementById('perfilInputEmail').value = isLucas ? 'contato@vortexsoftware.tech' : isMaria ? 'maria.silva@vortexsoftware.tech' : '';
 
-            if (isJoao) {
+            if (isLucas) {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 50.000,00';
                 document.getElementById('mainLimitDisplay').innerText = 'R$ 50.000,00';
                 document.getElementById('creditMaxDisplay').innerText = 'R$ 50.000,00';
                 document.getElementById('cardBadgeType').innerText = 'Carbon Black';
                 document.getElementById('miniCardNumber').innerText = '•••• 4289';
-                document.getElementById('miniCardHolder').innerText = 'JOAO PAULO SOUZA';
+                document.getElementById('miniCardHolder').innerText = 'LUCAS MENDES ROCHA';
                 document.getElementById('cardNameSubtitle').innerText = 'Final 4289 • Carbon Black';
                 document.getElementById('cardInvoiceValue').innerText = 'R$ 2.296,07';
                 document.getElementById('cardVisualNumber').innerText = '•••• •••• •••• 4289';
-                document.getElementById('cardVisualHolder').innerText = 'JOAO PAULO';
+                document.getElementById('cardVisualHolder').innerText = 'LUCAS MENDES';
                 document.getElementById('cardLimitUsed').innerText = 'R$ 8.371,00';
                 document.getElementById('cardLimitAvailable').innerText = 'R$ 12.260,00';
                 document.getElementById('cardLimitTotalText').innerText = 'R$ 20.631,00';

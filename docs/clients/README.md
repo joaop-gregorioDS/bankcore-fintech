@@ -40,7 +40,7 @@ Fora da v1 (mock local, selo **Simulado**, iguais ao iOS / SPA): cartões, DDA, 
 
 | Titular | CPF | Senha |
 | :--- | :--- | :--- |
-| João Paulo | `33548376835` | `teste123456` |
+| Lucas Mendes | `98765432100` | `teste123456` |
 | Maria Silva | `12345678900` | `teste123456` |
 
 Base da API: `http://2.25.126.53`

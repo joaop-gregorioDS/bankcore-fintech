@@ -28,7 +28,7 @@ Ordem: **Tauri** (`apps/desktop`) → **Android** (`apps/android`).
 - JWT no Keychain; Pix/extrato reais; cartões/DDA/invest simulados
 - Aparelho: iPhone 11 Pro Max (Signing → Team; confiar certificado na primeira instalação)
 
-Contas: João `33548376835` / Maria `12345678900` / `teste123456`.
+Contas: Lucas `98765432100` / Maria `12345678900` / `teste123456`.
 
 ## Windows (próximos chats)
 

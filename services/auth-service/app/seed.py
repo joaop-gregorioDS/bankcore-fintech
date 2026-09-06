@@ -4,22 +4,22 @@ from sqlalchemy.future import select
 from app.models import User
 from app.security import hash_password
 
-JOAO_USER_ID = uuid.UUID("0f2dba40-cad0-45ab-9901-eaf9ecd72f5e")
+LUCAS_USER_ID = uuid.UUID("0f2dba40-cad0-45ab-9901-eaf9ecd72f5e")
 MARIA_USER_ID = uuid.UUID("a7b8c9d0-e1f2-4a3b-9c4d-5e6f708192a3")
 
 DEMO_USERS = [
     {
-        "id": JOAO_USER_ID,
-        "tax_id": "33548376835",
-        "full_name": "João Paulo Gregorio de Souza",
-        "email": "joao.paulo@vortexsoftware.com.br",
+        "id": LUCAS_USER_ID,
+        "tax_id": "98765432100",
+        "full_name": "Lucas Mendes Rocha",
+        "email": "contato@vortexsoftware.tech",
         "password": "teste123456",
     },
     {
         "id": MARIA_USER_ID,
         "tax_id": "12345678900",
         "full_name": "Maria Silva Santos",
-        "email": "maria.silva@vortexsoftware.com.br",
+        "email": "maria.silva@vortexsoftware.tech",
         "password": "teste123456",
     },
 ]

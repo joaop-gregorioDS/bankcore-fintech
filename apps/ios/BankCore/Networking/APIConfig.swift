@@ -7,8 +7,8 @@ enum APIConfig {
     static let baseURL = URL(string: "http://2.25.126.53")!
 
     static let joao = DemoAccount(
-        name: "João Paulo",
-        taxId: "33548376835",
+        name: "Lucas Mendes",
+        taxId: "98765432100",
         password: "teste123456"
     )
     static let maria = DemoAccount(
