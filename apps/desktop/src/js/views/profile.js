@@ -71,6 +71,28 @@ export async function renderProfile(container, user, account, onLogout, showToas
               </div>
             </div>
           </div>
+
+          <!-- Compliance & Banking Governance Card -->
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h4 style="font-size:13.5px; font-weight:900; color:var(--text-primary);">Conformidade & Governança</h4>
+              <span class="badge-verified">Auditoria OK</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:11.5px; color:var(--text-secondary);">
+              <div style="display:flex; justify-content:space-between;">
+                <span>Regime Tributário:</span>
+                <strong style="color:var(--text-primary);">Simples Nacional</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span>Segurança Cibernética:</span>
+                <strong style="color:var(--color-credit);">BACEN Res. 4.658</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span>Domicílio Bancário:</span>
+                <strong style="color:var(--text-primary);">Matriz Curitiba / PR</strong>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Right Column: Settings & App Info -->

@@ -139,6 +139,45 @@ export function renderCards(container, user, account, onNavigate, showToast) {
           </div>
         `}
       </div>
+
+      <!-- Corporate Card Benefits & Governance Section -->
+      <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
+        <div class="card-subtle">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:30px; height:30px; border-radius:8px; background:var(--accent-gold-soft); color:var(--accent-gold); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px;">
+              ✓
+            </div>
+            <strong style="font-size:13px; color:var(--text-primary);">Conciliação OFX/CSV</strong>
+          </div>
+          <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
+            Despesas corporativas integradas com a Contabilizei e os principais ERPs contábeis do Brasil.
+          </p>
+        </div>
+
+        <div class="card-subtle">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:30px; height:30px; border-radius:8px; background:var(--accent-gold-soft); color:var(--accent-gold); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px;">
+              🛡
+            </div>
+            <strong style="font-size:13px; color:var(--text-primary);">Seguro & Proteção</strong>
+          </div>
+          <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
+            Proteção de compras e seguro corporativo internacional para compras online e presenciais.
+          </p>
+        </div>
+
+        <div class="card-subtle">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:30px; height:30px; border-radius:8px; background:var(--accent-gold-soft); color:var(--accent-gold); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px;">
+              ⚡
+            </div>
+            <strong style="font-size:13px; color:var(--text-primary);">Controle de Limites</strong>
+          </div>
+          <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
+            Defina tetos orçamentários por cartão e altere limites em tempo real pelo aplicativo desktop.
+          </p>
+        </div>
+      </div>
     </div>
   `;
 }

@@ -1,5 +1,5 @@
 // Root Application Controller for BankCore Desktop
-import { initStore, getSecureItem } from './store.js';
+import { initStore, getSecureItem, setSecureItem, clearAuthSession } from './store.js';
 import { CONFIG } from './config.js';
 import { renderLogin } from './views/login.js';
 import { renderHome } from './views/home.js';
@@ -15,8 +15,22 @@ class BankCoreDesktopApp {
     this.account = null;
     this.currentTab = 'home';
     this.viewport = document.getElementById('viewport');
-    this.navBar = document.getElementById('desktopNav');
-    this.topbarUser = document.getElementById('topbarUser');
+    this.sidebar = document.getElementById('desktopSidebar');
+    this.contentTopbar = document.getElementById('contentTopbar');
+    this.sidebarNav = document.getElementById('sidebarNav');
+    this.pageTitleDisplay = document.getElementById('pageTitleDisplay');
+    
+    // Sidebar User Elements
+    this.sidebarAvatar = document.getElementById('sidebarAvatar');
+    this.sidebarUserName = document.getElementById('sidebarUserName');
+    this.sidebarUserAcc = document.getElementById('sidebarUserAcc');
+    this.sidebarUserCard = document.getElementById('sidebarUserCard');
+    this.btnQuickLogout = document.getElementById('btnQuickLogout');
+
+    // Topbar Elements
+    this.btnToggleThemeTopbar = document.getElementById('btnToggleThemeTopbar');
+    this.topbarThemeText = document.getElementById('topbarThemeText');
+
     this.toastContainer = document.getElementById('toastContainer');
     this.modalContainer = document.getElementById('modalContainer');
   }
@@ -27,11 +41,31 @@ class BankCoreDesktopApp {
     // Apply stored theme (Light mode by default)
     if (store.theme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
+      if (this.topbarThemeText) this.topbarThemeText.innerText = 'Escuro';
     } else {
       document.documentElement.removeAttribute('data-theme');
+      if (this.topbarThemeText) this.topbarThemeText.innerText = 'Claro';
     }
 
-    // Handle unauthorized events
+    // Topbar theme toggle button
+    if (this.btnToggleThemeTopbar) {
+      this.btnToggleThemeTopbar.addEventListener('click', async () => {
+        const isCurrentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const nextTheme = isCurrentlyDark ? 'light' : 'dark';
+        await setSecureItem('theme', nextTheme);
+        if (nextTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          if (this.topbarThemeText) this.topbarThemeText.innerText = 'Escuro';
+          this.showToast('Modo Escuro ativado.', 'info');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          if (this.topbarThemeText) this.topbarThemeText.innerText = 'Claro';
+          this.showToast('Modo Claro ativado.', 'info');
+        }
+      });
+    }
+
+    // Handle unauthorized events from API
     window.addEventListener('bankcore:unauthorized', () => {
       this.user = null;
       this.account = null;
@@ -39,7 +73,7 @@ class BankCoreDesktopApp {
       this.showToast('Sessão encerrada por segurança.', 'error');
     });
 
-    // Check existing auth
+    // Check existing auth session
     if (store.auth_token && store.auth_user && store.auth_account) {
       this.user = store.auth_user;
       this.account = store.auth_account;
@@ -48,18 +82,42 @@ class BankCoreDesktopApp {
       this.showLogin();
     }
 
-    // Attach navigation listeners
-    this.navBar.querySelectorAll('.nav-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.getAttribute('data-tab');
-        this.navigateTo(tab);
+    // Attach navigation listeners to sidebar buttons
+    if (this.sidebarNav) {
+      this.sidebarNav.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.getAttribute('data-tab');
+          this.navigateTo(tab);
+        });
       });
-    });
+    }
+
+    // Sidebar footer: click user info to go to Profile
+    if (this.sidebarUserCard) {
+      this.sidebarUserCard.addEventListener('click', (e) => {
+        if (e.target.closest('#btnQuickLogout')) return;
+        this.navigateTo('profile');
+      });
+    }
+
+    // Quick logout in sidebar
+    if (this.btnQuickLogout) {
+      this.btnQuickLogout.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (confirm('Deseja realmente encerrar a sessão corporativa?')) {
+          await clearAuthSession();
+          this.user = null;
+          this.account = null;
+          this.showToast('Sessão encerrada.', 'info');
+          this.showLogin();
+        }
+      });
+    }
   }
 
   showLogin() {
-    this.navBar.classList.add('hidden');
-    this.topbarUser.classList.add('hidden');
+    this.sidebar.classList.add('hidden');
+    this.contentTopbar.classList.add('hidden');
     renderLogin(this.viewport, (user, account) => {
       this.user = user;
       this.account = account;
@@ -68,22 +126,44 @@ class BankCoreDesktopApp {
   }
 
   showApp() {
-    this.navBar.classList.remove('hidden');
-    this.topbarUser.classList.remove('hidden');
+    this.sidebar.classList.remove('hidden');
+    this.contentTopbar.classList.remove('hidden');
     
+    // Update sidebar profile card
     const initials = this.user.full_name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
-    this.topbarUser.querySelector('.user-avatar-mini').innerText = initials;
-    this.topbarUser.querySelector('.user-name-mini').innerText = this.user.full_name;
+    if (this.sidebarAvatar) this.sidebarAvatar.innerText = initials;
+    if (this.sidebarUserName) this.sidebarUserName.innerText = this.user.full_name;
+    if (this.sidebarUserAcc) this.sidebarUserAcc.innerText = `Ag. 0001-9 · Cc. ${this.account.account_number}`;
 
     this.navigateTo('home');
   }
 
   navigateTo(tab, param = null) {
     this.currentTab = tab;
-    this.navBar.querySelectorAll('.nav-item').forEach(btn => {
-      if (btn.getAttribute('data-tab') === tab) btn.classList.add('active');
-      else btn.classList.remove('active');
-    });
+
+    // Highlight sidebar active item
+    if (this.sidebarNav) {
+      this.sidebarNav.querySelectorAll('.nav-item').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tab) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
+
+    // Update topbar title
+    const titles = {
+      home: 'Início · Dashboard Geral',
+      pix: 'Área Pix · Transferência Instantânea',
+      statement: 'Extrato Consolidado & Auditoria Contábil',
+      cards: 'Gestão de Cartões Corporativos',
+      dda: 'DDA · Boletos Registrados (CIP)',
+      invest: 'Carteira de Investimentos',
+      credit: 'Crédito & Financiamento (Tabela Price)',
+      profile: 'Perfil Corporativo & Configurações',
+    };
+
+    if (this.pageTitleDisplay) {
+      this.pageTitleDisplay.innerHTML = `<span>${titles[tab] || 'BankCore'}</span>`;
+    }
 
     this.viewport.scrollTop = 0;
 
@@ -135,7 +215,7 @@ class BankCoreDesktopApp {
     const date = new Date(tx.created_at || Date.now());
     const dateFormatted = date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
     const timeFormatted = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const authCode = tx.idempotency_key ? `AUT-${tx.idempotency_key.toUpperCase()}` : `AUT-${tx.transaction_id.slice(0, 16).toUpperCase()}`;
+    const authCode = tx.idempotency_key ? `AUT-${tx.idempotency_key.toUpperCase()}` : `AUT-${(tx.transaction_id || 'DEMO').slice(0, 16).toUpperCase()}`;
 
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
