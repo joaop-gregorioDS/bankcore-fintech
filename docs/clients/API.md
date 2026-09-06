@@ -1,6 +1,6 @@
 # Contrato da API BankCore
 
-Base: `http://2.25.126.53`  
+Base: `https://bankcore.vortexsoftware.tech` (ou `http://2.25.126.53` em laboratório)  
 JSON, UTF-8. Rotas financeiras: header `Authorization: Bearer <access_token>`.
 
 Sem token → **401** `{ "detail": "Token de acesso ausente." }`
@@ -122,13 +122,13 @@ Gera um par DEBIT (liquidação) + CREDIT (correntista).
 3. Pix / depósito com Bearer + `idempotency_key` novo.
 4. Recarregar conta + statement.
 
-## ATS / App Transport (iOS)
-
-A demo é **HTTP** (`http://2.25.126.53`). No Info.plist: exceção ATS para esse host **somente em debug**, ou `NSAllowsArbitraryLoads` documentado como lab. Não finja HTTPS.
-
+## ATS / App Transport (iOS) e Conectividade
+ 
+A API oficial opera em **HTTPS** com certificado Let's Encrypt (`https://bankcore.vortexsoftware.tech`). Para ambiente de laboratório direto via IP (`http://2.25.126.53`): no Info.plist use exceção ATS para esse host **somente em debug**, ou `NSAllowsArbitraryLoads` documentado como lab.
+ 
 ## Swagger
-
-- http://2.25.126.53/auth/docs  
-- http://2.25.126.53/transactions/docs  
-
+ 
+- https://bankcore.vortexsoftware.tech/auth/docs (ou http://2.25.126.53/auth/docs)  
+- https://bankcore.vortexsoftware.tech/transactions/docs (ou http://2.25.126.53/transactions/docs)  
+ 
 Authorize no Swagger com o Bearer para testar.

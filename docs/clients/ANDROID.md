@@ -1,10 +1,10 @@
 # BankCore Android (Kotlin + Compose)
 
-Construir no **Windows** com Android Studio. API: `http://2.25.126.53`.
+Construir no **Windows** com Android Studio. API: `https://bankcore.vortexsoftware.tech`.
 
 ## Prompt para o chat
 
-> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `ANDROID.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS. App Compose em `apps/android`, applicationId `br.vortex.bankcore`. API `http://2.25.126.53`. v1: login → Pix → extrato → comprovante. Home viva + módulos simulados + `version 1.10.25`. Sem WebView da SPA. Sem inventar endpoint.
+> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `ANDROID.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS. App Compose em `apps/android`, applicationId `br.vortex.bankcore`. API `https://bankcore.vortexsoftware.tech` (ou `http://2.25.126.53` em lab). v1: login → Pix → extrato → comprovante. Home viva + módulos simulados + `version 1.10.25`. Sem WebView da SPA. Sem inventar endpoint.
 
 ## Stack
 
@@ -19,4 +19,4 @@ Bottom nav: Início | Pix | Extrato | Cartões | Perfil. Contrato `API.md`, toke
 
 ## Pronto quando
 
-Emulador ou aparelho: login João, Pix para Maria, extrato com débito vermelho, share do comprovante.
+Emulador ou aparelho: login Lucas, Pix para Maria, extrato com débito vermelho, share do comprovante.

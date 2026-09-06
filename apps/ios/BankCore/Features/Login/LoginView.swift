@@ -121,7 +121,7 @@ struct LoginView: View {
                     .font(TypeScale.label)
                     .foregroundStyle(Palette.mute)
                 HStack(spacing: 10) {
-                    demoChip(APIConfig.joao, "JP")
+                    demoChip(APIConfig.joao, "LM")
                     demoChip(APIConfig.maria, "MS")
                 }
             }
@@ -163,7 +163,7 @@ struct LoginView: View {
         CarbonCard {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Pix real entre João e Maria")
+                    Text("Pix real entre Lucas e Maria")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Palette.ivory)
                     Text("O avaliador entra, transfere R$ 1,00 e vê o comprovante no ledger interno.")

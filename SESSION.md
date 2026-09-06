@@ -14,7 +14,7 @@ Ordem: **Tauri** (`apps/desktop`) → **Android** (`apps/android`).
 
 ## Git
 
-- Repo: `/Users/joaopaulogregorio/bankcore-fintech`
+- Repo: `~/bankcore-fintech`
 - Remote: `https://github.com/joaop-gregorioDS/bankcore-fintech`
 - Branch: `main`
 - iOS no GitHub: `4a6f9f0` — `feat(ios): home viva, ícone do escudo e version 1.10.25`
@@ -24,7 +24,7 @@ Ordem: **Tauri** (`apps/desktop`) → **Android** (`apps/android`).
 - Pasta: `apps/ios/BankCore.xcodeproj`
 - Bundle: `br.vortex.bankcore`
 - Versão: **1.10.25** (build 11025)
-- API: `http://2.25.126.53`
+- API: `https://bankcore.vortexsoftware.tech` (lab: `http://2.25.126.53`)
 - JWT no Keychain; Pix/extrato reais; cartões/DDA/invest simulados
 - Aparelho: iPhone 11 Pro Max (Signing → Team; confiar certificado na primeira instalação)
 

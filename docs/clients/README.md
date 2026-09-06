@@ -1,6 +1,6 @@
 # Clientes BankCore
 
-O backend (`services/`) e a SPA (`frontend/`) já existem. Três clientes do **mesmo contrato**, no mesmo monorepo, mesma API `http://2.25.126.53`.
+O backend (`services/`) e a SPA (`frontend/`) já existem. Três clientes do **mesmo contrato**, no mesmo monorepo, mesma API `https://bankcore.vortexsoftware.tech`.
 
 **Estratégia e UX (ler primeiro):** [`PORTFOLIO.md`](PORTFOLIO.md) — o iOS é a referência visual; Android e Tauri se constroem no Windows a partir deste pacote no GitHub.
 
@@ -43,4 +43,4 @@ Fora da v1 (mock local, selo **Simulado**, iguais ao iOS / SPA): cartões, DDA, 
 | Lucas Mendes | `98765432100` | `teste123456` |
 | Maria Silva | `12345678900` | `teste123456` |
 
-Base da API: `http://2.25.126.53`
+Base da API: `https://bankcore.vortexsoftware.tech` (lab fallback: `http://2.25.126.53`)

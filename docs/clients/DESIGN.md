@@ -28,7 +28,7 @@ Ouro **não** pinta a tela inteira. Vermelho **só** em dinheiro saindo e “Sai
 
 ## Telas v1
 
-1. **Login** — CPF, senha, atalho João / Maria, faixa “demonstração”.
+1. **Login** — CPF, senha, atalho Lucas / Maria, faixa “demonstração”.
 2. **Início** — saldo, limite (pode ser mock), CTA ouro “Pix”, atalho extrato.
 3. **Pix** — CPF destino, valor, descrição, confirmar.
 4. **Extrato** — lista; débito vermelho; tap abre comprovante.

@@ -3,7 +3,7 @@
 Como construir **Android** e **Tauri** iguais ao iOS, todos contra a **mesma API** na VPS. Este arquivo é a fonte da verdade para o chat no Windows.
 
 Repo: `https://github.com/joaop-gregorioDS/bankcore-fintech`  
-API: `http://2.25.126.53`  
+API: `https://bankcore.vortexsoftware.tech` (lab fallback: `http://2.25.126.53`)  
 Versão de portfólio: **`version 1.10.25`** (mostrar no login e no perfil/configurações).
 
 ---
@@ -122,7 +122,7 @@ Copiar **estrutura**, não marca.
 
 JWT: Keystore / EncryptedPrefs (Android), plugin Tauri de store seguro (não `localStorage` puro). `account_id` só em memória após `POST /accounts/` com `user_id` = `sub` do JWT.
 
-HTTP claro só para `2.25.126.53` (lab). Android: cleartext no flavor debug. Não fingir HTTPS.
+API oficial com HTTPS (`https://bankcore.vortexsoftware.tech`). HTTP claro apenas para o IP da VPS (`2.25.126.53`) em laboratório/debug. Android: cleartext no flavor debug se usar IP direto.
 
 ---
 
@@ -142,11 +142,11 @@ Senha demo: `teste123456`. Agência sempre `0001-9`.
 
 **Chat Tauri** (`apps/desktop`)
 
-> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `DESKTOP.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). Scaffold Tauri 2 em `apps/desktop`. Cliente HTTP de `http://2.25.126.53`. v1: login → Pix → extrato → comprovante. Depois: home com grade, cartões/DDA/invest simulados, `version 1.10.25` no login e no perfil. Sem empacotar `frontend/index.html`. Sem inventar endpoint. Visual Carbon Ledger (escuro).
+> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `DESKTOP.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). Scaffold Tauri 2 em `apps/desktop`. Cliente HTTP de `https://bankcore.vortexsoftware.tech` (ou `http://2.25.126.53` em lab). v1: login → Pix → extrato → comprovante. Depois: home com grade, cartões/DDA/invest simulados, `version 1.10.25` no login e no perfil. Sem empacotar `frontend/index.html`. Sem inventar endpoint. Visual Carbon Ledger (escuro).
 
 **Chat Android** (`apps/android`)
 
-> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `ANDROID.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). App Compose em `apps/android`, applicationId `br.vortex.bankcore`. Cliente da API `http://2.25.126.53`. JWT no EncryptedPrefs/Keystore. v1: login → Pix → extrato → comprovante. Home com densidade do iOS, módulos simulados com selo, `version 1.10.25`. Sem WebView da SPA. Sem inventar endpoint. Cleartext só no debug, para o IP da demo.
+> `git pull origin main`. Leia `docs/clients/PORTFOLIO.md`, `ANDROID.md`, `API.md` e `DESIGN.md`. Espelhe a UX do iOS (`apps/ios`). App Compose em `apps/android`, applicationId `br.vortex.bankcore`. Cliente da API `https://bankcore.vortexsoftware.tech` (ou `http://2.25.126.53` em lab). JWT no EncryptedPrefs/Keystore. v1: login → Pix → extrato → comprovante. Home com densidade do iOS, módulos simulados com selo, `version 1.10.25`. Sem WebView da SPA. Sem inventar endpoint. Cleartext só no debug, se usar o IP da demo.
 
 ---
 

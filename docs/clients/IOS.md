@@ -1,6 +1,6 @@
 # BankCore iOS (SwiftUI) — Mac M1 Air
 
-Construir **neste Mac**, não no Windows. O backend já está em `http://2.25.126.53`.
+Construir **neste Mac**, não no Windows. O backend já está em `https://bankcore.vortexsoftware.tech`.
 
 ## Prompt para o chat no Mac
 
@@ -17,7 +17,7 @@ cd bankcore-fintech
 ```
 
 3. Crie o projeto em `apps/ios` (Xcode → App → SwiftUI, bundle `br.vortex.bankcore`).
-4. Info.plist: HTTP permitido para `2.25.126.53` (ATS exception de laboratório).
+4. Info.plist: HTTPS para `bankcore.vortexsoftware.tech` (e exceção de laboratório para `2.25.126.53`).
 
 ## Arquitetura sugerida
 
@@ -43,7 +43,7 @@ apps/ios/BankCore/
 
 Tab bar: Início | Pix | Extrato.
 
-- Login: dois botões demo (João / Maria) + formulário.
+- Login: dois botões demo (Lucas / Maria) + formulário.
 - Início: saldo `balance_reais`, botão ouro Pix.
 - Pix: `destination_key` = CPF dígitos, valor Decimal, confirmação.
 - Extrato: `direction` DEBIT vermelho, CREDIT texto padrão.
@@ -51,7 +51,7 @@ Tab bar: Início | Pix | Extrato.
 
 ## Pronto quando
 
-- Simulador iPhone: login João, Pix R$ 1,00 para `12345678900`, aparece no extrato dos dois lados (João débito, Maria crédito se logar nela).
+- Simulador iPhone: login Lucas, Pix R$ 1,00 para `12345678900`, aparece no extrato dos dois lados (Lucas débito, Maria crédito se logar nela).
 - Sem token, a API 401 (o app nem chama sem JWT).
 - Visual Carbon Ledger, não um clone de marca de banco.
 

@@ -14,11 +14,12 @@ Web banking corporativo de **demonstração** — FastAPI, PostgreSQL, Redis e u
 
 ## Demonstração
 
-- App: [http://2.25.126.53](http://2.25.126.53)
-- Auth API: [http://2.25.126.53/auth/docs](http://2.25.126.53/auth/docs)
-- Ledger API: [http://2.25.126.53/transactions/docs](http://2.25.126.53/transactions/docs)
+- **Aplicação Web:** [https://bankcore.vortexsoftware.tech](https://bankcore.vortexsoftware.tech)
+- **Auth API (Swagger Docs):** [https://bankcore.vortexsoftware.tech/auth/docs](https://bankcore.vortexsoftware.tech/auth/docs)
+- **Ledger API (Swagger Docs):** [https://bankcore.vortexsoftware.tech/transactions/docs](https://bankcore.vortexsoftware.tech/transactions/docs)
+- **Website Institucional Vortex:** [https://vortexsoftware.tech](https://vortexsoftware.tech)
 
-Ambiente de laboratório em HTTP (IP da VPS).
+Ambiente de demonstração em HTTPS com certificado SSL (Let's Encrypt). *(Laboratório direto via IP: `http://2.25.126.53`)*
 
 ### Contas de um clique
 
@@ -141,4 +142,4 @@ docs/clients/             specs iOS (Mac), Android e Tauri
 
 ## Licença
 
-MIT © Lucas Mendes Rocha · Vortex Software
+MIT © Vortex Software Desenvolvimento de Software LTDA
