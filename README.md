@@ -142,4 +142,4 @@ docs/clients/             specs iOS (Mac), Android e Tauri
 
 ## Licença
 
-MIT © Vortex Software Desenvolvimento de Software LTDA
+MIT © Vortex Software LTDA
