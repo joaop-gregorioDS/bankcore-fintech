@@ -11,11 +11,15 @@ Gráficos, indicadores, boletas e estratégias automatizadas em uma interface al
 | Modalidade | Simulação educacional |
 | Conteúdo público | Executável e documentação |
 
+## Arquitetura e tecnologia
+
+O Investimentos Pro é um aplicativo desktop construído com **Tauri 2**, combinando um núcleo nativo em **Rust** com uma interface em **React, TypeScript e Vite**. Essa arquitetura mantém a experiência de uma aplicação web moderna em um executável leve para Windows, sem exigir Node.js ou Rust no computador do usuário.
+
 > Não conecta corretoras nem movimenta dinheiro real. Esta versão opera localmente e não compartilha autenticação, contas ou saldo com o backend bancário do BankCore.
 
 ## Download e instalação
 
-A distribuição será disponibilizada em [Releases do BankCore](https://github.com/joaop-gregorioDS/bankcore-fintech/releases), com a tag sugerida `investimentos-pro-v4.0.25`.
+Os artefatos de distribuição estão neste módulo e podem ser publicados em [Releases do BankCore](https://github.com/joaop-gregorioDS/bankcore-fintech/releases), usando a tag sugerida `investimentos-pro-v4.0.25`.
 
 1. Baixe `Investimentos-Pro-4.0.25-windows-x64.zip` e extraia seu conteúdo.
 2. Verifique se o Microsoft Edge WebView2 Runtime está instalado.

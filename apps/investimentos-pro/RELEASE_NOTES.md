@@ -2,6 +2,10 @@
 
 Simulador educacional desktop associado ao ecossistema BankCore.
 
+## Stack
+
+Tauri 2, Rust, React, TypeScript e Vite.
+
 ## Destaques
 
 - Chart Trading e menu contextual com acabamento translúcido e paleta BankCore.
