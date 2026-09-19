@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from uuid import UUID
 from app.database import get_db
+from app.config import settings
 from app.deps import get_current_user
 from app.models import Account, LedgerTransaction
 from app.schemas import AccountCreateRequest, AccountResponse, TransactionResponse
@@ -52,7 +53,11 @@ async def create_or_get_account(
     acc = Account(
         user_id=user_id,
         account_number=acc_num,
-        balance_cents=welcome_balance_cents(current_user.get("tax_id")),
+        balance_cents=(
+            welcome_balance_cents(current_user.get("tax_id"))
+            if settings.DEMO_MODE
+            else 0
+        ),
     )
     db.add(acc)
     await db.commit()

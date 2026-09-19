@@ -13,6 +13,8 @@ Web banking corporativo de **demonstração** — FastAPI, PostgreSQL, Redis e u
 
 ## Demonstração
 
+O modo de demonstração é controlado por `DEMO_MODE` e permanece desativado por padrão. Para uma execução local explicitamente demonstrativa, defina `DEMO_MODE=true` no `.env`; essa opção habilita os seeds de demonstração e o depósito de teste. Com `DEMO_MODE=false` ou sem `.env`, nenhum usuário/conta demo é criado e o endpoint de depósito demo responde **404**.
+
 - **Web:** [https://bankcore.vortexsoftware.tech](https://bankcore.vortexsoftware.tech)
 - **Institucional:** [https://vortexsoftware.tech](https://vortexsoftware.tech)
 
@@ -27,7 +29,7 @@ Clientes nativos (iOS, Android e desktop) apontam para a mesma API HTTPS.
 
 **Caminho do avaliador:** login → Pix de R$ 1,00 para o CPF da outra conta → extrato → comprovante. Também é possível abrir conta com um CPF novo e Pixar para Lucas ou Maria.
 
-Rotas financeiras exigem JWT. Sem token, `POST /accounts/` e `POST /transactions/*` respondem **401**.
+Rotas financeiras exigem JWT. Sem token, `POST /accounts/` e `POST /transactions/*` respondem **401**; o depósito de demonstração também exige `DEMO_MODE=true`.
 
 ---
 

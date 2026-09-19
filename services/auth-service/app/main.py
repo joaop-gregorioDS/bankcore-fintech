@@ -1,7 +1,9 @@
 import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.config import settings
 from app.database import engine, Base, AsyncSessionLocal
+from app.demo_mode import is_demo_mode_enabled
 from app.routes import auth
 from app.seed import seed_demo_users
 
@@ -39,8 +41,9 @@ async def startup():
         try:
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
-            async with AsyncSessionLocal() as session:
-                await seed_demo_users(session)
+            if is_demo_mode_enabled(settings.DEMO_MODE):
+                async with AsyncSessionLocal() as session:
+                    await seed_demo_users(session)
             break
         except Exception:
             await asyncio.sleep(2)
