@@ -15,6 +15,7 @@ from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 from app.services.ledger import deposit_funds, transfer_funds
 
 router = APIRouter(prefix="/transactions", tags=["Transações Financeiras"])
+PIX_DESTINATION_NOT_FOUND = "Destinatário não encontrado."
 
 
 def require_demo_deposit_mode() -> None:
@@ -62,33 +63,34 @@ async def _resolve_pix_destination(
     as_uuid = _parse_uuid_key(raw)
     if as_uuid:
         if as_uuid == SETTLEMENT_ACCOUNT_ID:
-            raise HTTPException(status_code=400, detail="Chave Pix inválida.")
+            raise HTTPException(status_code=404, detail=PIX_DESTINATION_NOT_FOUND)
         result = await db.execute(select(Account).where(Account.id == as_uuid))
         acc = result.scalars().first()
         if not acc or is_settlement(acc):
-            raise HTTPException(status_code=404, detail="Chave Pix não encontrada no banco.")
+            raise HTTPException(status_code=404, detail=PIX_DESTINATION_NOT_FOUND)
         return acc.id
 
     tax_id = "".join(ch for ch in raw if ch.isdigit())
-    if len(tax_id) < 11:
-        raise HTTPException(status_code=400, detail="Informe um CPF/CNPJ ou a chave da conta.")
+    if len(tax_id) not in (11, 14):
+        raise HTTPException(status_code=404, detail=PIX_DESTINATION_NOT_FOUND)
 
     try:
         service_token = await get_internal_service_token()
         async with httpx.AsyncClient(timeout=10.0) as client:
-            res = await client.get(
-                f"{settings.AUTH_SERVICE_URL}/auth/directory/{tax_id}",
+            res = await client.post(
+                f"{settings.AUTH_SERVICE_URL}/auth/internal/pix/resolve",
                 headers={"Authorization": f"Bearer {service_token}"},
+                json={"pix_key": tax_id},
             )
     except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=f"Falha ao consultar diretório Pix: {exc}") from exc
+        raise HTTPException(status_code=502, detail="Diretório Pix indisponível.") from exc
 
     if res.status_code == 404:
-        raise HTTPException(status_code=404, detail="Chave Pix (CPF) não encontrada no banco.")
+        raise HTTPException(status_code=404, detail=PIX_DESTINATION_NOT_FOUND)
     if res.status_code != 200:
         raise HTTPException(status_code=502, detail="Diretório Pix indisponível.")
 
-    dest_user_id = UUID(res.json()["user_id"])
+    dest_user_id = UUID(res.json()["destination_user_id"])
     q = select(Account).where(
         Account.user_id == dest_user_id,
         Account.id != SETTLEMENT_ACCOUNT_ID,
@@ -96,7 +98,7 @@ async def _resolve_pix_destination(
     r = await db.execute(q)
     acc = r.scalars().first()
     if not acc:
-        raise HTTPException(status_code=404, detail="Destinatário ainda não possui conta corrente.")
+        raise HTTPException(status_code=404, detail=PIX_DESTINATION_NOT_FOUND)
     return acc.id
 
 
