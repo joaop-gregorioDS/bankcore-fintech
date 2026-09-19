@@ -76,6 +76,16 @@ Segredos e material criptográfico ficam fora do Git: o segredo de bootstrap e d
 
 O `docker-compose.yml` é production-like por padrão: executa os serviços de aplicação como non-root, sem `--reload`, com rede interna e apenas o Nginx publicado.
 
+O schema não é criado pela aplicação. Execute as migrations explicitamente antes de subir os serviços:
+
+```bash
+docker compose --profile migration run --rm migrate-auth
+docker compose --profile migration run --rm migrate-transactions
+docker compose up -d --wait
+```
+
+Auth e Transactions possuem históricos Alembic independentes. O runner classifica o banco vazio, legado pré-P0 ou compatível pós-P0; schemas desconhecidos abortam sem alteração.
+
 Para desenvolvimento com hot reload, use explicitamente o override:
 
 ```bash

@@ -123,7 +123,9 @@ class AuthenticationHardeningTests(unittest.TestCase):
                 self.assert_unauthorized(self.raw_token(self.claims(**case[1]), kid=kid))
 
         token = self.raw_token()
-        tampered = f"{token[:-1]}{'A' if token[-1] != 'A' else 'B'}"
+        header, payload, signature = token.split(".")
+        replacement = "A" if signature[0] != "A" else "B"
+        tampered = ".".join((header, payload, replacement + signature[1:]))
         self.assert_unauthorized(tampered)
         self.assert_unauthorized(self.raw_token(algorithm="HS256", key="wrong-secret"))
 

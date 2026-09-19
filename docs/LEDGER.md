@@ -23,7 +23,7 @@ Cada depósito ou Pix grava duas linhas em `ledger_entries` (DEBIT + CREDIT) com
 4. Replay idêntico retorna a transação original; payload divergente responde `409 Conflict`.
 5. Falhas fazem rollback do registro e não deixam transação fantasma.
 
-A migração inicial está em `infra/postgres/migrations/001_idempotency_ownership.sql`.
+As migrations versionadas ficam em `infra/postgres/alembic/transactions/`.
 
 ## Autenticação
 

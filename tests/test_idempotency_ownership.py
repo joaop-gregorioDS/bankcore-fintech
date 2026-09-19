@@ -64,12 +64,12 @@ class IdempotencyOwnershipTests(unittest.TestCase):
     def test_server_owns_scope_and_database_defines_unique_boundary(self):
         route_source = (APP / "routes/transactions.py").read_text(encoding="utf-8")
         model_source = (APP / "models.py").read_text(encoding="utf-8")
-        migration_source = (ROOT / "infra/postgres/migrations/001_idempotency_ownership.sql").read_text(encoding="utf-8")
+        migration_source = (ROOT / "infra/postgres/alembic/transactions/versions/tx_002_idempotency_ownership.py").read_text(encoding="utf-8")
 
         self.assertIn('user_id = UUID(current_user["sub"])', route_source)
         self.assertIn("user_id=user_id", route_source)
         self.assertIn('UniqueConstraint(\n            "user_id",\n            "account_id",\n            "operation_type",\n            "idempotency_key"', model_source)
-        self.assertIn("user_id, account_id, operation_type, idempotency_key", migration_source)
+        self.assertIn("uq_idempotency_scope", migration_source)
 
     def test_ledger_uses_idempotency_record_and_fingerprint(self):
         ledger_source = (APP / "services/ledger.py").read_text(encoding="utf-8")
