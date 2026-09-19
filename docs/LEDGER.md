@@ -33,4 +33,4 @@ Fatura de cartão, DDA, boleto, CDB e empréstimo não liquidam no razão. São 
 
 ## Centavos
 
-Valores em `BIGINT`. A API expõe `amount_reais` apenas na borda (`/ 100.0`).
+Valores persistidos em `BIGINT` de centavos. Requests monetários entram como `Decimal`, aceitam no máximo duas casas decimais e são convertidos explicitamente para centavos na borda; o ledger opera somente com inteiros. Respostas mantêm o número JSON legado para compatibilidade dos clientes, com conversão explícita apenas na saída HTTP.

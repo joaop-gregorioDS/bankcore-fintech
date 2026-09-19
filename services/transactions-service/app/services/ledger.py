@@ -11,6 +11,11 @@ DEBIT = "DEBIT"
 CREDIT = "CREDIT"
 
 
+def _validate_amount_cents(amount_cents: int) -> None:
+    if isinstance(amount_cents, bool) or not isinstance(amount_cents, int):
+        raise HTTPException(status_code=400, detail="Valor deve ser informado em centavos inteiros.")
+
+
 def _balanced(entries: list[tuple[Account, str, int]]) -> None:
     total_debit = sum(amount for _, side, amount in entries if side == DEBIT)
     total_credit = sum(amount for _, side, amount in entries if side == CREDIT)
@@ -90,6 +95,7 @@ async def deposit_funds(
     description: str | None = None,
     redis=None,
 ) -> LedgerTransaction:
+    _validate_amount_cents(amount_cents)
     if amount_cents <= 0:
         raise HTTPException(status_code=400, detail="Valor do depósito deve ser positivo.")
 
@@ -150,6 +156,7 @@ async def transfer_funds(
     description: str | None = None,
     redis=None,
 ) -> LedgerTransaction:
+    _validate_amount_cents(amount_cents)
     if amount_cents <= 0:
         raise HTTPException(status_code=400, detail="Valor da transferência deve ser positivo.")
     if source_account_id == destination_account_id:
