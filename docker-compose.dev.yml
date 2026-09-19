@@ -1,0 +1,10 @@
+services:
+  auth-service:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    volumes:
+      - ./services/auth-service/app:/app/app:ro
+
+  transactions-service:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+    volumes:
+      - ./services/transactions-service/app:/app/app:ro

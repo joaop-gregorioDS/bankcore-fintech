@@ -4,8 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from uuid import UUID
 from app.database import get_db
+from app.config import settings
 from app.deps import get_current_user
 from app.models import Account, LedgerTransaction
+from app.money import cents_to_reais
 from app.schemas import AccountCreateRequest, AccountResponse, TransactionResponse
 from app.seed import SETTLEMENT_ACCOUNT_ID, welcome_balance_cents, is_settlement
 
@@ -17,7 +19,7 @@ def _to_response(acc: Account) -> AccountResponse:
         id=acc.id,
         user_id=acc.user_id,
         account_number=acc.account_number,
-        balance_reais=acc.balance_cents / 100.0,
+        balance_reais=float(cents_to_reais(acc.balance_cents)),
         is_active=acc.is_active,
     )
 
@@ -52,7 +54,11 @@ async def create_or_get_account(
     acc = Account(
         user_id=user_id,
         account_number=acc_num,
-        balance_cents=welcome_balance_cents(current_user.get("tax_id")),
+        balance_cents=(
+            welcome_balance_cents(current_user.get("tax_id"))
+            if settings.DEMO_MODE
+            else 0
+        ),
     )
     db.add(acc)
     await db.commit()
@@ -99,7 +105,7 @@ async def get_statement(
             idempotency_key=tx.idempotency_key,
             source_account_id=tx.source_account_id,
             destination_account_id=tx.destination_account_id,
-            amount_reais=tx.amount_cents / 100.0,
+            amount_reais=float(cents_to_reais(tx.amount_cents)),
             transaction_type=tx.transaction_type,
             direction="CREDIT" if is_credit else "DEBIT",
             status=tx.status,

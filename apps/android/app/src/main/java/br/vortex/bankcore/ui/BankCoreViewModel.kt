@@ -7,7 +7,6 @@ import br.vortex.bankcore.data.Account
 import br.vortex.bankcore.data.ApiConfig
 import br.vortex.bankcore.data.ApiException
 import br.vortex.bankcore.data.BankCoreApi
-import br.vortex.bankcore.data.DirectoryEntry
 import br.vortex.bankcore.data.Jwt
 import br.vortex.bankcore.data.LedgerTransaction
 import br.vortex.bankcore.data.MockCatalog
@@ -222,12 +221,6 @@ class BankCoreViewModel(application: Application) : AndroidViewModel(application
         } catch (e: Exception) {
             _state.update { it.copy(errorMessage = e.message ?: e.toString()) }
         }
-    }
-
-    suspend fun lookupPix(taxId: String): DirectoryEntry {
-        val session = _state.value.session
-            ?: throw ApiException(401, "Token de acesso ausente.")
-        return withContext(Dispatchers.IO) { api.directory(taxId, session.token) }
     }
 
     suspend fun sendPix(destinationKey: String, amountReais: Double, description: String): LedgerTransaction {

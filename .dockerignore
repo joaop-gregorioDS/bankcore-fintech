@@ -1,0 +1,12 @@
+.git
+.github
+.codex
+apps
+frontend
+docs
+work
+**/__pycache__
+**/*.pyc
+.env
+.env.*
+secrets

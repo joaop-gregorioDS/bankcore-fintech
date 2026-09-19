@@ -34,10 +34,6 @@ struct BankCoreAPI {
         try await get("/auth/me", token: token)
     }
 
-    func directory(taxId: String, token: String) async throws -> DirectoryEntry {
-        try await get("/auth/directory/\(TaxID.digits(taxId))", token: token)
-    }
-
     func createOrGetAccount(userId: UUID, token: String) async throws -> Account {
         try await post("/accounts/", body: ["user_id": userId.uuidString], token: token)
     }
@@ -120,7 +116,6 @@ struct BankCoreAPI {
         path.hasPrefix("/accounts")
             || path.hasPrefix("/transactions")
             || path.hasPrefix("/auth/me")
-            || path.hasPrefix("/auth/directory")
     }
 
     static func parseDetail(_ data: Data) -> String? {

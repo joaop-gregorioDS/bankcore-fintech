@@ -17,15 +17,19 @@ Cada depósito ou Pix grava duas linhas em `ledger_entries` (DEBIT + CREDIT) com
 
 ## Idempotência
 
-1. Redis `SET idem:{key} NX EX 86400`
-2. Unique em `ledger_transactions.idempotency_key`
-3. Se a operação falha, a chave Redis é liberada para retry
+1. `idempotency_records` vincula usuário, conta, operação e chave com unique composto.
+2. O fingerprint SHA-256 cobre o contexto servidor e os campos relevantes do payload.
+3. `PROCESSING` e `COMPLETED` são confirmados na mesma transação Postgres do ledger.
+4. Replay idêntico retorna a transação original; payload divergente responde `409 Conflict`.
+5. Falhas fazem rollback do registro e não deixam transação fantasma.
+
+As migrations versionadas ficam em `infra/postgres/alembic/transactions/`.
 
 ## Autenticação
 
-- Auth emite JWT HS256 (`sub`, `tax_id`, `name`, `exp`).
-- O serviço de transações valida o mesmo segredo. Sem Bearer → 401.
-- Pix resolve CPF no diretório com o JWT do **remetente**. Não há login com a senha do destino.
+- Auth emite JWT RS256 com `kid`, `sub`, `iss`, `aud`, `iat`, `nbf`, `exp` e `jti`.
+- O serviço de transações valida com chaves públicas rotacionáveis; a chave privada não sai do Auth. Sem Bearer → 401.
+- Pix resolve uma chave exata no diretório interno com um token de serviço e recebe somente o identificador do destinatário. A chave vai no corpo da requisição, não na URL. O JWT do correntista não é reutilizado entre serviços.
 
 ## Fora do ledger
 
@@ -33,4 +37,4 @@ Fatura de cartão, DDA, boleto, CDB e empréstimo não liquidam no razão. São 
 
 ## Centavos
 
-Valores em `BIGINT`. A API expõe `amount_reais` apenas na borda (`/ 100.0`).
+Valores persistidos em `BIGINT` de centavos. Requests monetários entram como `Decimal`, aceitam no máximo duas casas decimais e respeitam o teto de negócio de `R$ 999.999.999.999,99`, muito abaixo do limite de `BIGINT`. A conversão para centavos é explícita na borda; o ledger opera somente com inteiros. Respostas mantêm o número JSON legado para compatibilidade dos clientes, com conversão explícita apenas na saída HTTP.

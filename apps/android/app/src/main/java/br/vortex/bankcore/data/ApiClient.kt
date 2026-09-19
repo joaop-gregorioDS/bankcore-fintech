@@ -61,9 +61,6 @@ class BankCoreApi(
 
     fun me(token: String): UserProfile = get("/auth/me", token)
 
-    fun directory(taxId: String, token: String): DirectoryEntry =
-        get("/auth/directory/${TaxId.digits(taxId)}", token)
-
     fun createOrGetAccount(userId: String, token: String): Account =
         post("/accounts/", mapOf("user_id" to userId), token)
 
@@ -155,8 +152,7 @@ class BankCoreApi(
     private fun needsAuth(path: String): Boolean =
         path.startsWith("/accounts") ||
             path.startsWith("/transactions") ||
-            path.startsWith("/auth/me") ||
-            path.startsWith("/auth/directory")
+            path.startsWith("/auth/me")
 
     private fun parseDetail(raw: String): String? {
         return try {
