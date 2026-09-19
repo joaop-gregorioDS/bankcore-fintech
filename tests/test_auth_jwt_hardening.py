@@ -13,17 +13,17 @@ try:
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import rsa
     from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
-    from jose import jwt as jose_jwt
+    import jwt as pyjwt
 except ImportError:  # pragma: no cover - the service requirements provide these packages.
     rsa = None
-    jose_jwt = None
+    pyjwt = None
 
 
 ROOT = Path(__file__).resolve().parents[1]
 AUTH_ROOT = ROOT / "services/auth-service"
 
 
-@unittest.skipUnless(jose_jwt and rsa, "requires auth service crypto dependencies")
+@unittest.skipUnless(pyjwt and rsa, "requires auth service crypto dependencies")
 class AuthenticationHardeningTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -87,7 +87,7 @@ class AuthenticationHardeningTests(unittest.TestCase):
     def raw_token(self, payload=None, *, kid="key-a", algorithm="RS256", key=None):
         if key is None:
             key = self.private_path.read_bytes()
-        return jose_jwt.encode(
+        return pyjwt.encode(
             payload or self.claims(),
             key,
             algorithm=algorithm,
@@ -101,7 +101,7 @@ class AuthenticationHardeningTests(unittest.TestCase):
 
     def test_access_token_contains_required_claims_and_kid(self):
         token = self.security.create_access_token({"sub": "user-1", "tax_id": "123"})
-        header = jose_jwt.get_unverified_header(token)
+        header = pyjwt.get_unverified_header(token)
         payload = self.security.decode_access_token(token)
         self.assertEqual(header["alg"], "RS256")
         self.assertEqual(header["kid"], "key-a")

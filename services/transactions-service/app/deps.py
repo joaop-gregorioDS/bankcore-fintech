@@ -4,7 +4,7 @@ from pathlib import Path
 from uuid import UUID
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jwt import PyJWTError, decode, get_unverified_header
 from app.config import settings
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -27,14 +27,14 @@ def get_current_user(creds: HTTPAuthorizationCredentials = Depends(bearer_scheme
             detail="Token de acesso ausente.",
         )
     try:
-        header = jwt.get_unverified_header(creds.credentials)
+        header = get_unverified_header(creds.credentials)
         if header.get("alg") != settings.JWT_ALGORITHM or not header.get("kid"):
-            raise JWTError("unexpected jwt header")
+            raise PyJWTError("unexpected jwt header")
         kid = header["kid"]
         if not re.fullmatch(r"[A-Za-z0-9._-]+", kid):
-            raise JWTError("invalid kid")
+            raise PyJWTError("invalid kid")
         public_key = (Path(settings.JWT_PUBLIC_KEYS_DIR) / f"{kid}.pem").read_text(encoding="utf-8")
-        payload = jwt.decode(
+        payload = decode(
             creds.credentials,
             public_key,
             algorithms=[settings.JWT_ALGORITHM],
@@ -43,13 +43,13 @@ def get_current_user(creds: HTTPAuthorizationCredentials = Depends(bearer_scheme
         )
         required = ("sub", "iss", "aud", "iat", "nbf", "exp", "jti")
         if any(payload.get(claim) in (None, "") for claim in required):
-            raise JWTError("missing required claim")
+            raise PyJWTError("missing required claim")
         if any(isinstance(payload[claim], bool) or not isinstance(payload[claim], int) for claim in ("iat", "nbf", "exp")):
-            raise JWTError("invalid temporal claim")
+            raise PyJWTError("invalid temporal claim")
         now = int(datetime.now(timezone.utc).timestamp())
         if payload["iat"] > now or payload["nbf"] > now or payload["exp"] <= now:
-            raise JWTError("token outside validity window")
-    except (JWTError, OSError, UnicodeError, KeyError, TypeError, ValueError):
+            raise PyJWTError("token outside validity window")
+    except (PyJWTError, OSError, UnicodeError, KeyError, TypeError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido ou expirado.",

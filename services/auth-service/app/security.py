@@ -7,7 +7,7 @@ from uuid import uuid4
 from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
-from jose import JWTError, jwt
+from jwt import PyJWTError, decode, encode, get_unverified_header
 from app.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -55,7 +55,7 @@ def _encode_token(data: dict, *, audience: str, expires_in: int, scope: str | No
             payload[key] = data[key]
     if scope:
         payload["scope"] = scope
-    return jwt.encode(
+    return encode(
         payload,
         _load_private_key(),
         algorithm=settings.JWT_ALGORITHM,
@@ -83,15 +83,15 @@ def create_internal_service_token(service_name: str) -> str:
 def validate_key_material() -> None:
     private_key = _load_private_key()
     public_key = _load_public_key(settings.JWT_ACTIVE_KID)
-    probe = jwt.encode(
+    probe = encode(
         {"probe": str(uuid4())},
         private_key,
         algorithm=settings.JWT_ALGORITHM,
         headers={"kid": settings.JWT_ACTIVE_KID},
     )
     try:
-        jwt.decode(probe, public_key, algorithms=[settings.JWT_ALGORITHM])
-    except JWTError as exc:
+        decode(probe, public_key, algorithms=[settings.JWT_ALGORITHM])
+    except PyJWTError as exc:
         raise RuntimeError("JWT private/public key pair is invalid.") from exc
 
 
@@ -110,10 +110,10 @@ def _validate_claims(payload: dict, *, audience: str) -> None:
 
 def decode_token(token: str, *, audience: str, required_scope: str | None = None) -> dict:
     try:
-        header = jwt.get_unverified_header(token)
+        header = get_unverified_header(token)
         if header.get("alg") != settings.JWT_ALGORITHM or not header.get("kid"):
             raise _unauthorized("Token com algoritmo ou chave inválidos.")
-        payload = jwt.decode(
+        payload = decode(
             token,
             _load_public_key(header["kid"]),
             algorithms=[settings.JWT_ALGORITHM],
@@ -126,7 +126,7 @@ def decode_token(token: str, *, audience: str, required_scope: str | None = None
         return payload
     except HTTPException:
         raise
-    except (JWTError, KeyError, TypeError, ValueError):
+    except (PyJWTError, KeyError, TypeError, ValueError):
         raise _unauthorized()
 
 def decode_access_token(token: str) -> dict:
