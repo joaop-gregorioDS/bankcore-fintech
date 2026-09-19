@@ -1,6 +1,7 @@
 import asyncio
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from app.config import settings
 from app.database import engine, Base, AsyncSessionLocal, init_redis, close_redis
 from app.demo_mode import is_demo_mode_enabled
@@ -58,6 +59,16 @@ async def shutdown():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "bankcore-transactions-service"}
+
+
+@app.get("/readiness")
+async def readiness_check():
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Banco de dados indisponível.") from exc
+    return {"status": "ready", "service": "bankcore-transactions-service"}
 
 app.include_router(accounts.router)
 app.include_router(transactions.router)

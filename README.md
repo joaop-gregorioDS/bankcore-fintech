@@ -52,7 +52,7 @@ Implementação em `services/transactions-service/app/services/ledger.py`. Detal
 - Cada Pix ou depósito gera um par DEBIT + CREDIT no mesmo `COMMIT`.
 - Saldo em cache na conta; a trilha auditável é o razão.
 - `SELECT … FOR UPDATE` nas contas, ordenadas por UUID.
-- Idempotência: Redis `NX` + unique no Postgres.
+- Idempotência: registro escopado, fingerprint determinístico e constraint única no Postgres.
 
 ---
 
@@ -68,9 +68,19 @@ services/transactions-service  contas, Pix, extrato, partidas dobradas
 infra/nginx                 gateway
 ```
 
-Stack: Python 3.12 · FastAPI · SQLAlchemy 2 · PostgreSQL 16 · Redis 7 · Nginx.
+Stack: Python 3.12.8 · FastAPI · SQLAlchemy 2.0.35 · PostgreSQL 16.4 · Redis 7.4.1 · Nginx unprivileged 1.27.1.
 
 Segredos ficam no `.env` (não versionado).
+
+### Runtime local
+
+O `docker-compose.yml` é production-like por padrão: executa os serviços de aplicação como non-root, sem `--reload`, com rede interna e apenas o Nginx publicado.
+
+Para desenvolvimento com hot reload, use explicitamente o override:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
 
 ---
 
