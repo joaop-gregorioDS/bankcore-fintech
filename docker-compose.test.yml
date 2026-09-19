@@ -1,0 +1,77 @@
+services:
+  postgres-test:
+    image: postgres:16.4-alpine3.20
+    environment:
+      POSTGRES_USER: ${TEST_POSTGRES_USER:-bankadmin}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD:?set TEST_POSTGRES_PASSWORD}
+      POSTGRES_DB: bankcore_test_auth
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/test-init.sql:/docker-entrypoint-initdb.d/test-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    networks:
+      - bankcore_test_net
+
+  migrate-auth-test:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_auth
+      REDIS_URL: redis://unused
+      JWT_ACTIVE_KID: test-runner
+      AUTH_SERVICE_TOKEN: test-runner
+      BANKCORE_TESTING: "true"
+    command: ["python", "/app/migrate.py", "--service", "auth"]
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    networks:
+      - bankcore_test_net
+
+  migrate-transactions-test:
+    build:
+      context: .
+      dockerfile: services/transactions-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
+      REDIS_URL: redis://unused
+      JWT_ACTIVE_KID: test-runner
+      AUTH_SERVICE_TOKEN: test-runner
+      BANKCORE_TESTING: "true"
+    command: ["python", "/app/migrate.py", "--service", "transactions"]
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    networks:
+      - bankcore_test_net
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    environment:
+      BANKCORE_TESTING: "true"
+      TEST_SUITE: ${TEST_SUITE:-all}
+      TEST_FORCE_FAILURE: ${TEST_FORCE_FAILURE:-false}
+      BANKCORE_TEST_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
+      REDIS_URL: redis://unused
+      JWT_ACTIVE_KID: test-runner
+      AUTH_SERVICE_TOKEN: test-runner
+    depends_on:
+      migrate-auth-test:
+        condition: service_completed_successfully
+      migrate-transactions-test:
+        condition: service_completed_successfully
+    networks:
+      - bankcore_test_net
+
+volumes:
+  test_postgres_data:
+
+networks:
+  bankcore_test_net:

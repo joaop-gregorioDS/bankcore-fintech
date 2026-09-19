@@ -3,7 +3,6 @@
 .codex
 apps
 frontend
-tests
 docs
 work
 **/__pycache__
