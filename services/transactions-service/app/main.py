@@ -6,6 +6,7 @@ from app.config import settings
 from app.database import engine, Base, AsyncSessionLocal, init_redis, close_redis
 from app.demo_mode import is_demo_mode_enabled
 from app.routes import accounts, transactions
+from app.deps import validate_public_key_material
 from app.seed import seed_demo_accounts
 
 ALLOWED_ORIGINS = [
@@ -38,6 +39,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
+    validate_public_key_material()
     await init_redis()
     for _ in range(10):
         try:

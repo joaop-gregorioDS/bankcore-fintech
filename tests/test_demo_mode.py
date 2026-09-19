@@ -22,7 +22,8 @@ class DemoModePolicyTests(unittest.TestCase):
         base_env = {
             "DATABASE_URL": "postgresql+asyncpg://test",
             "REDIS_URL": "redis://test",
-            "JWT_SECRET_KEY": "test-only",
+            "JWT_ACTIVE_KID": "test-key",
+            "AUTH_SERVICE_TOKEN": "test-service-token",
         }
         with patch.dict(os.environ, base_env, clear=False):
             os.environ.pop("DEMO_MODE", None)

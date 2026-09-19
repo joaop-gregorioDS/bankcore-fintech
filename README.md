@@ -70,7 +70,7 @@ infra/nginx                 gateway
 
 Stack: Python 3.12.8 · FastAPI · SQLAlchemy 2.0.35 · PostgreSQL 16.4 · Redis 7.4.1 · Nginx unprivileged 1.27.1.
 
-Segredos ficam no `.env` (não versionado).
+Segredos e material criptográfico ficam fora do Git: o segredo de bootstrap e demais configurações sensíveis ficam no `.env` (não versionado), enquanto a chave privada JWT e o diretório de chaves públicas usam os caminhos configurados por `JWT_PRIVATE_KEY_FILE` e `JWT_PUBLIC_KEYS_HOST_DIR`. O Auth assina com a chave privada; os demais serviços recebem somente chaves públicas.
 
 ### Runtime local
 

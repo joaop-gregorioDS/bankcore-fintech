@@ -54,10 +54,19 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_auth
       REDIS_URL: redis://redis:6379/0
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env}
-      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-RS256}
+      JWT_ISSUER: ${JWT_ISSUER:-bankcore-auth}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-bankcore-api}
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
+      JWT_PRIVATE_KEY_PATH: /run/secrets/jwt-private.pem
+      JWT_PUBLIC_KEYS_DIR: /run/secrets/jwt-public
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      INTERNAL_TOKEN_EXPIRE_SECONDS: ${INTERNAL_TOKEN_EXPIRE_SECONDS:-60}
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
       DEMO_MODE: ${DEMO_MODE:-false}
+    volumes:
+      - ${JWT_PRIVATE_KEY_FILE:-./secrets/jwt-private.pem}:/run/secrets/jwt-private.pem:ro
+      - ${JWT_PUBLIC_KEYS_HOST_DIR:-./secrets/jwt-public}:/run/secrets/jwt-public:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -78,10 +87,16 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
       REDIS_URL: redis://redis:6379/0
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env}
-      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-RS256}
+      JWT_ISSUER: ${JWT_ISSUER:-bankcore-auth}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-bankcore-api}
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
+      JWT_PUBLIC_KEYS_DIR: /run/secrets/jwt-public
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:8000}
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
       DEMO_MODE: ${DEMO_MODE:-false}
+    volumes:
+      - ${JWT_PUBLIC_KEYS_HOST_DIR:-./secrets/jwt-public}:/run/secrets/jwt-public:ro
     depends_on:
       postgres:
         condition: service_healthy

@@ -27,9 +27,9 @@ A migração inicial está em `infra/postgres/migrations/001_idempotency_ownersh
 
 ## Autenticação
 
-- Auth emite JWT HS256 (`sub`, `tax_id`, `name`, `exp`).
-- O serviço de transações valida o mesmo segredo. Sem Bearer → 401.
-- Pix resolve CPF no diretório com o JWT do **remetente**. Não há login com a senha do destino.
+- Auth emite JWT RS256 com `kid`, `sub`, `iss`, `aud`, `iat`, `nbf`, `exp` e `jti`.
+- O serviço de transações valida com chaves públicas rotacionáveis; a chave privada não sai do Auth. Sem Bearer → 401.
+- Pix resolve CPF no diretório com um token interno de serviço. O JWT do correntista não é reutilizado entre serviços.
 
 ## Fora do ledger
 

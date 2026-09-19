@@ -12,7 +12,15 @@ from app.schemas import (
     UserResponse,
     DirectoryLookupResponse,
 )
-from app.security import hash_password, verify_password, create_access_token, get_current_user
+from app.security import (
+    create_access_token,
+    create_internal_service_token,
+    get_current_user,
+    hash_password,
+    require_internal_service,
+    validate_internal_service_secret,
+    verify_password,
+)
 from app.seed import normalize_tax_id
 from app.limiter import assert_login_allowed, clear_login_failures
 
@@ -61,6 +69,14 @@ async def login(payload: UserLoginRequest, db: AsyncSession = Depends(get_db)):
     )
 
 
+@router.post("/internal-token", response_model=TokenResponse, include_in_schema=False)
+async def internal_token(_: None = Depends(validate_internal_service_secret)):
+    return TokenResponse(
+        access_token=create_internal_service_token("transactions"),
+        expires_in=settings.INTERNAL_TOKEN_EXPIRE_SECONDS,
+    )
+
+
 @router.get("/me", response_model=UserResponse)
 async def me(current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     query = select(User).where(User.id == UUID(current_user["sub"]))
@@ -74,7 +90,7 @@ async def me(current_user: dict = Depends(get_current_user), db: AsyncSession = 
 @router.get("/directory/{tax_id}", response_model=DirectoryLookupResponse)
 async def lookup_directory(
     tax_id: str,
-    current_user: dict = Depends(get_current_user),
+    service: dict = Depends(require_internal_service),
     db: AsyncSession = Depends(get_db),
 ):
     normalized = normalize_tax_id(tax_id)
