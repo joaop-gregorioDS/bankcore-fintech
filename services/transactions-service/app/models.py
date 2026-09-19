@@ -1,7 +1,7 @@
 import uuid
 import enum
 from datetime import datetime
-from sqlalchemy import Column, String, BigInteger, Boolean, DateTime, ForeignKey, Index
+from sqlalchemy import Column, String, BigInteger, Boolean, DateTime, ForeignKey, Index, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from app.database import Base
 
@@ -29,7 +29,7 @@ class LedgerTransaction(Base):
     __tablename__ = "ledger_transactions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    idempotency_key = Column(String(100), unique=True, nullable=False, index=True)
+    idempotency_key = Column(String(100), nullable=False, index=True)
     source_account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=True)
     destination_account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=True)
     amount_cents = Column(BigInteger, nullable=False)
@@ -40,6 +40,31 @@ class LedgerTransaction(Base):
 
     __table_args__ = (
         Index("idx_ledger_accounts", "source_account_id", "destination_account_id"),
+    )
+
+
+class IdempotencyRecord(Base):
+    __tablename__ = "idempotency_records"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    idempotency_key = Column(String(100), nullable=False)
+    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    account_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    operation_type = Column(String(20), nullable=False)
+    request_fingerprint = Column(String(64), nullable=False)
+    transaction_id = Column(UUID(as_uuid=True), ForeignKey("ledger_transactions.id"), nullable=True)
+    status = Column(String(20), nullable=False, default="PROCESSING")
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "account_id",
+            "operation_type",
+            "idempotency_key",
+            name="uq_idempotency_scope",
+        ),
+        Index("idx_idempotency_transaction", "transaction_id"),
     )
 
 class LedgerEntry(Base):

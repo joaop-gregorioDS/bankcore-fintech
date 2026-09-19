@@ -1,5 +1,5 @@
 from decimal import Decimal
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
 from pydantic import condecimal
@@ -12,6 +12,7 @@ MoneyReais = condecimal(
     decimal_places=2,
     allow_inf_nan=False,
 )
+IdempotencyKey = str
 
 class AccountCreateRequest(BaseModel):
     user_id: UUID
@@ -27,20 +28,20 @@ class AccountResponse(BaseModel):
 class DepositRequest(BaseModel):
     account_id: UUID
     amount_reais: MoneyReais
-    idempotency_key: str
+    idempotency_key: IdempotencyKey = Field(..., min_length=1, max_length=100)
 
 class TransferRequest(BaseModel):
     source_account_id: UUID
     destination_account_id: UUID
     amount_reais: MoneyReais
-    idempotency_key: str
+    idempotency_key: IdempotencyKey = Field(..., min_length=1, max_length=100)
     description: str | None = None
 
 class PixTransferRequest(BaseModel):
     source_account_id: UUID
     destination_key: str
     amount_reais: MoneyReais
-    idempotency_key: str
+    idempotency_key: IdempotencyKey = Field(..., min_length=1, max_length=100)
     description: str | None = None
 
 class TransactionResponse(BaseModel):
