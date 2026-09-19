@@ -127,6 +127,13 @@ class AuthenticationHardeningTests(unittest.TestCase):
         self.assert_unauthorized(tampered)
         self.assert_unauthorized(self.raw_token(algorithm="HS256", key="wrong-secret"))
 
+    def test_each_required_claim_is_enforced(self):
+        for claim in ("sub", "iss", "aud", "iat", "nbf", "exp", "jti"):
+            with self.subTest(claim=claim):
+                payload = self.claims()
+                payload.pop(claim)
+                self.assert_unauthorized(self.raw_token(payload))
+
     def test_rotation_keeps_previous_key_until_removed(self):
         token_a = self.raw_token()
         private_b = self.write_key("key-b")
@@ -147,6 +154,13 @@ class AuthenticationHardeningTests(unittest.TestCase):
         )
         self.assertEqual(payload["scope"], "service:transactions")
         self.assert_unauthorized(token)
+        with self.assertRaises(HTTPException) as context:
+            self.security.decode_token(
+                self.security.create_access_token({"sub": "user-1"}),
+                audience="bankcore-internal",
+                required_scope="service:transactions",
+            )
+        self.assertEqual(context.exception.status_code, 401)
 
     def test_local_rate_limit_is_used_when_redis_is_unavailable(self):
         limiter = importlib.import_module("app.limiter")
