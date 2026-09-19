@@ -24,23 +24,34 @@ class PostgresIdempotencyIntegrationTests(unittest.IsolatedAsyncioTestCase):
         os.environ.setdefault("REDIS_URL", "redis://unused")
         os.environ.setdefault("JWT_SECRET_KEY", "integration-test-only")
 
-        from app.database import AsyncSessionLocal, Base, engine
+        from app.database import Base
         from app.idempotency import build_request_fingerprint
         from app.models import IdempotencyRecord, LedgerTransaction
         from app.services.ledger import _claim_idempotency, _complete_idempotency
+        from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-        cls.AsyncSessionLocal = AsyncSessionLocal
         cls.Base = Base
-        cls.engine = engine
-        cls.build_request_fingerprint = build_request_fingerprint
+        cls.build_request_fingerprint = staticmethod(build_request_fingerprint)
+        cls.async_sessionmaker = staticmethod(async_sessionmaker)
+        cls.create_async_engine = staticmethod(create_async_engine)
+        cls.AsyncSession = AsyncSession
         cls.IdempotencyRecord = IdempotencyRecord
         cls.LedgerTransaction = LedgerTransaction
-        cls.claim = _claim_idempotency
-        cls.complete = _complete_idempotency
+        cls.claim = staticmethod(_claim_idempotency)
+        cls.complete = staticmethod(_complete_idempotency)
 
     async def asyncSetUp(self):
+        self.engine = self.create_async_engine(TEST_DATABASE_URL, echo=False)
+        self.AsyncSessionLocal = self.async_sessionmaker(
+            self.engine,
+            class_=self.AsyncSession,
+            expire_on_commit=False,
+        )
         async with self.engine.begin() as connection:
             await connection.run_sync(self.Base.metadata.create_all)
+
+    async def asyncTearDown(self):
+        await self.engine.dispose()
 
     def scope(self, *, user_id=None, account_id=None, operation_type="TRANSFER", key=None):
         return {
@@ -165,11 +176,6 @@ class PostgresIdempotencyIntegrationTests(unittest.IsolatedAsyncioTestCase):
             await first.close()
             await second.close()
         self.assertIsNone(first_result[0])
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.engine.sync_engine.dispose()
-
 
 if __name__ == "__main__":
     unittest.main()
