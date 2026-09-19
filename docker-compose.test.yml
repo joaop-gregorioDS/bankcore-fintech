@@ -58,6 +58,7 @@ services:
       BANKCORE_TESTING: "true"
       TEST_SUITE: ${TEST_SUITE:-all}
       TEST_FORCE_FAILURE: ${TEST_FORCE_FAILURE:-false}
+      TEST_VALIDATE_MIGRATIONS: ${TEST_VALIDATE_MIGRATIONS:-false}
       BANKCORE_TEST_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
       REDIS_URL: redis://unused
       JWT_ACTIVE_KID: test-runner
