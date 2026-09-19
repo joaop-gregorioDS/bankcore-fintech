@@ -17,9 +17,13 @@ Cada depósito ou Pix grava duas linhas em `ledger_entries` (DEBIT + CREDIT) com
 
 ## Idempotência
 
-1. Redis `SET idem:{key} NX EX 86400`
-2. Unique em `ledger_transactions.idempotency_key`
-3. Se a operação falha, a chave Redis é liberada para retry
+1. `idempotency_records` vincula usuário, conta, operação e chave com unique composto.
+2. O fingerprint SHA-256 cobre o contexto servidor e os campos relevantes do payload.
+3. `PROCESSING` e `COMPLETED` são confirmados na mesma transação Postgres do ledger.
+4. Replay idêntico retorna a transação original; payload divergente responde `409 Conflict`.
+5. Falhas fazem rollback do registro e não deixam transação fantasma.
+
+A migração inicial está em `infra/postgres/migrations/001_idempotency_ownership.sql`.
 
 ## Autenticação
 

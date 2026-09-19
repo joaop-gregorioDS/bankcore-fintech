@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from uuid import UUID
 import httpx
 from app.config import settings
-from app.database import get_db, get_redis
+from app.database import get_db
 from app.demo_mode import require_demo_mode
 from app.deps import get_current_user, bearer_scheme
 from app.models import Account
@@ -108,7 +108,6 @@ async def _resolve_pix_destination(
 async def deposit(
     payload: DepositRequest,
     db: AsyncSession = Depends(get_db),
-    redis=Depends(get_redis),
     current_user: dict = Depends(get_current_user),
 ):
     require_demo_mode(settings.DEMO_MODE)
@@ -116,10 +115,10 @@ async def deposit(
     await _require_own_account(db, payload.account_id, user_id)
     tx = await deposit_funds(
         db=db,
+        user_id=user_id,
         account_id=payload.account_id,
         amount_cents=reais_to_cents(payload.amount_reais),
         idempotency_key=payload.idempotency_key,
-        redis=redis,
     )
     return _tx_response(tx, "CREDIT")
 
@@ -128,7 +127,6 @@ async def deposit(
 async def pix_transfer(
     payload: PixTransferRequest,
     db: AsyncSession = Depends(get_db),
-    redis=Depends(get_redis),
     current_user: dict = Depends(get_current_user),
     creds: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ):
@@ -146,12 +144,12 @@ async def pix_transfer(
 
     tx = await transfer_funds(
         db=db,
+        user_id=user_id,
         source_account_id=payload.source_account_id,
         destination_account_id=dest_account_id,
         amount_cents=reais_to_cents(payload.amount_reais),
         idempotency_key=payload.idempotency_key,
         description=payload.description or "Transferência Pix BankCore",
-        redis=redis,
     )
     return _tx_response(tx, "DEBIT")
 
