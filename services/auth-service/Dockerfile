@@ -1,15 +1,24 @@
-FROM python:3.12-slim
+FROM python:3.12.8-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalar dependências de compilação
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd --system --gid 10001 bankcore && \
+    useradd --system --uid 10001 --gid bankcore --home-dir /nonexistent \
+        --shell /usr/sbin/nologin bankcore && \
+    chown -R bankcore:bankcore /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
-COPY . .
+COPY --chown=bankcore:bankcore app ./app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+USER bankcore
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
