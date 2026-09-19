@@ -92,6 +92,24 @@ Para desenvolvimento com hot reload, use explicitamente o override:
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
+### Testes reproduzíveis
+
+A suíte oficial não depende de PostgreSQL, pytest ou chaves JWT instalados no host. O runner cria um PostgreSQL descartável com dois bancos de teste, aplica os dois históricos Alembic, gera chaves temporárias dentro do container e remove volumes, rede e containers ao terminar:
+
+```powershell
+.\scripts\test.ps1 -Suite all
+```
+
+No Linux/macOS:
+
+```bash
+bash scripts/test.sh all
+```
+
+Suítes disponíveis: `unit`, `security`, `integration`, `postgres` e `all`. A URL usada pelos testes exige `BANKCORE_TESTING=true`, host local ou `postgres-test` e banco iniciado por `bankcore_test_`; URLs de desenvolvimento/produção são recusadas antes da migração.
+
+Para verificar deliberadamente o caminho de falha e teardown, use `.\scripts\test.ps1 -ForceFailure`; o comando deve retornar código diferente de zero e remover o ambiente temporário.
+
 ---
 
 ## Licença

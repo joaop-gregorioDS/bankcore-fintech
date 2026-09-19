@@ -7,6 +7,8 @@ from uuid import UUID, uuid4
 
 from fastapi import HTTPException
 
+from environment import validate_test_database_url
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TEST_DATABASE_URL = os.getenv("BANKCORE_TEST_DATABASE_URL")
@@ -19,7 +21,11 @@ TEST_DATABASE_URL = os.getenv("BANKCORE_TEST_DATABASE_URL")
 class PostgresIdempotencyIntegrationTests(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls):
+        validate_test_database_url(TEST_DATABASE_URL)
         sys.path.insert(0, str(ROOT / "services/transactions-service"))
+        for module_name in list(sys.modules):
+            if module_name == "app" or module_name.startswith("app."):
+                del sys.modules[module_name]
         os.environ["DATABASE_URL"] = TEST_DATABASE_URL
         os.environ.setdefault("REDIS_URL", "redis://unused")
         os.environ.setdefault("JWT_ACTIVE_KID", "integration-test")
