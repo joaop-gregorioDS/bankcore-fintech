@@ -85,6 +85,3 @@ jobs:
 
       - name: Run disposable test infrastructure
         run: bash scripts/test.sh all
-
-      - name: Deliberate CI failure
-        run: exit 97
