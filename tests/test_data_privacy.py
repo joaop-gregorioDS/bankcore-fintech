@@ -45,6 +45,20 @@ class DataPrivacyContractTests(unittest.TestCase):
         self.assertIn('location ^~ /auth/internal/ { return 404; }', nginx)
         self.assertIn('location = /auth/internal-token { return 404; }', nginx)
 
+    def test_legacy_directory_contract_is_absent_from_clients_and_services(self):
+        roots = (ROOT / "apps", ROOT / "services", ROOT / "infra", ROOT / "docs")
+        for root in roots:
+            for path in root.rglob("*"):
+                if path.is_file() and path.suffix not in {".pyc", ".class"}:
+                    self.assertNotIn("/auth/directory", path.read_text(encoding="utf-8", errors="ignore"))
+
+    def test_internal_destination_identifier_is_not_in_public_layers(self):
+        roots = (ROOT / "apps", ROOT / "infra", ROOT / "docs")
+        for root in roots:
+            for path in root.rglob("*"):
+                if path.is_file() and path.suffix not in {".pyc", ".class"}:
+                    self.assertNotIn("destination_user_id", path.read_text(encoding="utf-8", errors="ignore"))
+
     def test_account_endpoints_keep_server_side_ownership_checks(self):
         routes = ACCOUNT_ROUTES.read_text(encoding="utf-8")
         self.assertIn("def _owned_or_404", routes)

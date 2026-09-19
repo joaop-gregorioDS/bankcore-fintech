@@ -38,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.vortex.bankcore.data.DirectoryEntry
 import br.vortex.bankcore.ui.BankCoreViewModel
 import br.vortex.bankcore.ui.UiState
 import br.vortex.bankcore.ui.components.CarbonCard
@@ -57,7 +56,6 @@ fun PixScreen(vm: BankCoreViewModel, state: UiState) {
     var destination by remember { mutableStateOf("") }
     var amountText by remember { mutableStateOf("") }
     var descriptionText by remember { mutableStateOf("Pix BankCore") }
-    var lookup by remember { mutableStateOf<DirectoryEntry?>(null) }
     var confirming by remember { mutableStateOf(false) }
     var localError by remember { mutableStateOf<String?>(null) }
     var sending by remember { mutableStateOf(false) }
@@ -113,53 +111,37 @@ fun PixScreen(vm: BankCoreViewModel, state: UiState) {
                 isLoading = sending,
                 enabled = canContinue,
             ) {
-                scope.launch {
-                    localError = null
-                    confirming = false
-                    sending = true
-                    try {
-                        lookup = vm.lookupPix(destination)
-                        confirming = true
-                    } catch (e: Exception) {
-                        lookup = null
-                        localError = e.message
-                    } finally {
-                        sending = false
-                    }
-                }
+                localError = null
+                confirming = true
             }
         }
 
         if (confirming) {
-            lookup?.let { entry ->
-                CarbonCard(padding = 18.dp) {
-                    Text("Confirmar Pix", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = p.ivory)
-                    Spacer(Modifier.height(12.dp))
-                    ConfirmRow("Destinatário", entry.fullName)
-                    ConfirmRow("CPF", TaxId.formatted(entry.taxId))
-                    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Valor", fontSize = 12.sp, color = p.mute)
-                        Text(Money.reais(parsed ?: 0.0), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, color = p.ivory)
-                    }
-                    if (descriptionText.isNotBlank()) ConfirmRow("Descrição", descriptionText)
-                    Spacer(Modifier.height(8.dp))
-                    GoldButton(title = "Confirmar Pix", icon = Icons.Outlined.Check, isLoading = sending) {
-                        val amount = parsed ?: return@GoldButton
-                        scope.launch {
-                            localError = null
-                            sending = true
-                            try {
-                                vm.sendPix(destination, amount, descriptionText.trim())
-                                destination = ""
-                                amountText = ""
-                                descriptionText = "Pix BankCore"
-                                lookup = null
-                                confirming = false
-                            } catch (e: Exception) {
-                                localError = e.message
-                            } finally {
-                                sending = false
-                            }
+            CarbonCard(padding = 18.dp) {
+                Text("Confirmar Pix", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = p.ivory)
+                Spacer(Modifier.height(12.dp))
+                ConfirmRow("Chave de destino", TaxId.formatted(destination))
+                Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Valor", fontSize = 12.sp, color = p.mute)
+                    Text(Money.reais(parsed ?: 0.0), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, color = p.ivory)
+                }
+                if (descriptionText.isNotBlank()) ConfirmRow("Descrição", descriptionText)
+                Spacer(Modifier.height(8.dp))
+                GoldButton(title = "Confirmar Pix", icon = Icons.Outlined.Check, isLoading = sending) {
+                    val amount = parsed ?: return@GoldButton
+                    scope.launch {
+                        localError = null
+                        sending = true
+                        try {
+                            vm.sendPix(destination, amount, descriptionText.trim())
+                            destination = ""
+                            amountText = ""
+                            descriptionText = "Pix BankCore"
+                            confirming = false
+                        } catch (e: Exception) {
+                            localError = e.message
+                        } finally {
+                            sending = false
                         }
                     }
                 }

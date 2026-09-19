@@ -29,18 +29,6 @@ struct UserProfile: Decodable, Equatable {
     }
 }
 
-struct DirectoryEntry: Decodable, Equatable {
-    let userId: UUID
-    let taxId: String
-    let fullName: String
-
-    enum CodingKeys: String, CodingKey {
-        case userId = "user_id"
-        case taxId = "tax_id"
-        case fullName = "full_name"
-    }
-}
-
 struct Account: Decodable, Equatable, Identifiable {
     let id: UUID
     let userId: UUID

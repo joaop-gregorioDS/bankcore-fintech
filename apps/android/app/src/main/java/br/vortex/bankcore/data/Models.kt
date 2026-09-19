@@ -37,13 +37,6 @@ data class UserProfile(
 )
 
 @Serializable
-data class DirectoryEntry(
-    @SerialName("user_id") val userId: String,
-    @SerialName("tax_id") val taxId: String,
-    @SerialName("full_name") val fullName: String,
-)
-
-@Serializable
 data class Account(
     val id: String,
     @SerialName("user_id") val userId: String,

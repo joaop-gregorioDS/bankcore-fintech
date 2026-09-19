@@ -70,11 +70,6 @@ export const api = {
     return request('/auth/me');
   },
 
-  async lookupDirectory(taxId) {
-    const cleanTaxId = String(taxId).replace(/\D/g, '');
-    return request(`/auth/directory/${cleanTaxId}`);
-  },
-
   // Accounts
   async getOrCreateAccount(userId) {
     return request('/accounts/', {

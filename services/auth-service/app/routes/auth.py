@@ -89,7 +89,7 @@ async def me(current_user: dict = Depends(get_current_user), db: AsyncSession = 
 
 
 @router.post("/internal/pix/resolve", response_model=PixResolutionResponse, include_in_schema=False)
-async def lookup_directory(
+async def resolve_pix_destination(
     payload: PixResolutionRequest,
     service: dict = Depends(require_internal_service),
     db: AsyncSession = Depends(get_db),
