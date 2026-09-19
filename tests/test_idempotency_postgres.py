@@ -25,13 +25,20 @@ class PostgresIdempotencyIntegrationTests(unittest.IsolatedAsyncioTestCase):
         os.environ.setdefault("JWT_ACTIVE_KID", "integration-test")
         os.environ.setdefault("AUTH_SERVICE_TOKEN", "integration-test-only")
 
-        from app.database import Base
         from app.idempotency import build_request_fingerprint
         from app.models import IdempotencyRecord, LedgerTransaction
         from app.services.ledger import _claim_idempotency, _complete_idempotency
         from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+        from alembic import command
+        from alembic.config import Config
 
-        cls.Base = Base
+        migration_config = Config(str(ROOT / "infra/postgres/alembic/transactions/alembic.ini"))
+        migration_config.set_main_option(
+            "script_location",
+            str(ROOT / "infra/postgres/alembic/transactions").replace("%", "%%"),
+        )
+        migration_config.set_main_option("sqlalchemy.url", TEST_DATABASE_URL.replace("%", "%%"))
+        command.upgrade(migration_config, "head")
         cls.build_request_fingerprint = staticmethod(build_request_fingerprint)
         cls.async_sessionmaker = staticmethod(async_sessionmaker)
         cls.create_async_engine = staticmethod(create_async_engine)
@@ -48,9 +55,6 @@ class PostgresIdempotencyIntegrationTests(unittest.IsolatedAsyncioTestCase):
             class_=self.AsyncSession,
             expire_on_commit=False,
         )
-        async with self.engine.begin() as connection:
-            await connection.run_sync(self.Base.metadata.create_all)
-
     async def asyncTearDown(self):
         await self.engine.dispose()
 

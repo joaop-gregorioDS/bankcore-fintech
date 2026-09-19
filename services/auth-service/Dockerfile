@@ -13,10 +13,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         --shell /usr/sbin/nologin bankcore && \
     chown -R bankcore:bankcore /app
 
-COPY requirements.txt ./
+COPY services/auth-service/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
-COPY --chown=bankcore:bankcore app ./app
+COPY --chown=bankcore:bankcore services/auth-service/app ./app
+COPY --chown=bankcore:bankcore infra/postgres/alembic/auth ./alembic/auth
+COPY --chown=bankcore:bankcore infra/postgres/preflight.py ./preflight.py
+COPY --chown=bankcore:bankcore infra/postgres/migrate.py ./migrate.py
 
 USER bankcore
 EXPOSE 8000

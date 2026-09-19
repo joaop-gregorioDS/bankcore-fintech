@@ -48,7 +48,9 @@ services:
 
   auth-service:
     <<: *container-hardening
-    build: ./services/auth-service
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
     container_name: bankcore-auth-service
     restart: unless-stopped
     environment:
@@ -81,7 +83,9 @@ services:
 
   transactions-service:
     <<: *container-hardening
-    build: ./services/transactions-service
+    build:
+      context: .
+      dockerfile: services/transactions-service/Dockerfile
     container_name: bankcore-transactions-service
     restart: unless-stopped
     environment:
@@ -132,6 +136,36 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
+    networks:
+      - bankcore_net
+
+  migrate-auth:
+    image: bankcore-fintech-audit-auth-service
+    profiles: ["migration"]
+    command: ["python", "/app/migrate.py", "--service", "auth"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_auth
+      REDIS_URL: redis://redis:6379/0
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bankcore_net
+
+  migrate-transactions:
+    image: bankcore-fintech-audit-transactions-service
+    profiles: ["migration"]
+    command: ["python", "/app/migrate.py", "--service", "transactions"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
+      REDIS_URL: redis://redis:6379/0
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - bankcore_net
 

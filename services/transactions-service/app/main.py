@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from app.config import settings
-from app.database import engine, Base, AsyncSessionLocal, init_redis, close_redis
+from app.database import engine, init_redis, close_redis
 from app.demo_mode import is_demo_mode_enabled
 from app.routes import accounts, transactions
 from app.deps import validate_public_key_material
@@ -41,11 +41,18 @@ app.add_middleware(
 async def startup():
     validate_public_key_material()
     await init_redis()
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1 FROM accounts LIMIT 0"))
+            await conn.execute(text("SELECT 1 FROM ledger_transactions LIMIT 0"))
+            await conn.execute(text("SELECT 1 FROM ledger_entries LIMIT 0"))
+            await conn.execute(text("SELECT 1 FROM idempotency_records LIMIT 0"))
+    except Exception as exc:
+        raise RuntimeError("Transactions database schema is not migrated.") from exc
     for _ in range(10):
         try:
-            async with engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
             if is_demo_mode_enabled(settings.DEMO_MODE):
+                from app.database import AsyncSessionLocal
                 async with AsyncSessionLocal() as session:
                     await seed_demo_accounts(session)
             break
