@@ -6,6 +6,7 @@ from uuid import UUID
 import httpx
 from app.config import settings
 from app.database import get_db, get_redis
+from app.demo_mode import require_demo_mode
 from app.deps import get_current_user, bearer_scheme
 from app.models import Account
 from app.schemas import DepositRequest, PixTransferRequest, TransactionResponse
@@ -13,6 +14,10 @@ from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 from app.services.ledger import deposit_funds, transfer_funds
 
 router = APIRouter(prefix="/transactions", tags=["Transações Financeiras"])
+
+
+def require_demo_deposit_mode() -> None:
+    require_demo_mode(settings.DEMO_MODE)
 
 
 def _tx_response(tx: object, direction: str) -> TransactionResponse:
@@ -94,13 +99,18 @@ async def _resolve_pix_destination(
     return acc.id
 
 
-@router.post("/deposit", response_model=TransactionResponse)
+@router.post(
+    "/deposit",
+    response_model=TransactionResponse,
+    dependencies=[Depends(require_demo_deposit_mode)],
+)
 async def deposit(
     payload: DepositRequest,
     db: AsyncSession = Depends(get_db),
     redis=Depends(get_redis),
     current_user: dict = Depends(get_current_user),
 ):
+    require_demo_mode(settings.DEMO_MODE)
     user_id = UUID(current_user["sub"])
     await _require_own_account(db, payload.account_id, user_id)
     tx = await deposit_funds(
