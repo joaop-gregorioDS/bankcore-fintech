@@ -6,6 +6,7 @@ from app.config import settings
 from app.database import engine, Base, AsyncSessionLocal
 from app.demo_mode import is_demo_mode_enabled
 from app.routes import auth
+from app.security import validate_key_material
 from app.seed import seed_demo_users
 
 ALLOWED_ORIGINS = [
@@ -38,6 +39,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
+    validate_key_material()
     for _ in range(10):
         try:
             async with engine.begin() as conn:

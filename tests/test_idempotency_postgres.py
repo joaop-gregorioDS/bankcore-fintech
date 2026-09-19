@@ -22,7 +22,8 @@ class PostgresIdempotencyIntegrationTests(unittest.IsolatedAsyncioTestCase):
         sys.path.insert(0, str(ROOT / "services/transactions-service"))
         os.environ["DATABASE_URL"] = TEST_DATABASE_URL
         os.environ.setdefault("REDIS_URL", "redis://unused")
-        os.environ.setdefault("JWT_SECRET_KEY", "integration-test-only")
+        os.environ.setdefault("JWT_ACTIVE_KID", "integration-test")
+        os.environ.setdefault("AUTH_SERVICE_TOKEN", "integration-test-only")
 
         from app.database import Base
         from app.idempotency import build_request_fingerprint

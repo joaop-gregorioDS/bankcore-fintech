@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from uuid import UUID
@@ -7,7 +6,8 @@ import httpx
 from app.config import settings
 from app.database import get_db
 from app.demo_mode import require_demo_mode
-from app.deps import get_current_user, bearer_scheme
+from app.deps import get_current_user
+from app.internal_auth import get_internal_service_token
 from app.models import Account
 from app.money import cents_to_reais, reais_to_cents
 from app.schemas import DepositRequest, PixTransferRequest, TransactionResponse
@@ -57,7 +57,6 @@ def _parse_uuid_key(raw: str) -> UUID | None:
 async def _resolve_pix_destination(
     db: AsyncSession,
     destination_key: str,
-    bearer_token: str,
 ) -> UUID:
     raw = destination_key.strip()
     as_uuid = _parse_uuid_key(raw)
@@ -75,10 +74,11 @@ async def _resolve_pix_destination(
         raise HTTPException(status_code=400, detail="Informe um CPF/CNPJ ou a chave da conta.")
 
     try:
+        service_token = await get_internal_service_token()
         async with httpx.AsyncClient(timeout=10.0) as client:
             res = await client.get(
                 f"{settings.AUTH_SERVICE_URL}/auth/directory/{tax_id}",
-                headers={"Authorization": f"Bearer {bearer_token}"},
+                headers={"Authorization": f"Bearer {service_token}"},
             )
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=f"Falha ao consultar diretório Pix: {exc}") from exc
@@ -128,7 +128,6 @@ async def pix_transfer(
     payload: PixTransferRequest,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
-    creds: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ):
     user_id = UUID(current_user["sub"])
     await _require_own_account(db, payload.source_account_id, user_id)
@@ -136,7 +135,6 @@ async def pix_transfer(
     dest_account_id = await _resolve_pix_destination(
         db,
         payload.destination_key,
-        creds.credentials,
     )
 
     if dest_account_id == payload.source_account_id:
