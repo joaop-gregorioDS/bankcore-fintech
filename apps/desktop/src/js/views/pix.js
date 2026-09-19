@@ -4,7 +4,6 @@ import { api } from '../api.js';
 export function renderPix(container, user, account, onNavigate, showToast, showReceiptModal) {
   const isLucas = user.tax_id.replace(/\D/g, '') === '98765432100';
   const defaultTargetCpf = isLucas ? '123.456.789-00' : '987.654.321-00';
-  const defaultTargetName = isLucas ? 'Maria Silva Santos' : 'Lucas Mendes Rocha';
   const userCpfFormatted = user.tax_id.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 
   container.innerHTML = `
@@ -42,9 +41,9 @@ export function renderPix(container, user, account, onNavigate, showToast, showR
             <!-- Recipient Preview Box -->
             <div id="recipientBox" class="recipient-card">
               <div>
-                <div style="font-size:10.5px; text-transform:uppercase; font-weight:800; color:var(--text-mute);">Destinatário Identificado</div>
-                <div style="font-size:14px; font-weight:900; color:var(--text-primary);" id="recipientNameText">${defaultTargetName}</div>
-                <div style="font-size:11.5px; color:var(--text-secondary);" id="recipientBankText">Banco Vortex S.A. · Agência 0001-9</div>
+                <div style="font-size:10.5px; text-transform:uppercase; font-weight:800; color:var(--text-mute);">Destinatário informado</div>
+                <div style="font-size:14px; font-weight:900; color:var(--text-primary);" id="recipientNameText">Chave Pix será validada na liquidação</div>
+                <div style="font-size:11.5px; color:var(--text-secondary);" id="recipientBankText">A confirmação ocorre de forma privada no serviço de transações</div>
               </div>
               <span class="badge-verified">Diretório DICT</span>
             </div>
@@ -178,36 +177,17 @@ export function renderPix(container, user, account, onNavigate, showToast, showR
     });
   }
 
-  // CPF Mask & Live Directory Lookup
-  let lookupDebounce = null;
-  const triggerLookup = () => {
-    const clean = inputCpf.value.replace(/\D/g, '');
-    if (clean.length === 11) {
-      clearTimeout(lookupDebounce);
-      lookupDebounce = setTimeout(async () => {
-        try {
-          const found = await api.lookupDirectory(clean);
-          recipientName.innerText = found.full_name || 'Correntista Identificado';
-        } catch {
-          recipientName.innerText = 'Correntista Não Encontrado';
-        }
-      }, 300);
-    }
-  };
-
   inputCpf.addEventListener('input', (e) => {
     let val = e.target.value.replace(/\D/g, '').slice(0, 11);
     if (val.length > 9) val = val.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
     else if (val.length > 6) val = val.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
     else if (val.length > 3) val = val.replace(/(\d{3})(\d{1,3})/, '$1.$2');
     e.target.value = val;
-    triggerLookup();
   });
 
   // Quick fill demo button
   container.querySelector('#btnQuickFillTarget').addEventListener('click', () => {
     inputCpf.value = defaultTargetCpf;
-    recipientName.innerText = defaultTargetName;
     inputAmount.value = '1.00';
   });
 
@@ -260,7 +240,7 @@ export function renderPix(container, user, account, onNavigate, showToast, showR
         direction: 'DEBIT',
         description: desc,
         status: 'COMPLETED',
-        recipient_name: recipientName.innerText,
+        recipient_name: 'Destinatário informado',
         recipient_cpf: cleanCpf,
       }, user, account);
 

@@ -137,13 +137,6 @@ final class AppState {
         }
     }
 
-    func lookupPix(taxId: String) async throws -> DirectoryEntry {
-        guard let session else {
-            throw APIError(status: 401, detail: "Token de acesso ausente.")
-        }
-        return try await api.directory(taxId: taxId, token: session.token)
-    }
-
     func sendPix(destinationKey: String, amountReais: Double, description: String) async throws -> LedgerTransaction {
         guard let session else {
             throw APIError(status: 401, detail: "Token de acesso ausente.")

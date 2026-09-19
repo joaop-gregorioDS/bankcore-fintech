@@ -6,7 +6,6 @@ struct PixView: View {
     @State private var destination = ""
     @State private var amountText = ""
     @State private var descriptionText = "Pix BankCore"
-    @State private var lookup: DirectoryEntry?
     @State private var confirming = false
     @State private var localError: String?
     @State private var sending = false
@@ -18,8 +17,8 @@ struct PixView: View {
                     header
                     pixActions
                     form
-                    if confirming, let lookup {
-                        confirmation(lookup)
+                    if confirming {
+                        confirmation()
                     }
                     if let localError {
                         Text(localError)
@@ -112,20 +111,20 @@ struct PixView: View {
                     isLoading: sending,
                     enabled: canContinue
                 ) {
-                    Task { await lookupDestination() }
+                        localError = nil
+                        confirming = true
                 }
             }
         }
     }
 
-    private func confirmation(_ entry: DirectoryEntry) -> some View {
+    private func confirmation() -> some View {
         CarbonCard(padding: 18) {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Confirmar Pix")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Palette.ivory)
-                row("Destinatário", entry.fullName)
-                row("CPF", TaxID.formatted(entry.taxId))
+                row("Chave de destino", TaxID.formatted(destination))
                 HStack {
                     Text("Valor")
                         .font(TypeScale.label)
@@ -166,20 +165,6 @@ struct PixView: View {
         TaxID.digits(destination).count >= 11 && (parsedAmount ?? 0) > 0
     }
 
-    private func lookupDestination() async {
-        localError = nil
-        confirming = false
-        sending = true
-        defer { sending = false }
-        do {
-            lookup = try await app.lookupPix(taxId: destination)
-            confirming = true
-        } catch {
-            lookup = nil
-            localError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-        }
-    }
-
     private func send() async {
         guard let amount = parsedAmount, amount > 0 else { return }
         localError = nil
@@ -194,7 +179,6 @@ struct PixView: View {
             destination = ""
             amountText = ""
             descriptionText = "Pix BankCore"
-            lookup = nil
             confirming = false
         } catch {
             localError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription

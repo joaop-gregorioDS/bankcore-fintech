@@ -28,7 +28,8 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class DirectoryLookupResponse(BaseModel):
-    user_id: UUID
-    tax_id: str
-    full_name: str
+class PixResolutionRequest(BaseModel):
+    pix_key: str = Field(..., min_length=1, max_length=18)
+
+class PixResolutionResponse(BaseModel):
+    destination_user_id: UUID
