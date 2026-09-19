@@ -9,6 +9,7 @@ from app.database import get_db, get_redis
 from app.demo_mode import require_demo_mode
 from app.deps import get_current_user, bearer_scheme
 from app.models import Account
+from app.money import cents_to_reais, reais_to_cents
 from app.schemas import DepositRequest, PixTransferRequest, TransactionResponse
 from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 from app.services.ledger import deposit_funds, transfer_funds
@@ -26,7 +27,7 @@ def _tx_response(tx: object, direction: str) -> TransactionResponse:
         idempotency_key=tx.idempotency_key,
         source_account_id=tx.source_account_id,
         destination_account_id=tx.destination_account_id,
-        amount_reais=tx.amount_cents / 100.0,
+        amount_reais=float(cents_to_reais(tx.amount_cents)),
         transaction_type=tx.transaction_type,
         direction=direction,
         status=tx.status,
@@ -116,7 +117,7 @@ async def deposit(
     tx = await deposit_funds(
         db=db,
         account_id=payload.account_id,
-        amount_cents=int(round(payload.amount_reais * 100)),
+        amount_cents=reais_to_cents(payload.amount_reais),
         idempotency_key=payload.idempotency_key,
         redis=redis,
     )
@@ -147,7 +148,7 @@ async def pix_transfer(
         db=db,
         source_account_id=payload.source_account_id,
         destination_account_id=dest_account_id,
-        amount_cents=int(round(payload.amount_reais * 100)),
+        amount_cents=reais_to_cents(payload.amount_reais),
         idempotency_key=payload.idempotency_key,
         description=payload.description or "Transferência Pix BankCore",
         redis=redis,
