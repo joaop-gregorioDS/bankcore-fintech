@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import HTTPException
 from app.models import Account, LedgerTransaction, LedgerEntry, TransactionType, TransactionStatus
+from app.money import BIGINT_MAX_CENTS
 from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 
 IDEM_TTL_SECONDS = 86400
@@ -14,6 +15,8 @@ CREDIT = "CREDIT"
 def _validate_amount_cents(amount_cents: int) -> None:
     if isinstance(amount_cents, bool) or not isinstance(amount_cents, int):
         raise HTTPException(status_code=400, detail="Valor deve ser informado em centavos inteiros.")
+    if amount_cents > BIGINT_MAX_CENTS:
+        raise HTTPException(status_code=400, detail="Valor excede o limite de BIGINT.")
 
 
 def _balanced(entries: list[tuple[Account, str, int]]) -> None:

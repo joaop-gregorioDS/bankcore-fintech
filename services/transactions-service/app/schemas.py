@@ -7,7 +7,8 @@ from pydantic import condecimal
 
 MoneyReais = condecimal(
     gt=Decimal("0"),
-    max_digits=18,
+    le=Decimal("999999999999.99"),
+    max_digits=14,
     decimal_places=2,
     allow_inf_nan=False,
 )
