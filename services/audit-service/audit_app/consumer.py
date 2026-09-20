@@ -14,6 +14,7 @@ from audit_app.config import settings
 from audit_app.contracts import InvalidAuditEvent, validate_transaction_completed
 from audit_app.database import AuditSessionLocal, engine
 from audit_app.models import AuditEvent
+from common.observability import configure_logging, log_event, set_correlation_id
 
 
 logger = logging.getLogger("bankcore.audit-consumer")
@@ -25,6 +26,8 @@ ORIGINAL_OFFSET_HEADER = "original-offset"
 FAILURE_CLASS_HEADER = "failure-class"
 FAILURE_REASON_HEADER = "failure-reason"
 FAILED_AT_HEADER = "failed-at"
+CORRELATION_ID_HEADER = "x-correlation-id"
+EVENT_ID_HEADER = "x-event-id"
 TRANSIENT = "TRANSIENT"
 PERMANENT = "PERMANENT"
 SENSITIVE_ERROR = re.compile(
@@ -71,7 +74,7 @@ class AuditConsumer:
         self.consumer_factory = consumer_factory or AIOKafkaConsumer
         self.group_id = group_id or settings.KAFKA_GROUP_ID
 
-    async def persist(self, event: Any) -> None:
+    async def persist(self, event: Any) -> bool:
         async with self.session_factory() as session:
             statement = insert(AuditEvent).values(
                 event_id=event.event_id,
@@ -82,8 +85,9 @@ class AuditConsumer:
                 occurred_at=event.occurred_at,
                 consumer_version=settings.CONSUMER_VERSION,
             ).on_conflict_do_nothing(index_elements=[AuditEvent.event_id])
-            await session.execute(statement)
+            result = await session.execute(statement)
             await session.commit()
+            return result.rowcount == 1
 
     async def process_record(self, record: Any, kafka_consumer: Any = None) -> Any:
         payload = record.value
@@ -93,6 +97,13 @@ class AuditConsumer:
             except (UnicodeDecodeError, json.JSONDecodeError) as error:
                 raise InvalidAuditEvent("Invalid JSON audit event") from error
         event = validate_transaction_completed(payload)
+        set_correlation_id(str(event.correlation_id))
+        header_correlation_id = _header_value(record, CORRELATION_ID_HEADER)
+        if header_correlation_id and header_correlation_id != str(event.correlation_id):
+            raise InvalidAuditEvent("Kafka correlation header does not match event correlation_id")
+        header_event_id = _header_value(record, EVENT_ID_HEADER)
+        if header_event_id and header_event_id != str(event.event_id):
+            raise InvalidAuditEvent("Kafka event header does not match event_id")
         record_key = getattr(record, "key", None)
         if record_key is not None:
             try:
@@ -101,7 +112,14 @@ class AuditConsumer:
                 raise InvalidAuditEvent("Invalid Kafka message key") from error
             if message_key != str(event.data.transaction_id):
                 raise InvalidAuditEvent("Kafka message key does not match transaction_id")
-        await self.persist(event)
+        persisted = await self.persist(event)
+        log_event(
+            logger,
+            "audit.event.persisted" if persisted else "audit.event.duplicate",
+            event_id=str(event.event_id),
+            transaction_id=str(event.data.transaction_id),
+            status=200,
+        )
         if settings.CRASH_AFTER_DB_COMMIT:
             raise SystemExit(97)
         if kafka_consumer is not None:
@@ -145,6 +163,16 @@ class AuditConsumer:
             (FAILURE_CLASS_HEADER, failure_class.encode("ascii")),
             (FAILURE_REASON_HEADER, sanitize_failure_reason(error).encode("utf-8")),
             (FAILED_AT_HEADER, datetime.now(timezone.utc).isoformat().encode("ascii")),
+            *(
+                [(CORRELATION_ID_HEADER, value.encode("utf-8"))]
+                if (value := _header_value(record, CORRELATION_ID_HEADER))
+                else []
+            ),
+            *(
+                [(EVENT_ID_HEADER, value.encode("utf-8"))]
+                if (value := _header_value(record, EVENT_ID_HEADER))
+                else []
+            ),
         ]
 
     async def publish_failure(
@@ -180,6 +208,7 @@ class AuditConsumer:
             try:
                 await self.process_record(record)
                 await kafka_consumer.commit()
+                log_event(logger, "audit.event.processed", event_id=_header_value(record, "x-event-id"))
                 return "processed"
             except InvalidAuditEvent as error:
                 await self.publish_failure(
@@ -191,6 +220,7 @@ class AuditConsumer:
                     retry_count,
                 )
                 await kafka_consumer.commit()
+                log_event(logger, "audit.event.dlq", level=logging.WARNING, failure_class=PERMANENT)
                 return "dlq"
             except Exception as error:
                 last_error = error
@@ -208,6 +238,7 @@ class AuditConsumer:
                 retry_count + 1,
             )
             await kafka_consumer.commit()
+            log_event(logger, "audit.event.retry", level=logging.WARNING, retry_count=retry_count + 1)
             return "retry"
 
         await self.publish_failure(
@@ -219,6 +250,7 @@ class AuditConsumer:
             retry_count,
         )
         await kafka_consumer.commit()
+        log_event(logger, "audit.event.dlq", level=logging.WARNING, failure_class=TRANSIENT, retry_count=retry_count)
         return "dlq"
 
     async def _consume_loop(
@@ -275,5 +307,5 @@ async def main() -> int:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    configure_logging("audit-consumer")
     raise SystemExit(asyncio.run(main()))

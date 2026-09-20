@@ -13,6 +13,7 @@ COPY services/audit-service/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
 COPY --chown=bankcore:bankcore services/audit-service/audit_app ./audit_app
+COPY --chown=bankcore:bankcore common ./common
 COPY --chown=bankcore:bankcore infra/postgres/alembic/audit ./alembic/audit
 COPY --chown=bankcore:bankcore infra/postgres/migrate_audit.py ./migrate_audit.py
 

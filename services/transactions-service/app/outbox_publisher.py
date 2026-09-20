@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import json
+import logging
 import re
 import socket
 from dataclasses import dataclass
@@ -17,6 +18,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.config import settings
 from app.database import AsyncSessionLocal, engine
 from app.models import OutboxEvent
+from common.observability import log_event, set_correlation_id
+
+logger = logging.getLogger("bankcore.outbox-publisher")
 
 
 SENSITIVE_ERROR = re.compile(
@@ -98,6 +102,17 @@ class OutboxPublisher:
                 row.locked_by = self.publisher_id
                 row.locked_until = lease_until
             await session.commit()
+            for event in claimed:
+                correlation_id = event.payload.get("correlation_id")
+                if correlation_id:
+                    set_correlation_id(str(correlation_id))
+                log_event(
+                    logger,
+                    "outbox.event.claimed",
+                    event_id=str(event.id),
+                    transaction_id=str(event.payload.get("data", {}).get("transaction_id", "")),
+                    attempt=int(next((row.attempts for row in rows if row.id == event.id), 0)),
+                )
             return claimed
 
     async def mark_published(self, event_id: UUID) -> bool:
@@ -151,6 +166,13 @@ class OutboxPublisher:
             settings.KAFKA_TOPIC,
             key=event.message_key.encode("utf-8"),
             value=payload,
+            headers=[
+                ("x-event-id", str(event.payload.get("event_id", event.id)).encode("ascii")),
+                (
+                    "x-correlation-id",
+                    str(event.payload.get("correlation_id", "")).encode("ascii"),
+                ),
+            ],
         )
 
     async def run_once(self, producer: AIOKafkaProducer | None = None) -> tuple[int, int]:
@@ -176,12 +198,30 @@ class OutboxPublisher:
             for event in events:
                 try:
                     await self._publish_one(active_producer, event)
+                    set_correlation_id(str(event.payload.get("correlation_id", "")))
+                    log_event(
+                        logger,
+                        "outbox.event.publish.succeeded",
+                        event_id=str(event.id),
+                        transaction_id=str(event.payload.get("data", {}).get("transaction_id", "")),
+                        topic=settings.KAFKA_TOPIC,
+                    )
                     if settings.OUTBOX_CRASH_AFTER_KAFKA_ACK:
                         raise SystemExit(97)
                     if await self.mark_published(event.id):
                         published += 1
                 except Exception as error:
                     failed += 1
+                    set_correlation_id(str(event.payload.get("correlation_id", "")))
+                    log_event(
+                        logger,
+                        "outbox.event.publish.failed",
+                        level=logging.WARNING,
+                        event_id=str(event.id),
+                        transaction_id=str(event.payload.get("data", {}).get("transaction_id", "")),
+                        topic=settings.KAFKA_TOPIC,
+                        error_type=type(error).__name__,
+                    )
                     await self.mark_failed(event.id, error)
         finally:
             if owns_producer and producer_started:
@@ -198,6 +238,9 @@ async def main() -> int:
     parser = argparse.ArgumentParser(description="BankCore transactional outbox publisher")
     parser.add_argument("--once", action="store_true", help="claim and publish one batch")
     args = parser.parse_args()
+    from common.observability import configure_logging
+
+    configure_logging("outbox-publisher")
     publisher = OutboxPublisher()
     if args.once:
         await publisher.run_once()

@@ -5,6 +5,7 @@ import httpx
 from fastapi import HTTPException
 
 from app.config import settings
+from common.observability import current_correlation_id, current_request_id
 
 _tokens: dict[tuple[str, str], tuple[str, float]] = {}
 _lock = asyncio.Lock()
@@ -30,6 +31,16 @@ async def get_internal_service_token(*, scope: str = "service:transactions") -> 
                         "X-Service-Name": "transactions",
                         "X-Service-Token": settings.AUTH_SERVICE_TOKEN,
                         "X-Service-Scope": scope,
+                        **(
+                            {"X-Request-ID": current_request_id()}
+                            if current_request_id()
+                            else {}
+                        ),
+                        **(
+                            {"X-Correlation-ID": current_correlation_id()}
+                            if current_correlation_id()
+                            else {}
+                        ),
                     },
                 )
             response.raise_for_status()

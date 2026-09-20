@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import time
 from dataclasses import dataclass
 from uuid import UUID
@@ -8,6 +9,9 @@ from fastapi import HTTPException
 
 from app.config import settings
 from app.internal_auth import get_internal_service_token, invalidate_internal_service_token
+from common.observability import current_correlation_id, current_request_id, log_event
+
+logger = logging.getLogger("bankcore.transactions.risk")
 
 
 @dataclass(frozen=True)
@@ -89,6 +93,12 @@ async def assess_transaction_risk(
     }
     token_refreshed = False
     transient_attempt = 0
+    log_event(
+        logger,
+        "risk.assessment.started",
+        transaction_id=str(transaction_id),
+        operation_type=operation_type,
+    )
 
     while True:
         try:
@@ -96,7 +106,19 @@ async def assess_transaction_risk(
             async with httpx.AsyncClient(timeout=settings.RISK_TIMEOUT_SECONDS) as client:
                 response = await client.post(
                     f"{settings.RISK_SERVICE_URL}/internal/risk/assessments",
-                    headers={"Authorization": f"Bearer {service_token}"},
+                    headers={
+                        "Authorization": f"Bearer {service_token}",
+                        **(
+                            {"X-Request-ID": current_request_id()}
+                            if current_request_id()
+                            else {}
+                        ),
+                        **(
+                            {"X-Correlation-ID": current_correlation_id()}
+                            if current_correlation_id()
+                            else {}
+                        ),
+                    },
                     json=request_body,
                 )
         except httpx.TimeoutException as exc:
@@ -105,6 +127,14 @@ async def assess_transaction_risk(
                 await asyncio.sleep(settings.RISK_RETRY_DELAY_SECONDS)
                 continue
             await circuit_breaker.record_failure()
+            log_event(
+                logger,
+                "risk.assessment.failed",
+                level=logging.WARNING,
+                transaction_id=str(transaction_id),
+                status=504,
+                error_type=type(exc).__name__,
+            )
             raise _unavailable(status_code=504) from exc
         except httpx.RequestError as exc:
             if transient_attempt < settings.RISK_RETRY_COUNT:
@@ -112,6 +142,14 @@ async def assess_transaction_risk(
                 await asyncio.sleep(settings.RISK_RETRY_DELAY_SECONDS)
                 continue
             await circuit_breaker.record_failure()
+            log_event(
+                logger,
+                "risk.assessment.failed",
+                level=logging.WARNING,
+                transaction_id=str(transaction_id),
+                status=503,
+                error_type=type(exc).__name__,
+            )
             raise _unavailable() from exc
 
         if response.status_code in (401, 403) and not token_refreshed:
@@ -126,10 +164,24 @@ async def assess_transaction_risk(
                 await asyncio.sleep(settings.RISK_RETRY_DELAY_SECONDS)
                 continue
             await circuit_breaker.record_failure()
+            log_event(
+                logger,
+                "risk.assessment.failed",
+                level=logging.WARNING,
+                transaction_id=str(transaction_id),
+                status=response.status_code,
+            )
             raise _unavailable()
 
         if response.status_code == 409:
             await circuit_breaker.record_success()
+            log_event(
+                logger,
+                "risk.assessment.conflict",
+                level=logging.WARNING,
+                transaction_id=str(transaction_id),
+                status=409,
+            )
             raise _unavailable(status_code=409, detail="RISK_ASSESSMENT_CONFLICT")
 
         if response.status_code != 200:
@@ -145,7 +197,24 @@ async def assess_transaction_risk(
             )
         except (KeyError, TypeError, ValueError) as exc:
             await circuit_breaker.record_failure()
+            log_event(
+                logger,
+                "risk.assessment.failed",
+                level=logging.WARNING,
+                transaction_id=str(transaction_id),
+                status=503,
+                error_type=type(exc).__name__,
+            )
             raise _unavailable() from exc
 
         await circuit_breaker.record_success()
+        log_event(
+            logger,
+            "risk.assessment.completed",
+            transaction_id=str(transaction_id),
+            risk_assessment_id=str(assessment.assessment_id),
+            decision=assessment.decision,
+            rules_version=assessment.rules_version,
+            status=200,
+        )
         return assessment
