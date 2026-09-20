@@ -144,17 +144,27 @@ Regras de sequência:
 6. o Risk não reexecuta nem confirma a operação financeira;
 7. a estratégia final para crash entre a claim de idempotência e a avaliação será definida antes do P2-F.
 
-## Regras determinísticas iniciais
+## Regras determinísticas iniciais — `risk-rules-v1`
 
-As regras serão simples e explicáveis, por exemplo:
+O P2-C implementa somente regras sintéticas e didáticas, baseadas nos dados que o contrato já fornece. Elas não representam um modelo real de fraude bancária.
 
-- limite de valor por operação;
-- frequência de operações por conta em janela definida;
-- repetição de destino em curto intervalo;
-- conta de origem/destino iguais;
-- versão explícita do conjunto de regras.
+| Regra | Condição | Pontos | Reason |
+| --- | --- | ---: | --- |
+| `AmountRiskRule` | `amount_cents <= 100000` | 0 | — |
+| `AmountRiskRule` | `100000 < amount_cents <= 1000000` | 40 | `HIGH_AMOUNT` |
+| `AmountRiskRule` | `amount_cents > 1000000` | 70 | `VERY_HIGH_AMOUNT` |
+| `OperationTypeRule` | `operation_type = PIX` | 0 | — |
+| `OperationTypeRule` | operação diferente de `PIX` | 40 | `UNSUPPORTED_OPERATION` |
 
-Os limites, score e códigos de razão serão definidos em contrato de domínio antes de implementação. Não haverá alegação de antifraude real nem uso de ML nesta fase.
+O score composto é limitado a `0..100` e produz:
+
+- `0..39` → `APPROVED`;
+- `40..69` → `REVIEW`;
+- `70..100` → `REJECTED`.
+
+A ordem de execução das regras não altera score, decisão ou ordenação final dos reasons. A versão `risk-rules-v1` é obrigatória em toda avaliação.
+
+O domínio ainda não implementa velocity, histórico do cliente, destinatário novo, comportamento anômalo ou ML, porque essas informações não existem no contrato/runtime atual.
 
 ## Critérios de aceite do P2-A
 
@@ -184,4 +194,3 @@ Os limites, score e códigos de razão serão definidos em contrato de domínio 
 | P2-G | Compose, health/readiness, testes de integração e CI |
 
 Kafka, observabilidade avançada, IaC e ML permanecem fora destas fases iniciais.
-
