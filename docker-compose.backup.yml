@@ -1,0 +1,92 @@
+services:
+  backup-source:
+    image: postgres:16.4-alpine3.20
+    environment:
+      POSTGRES_USER: ${BACKUP_POSTGRES_USER:-bankadmin}
+      POSTGRES_PASSWORD: ${BACKUP_POSTGRES_PASSWORD:?set BACKUP_POSTGRES_PASSWORD}
+      POSTGRES_DB: bankcore_test_auth
+    volumes:
+      - backup_source_data:/var/lib/postgresql/data
+      - ./infra/postgres/test-init.sql:/docker-entrypoint-initdb.d/test-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    networks: [bankcore_backup_net]
+
+  backup-target:
+    image: postgres:16.4-alpine3.20
+    environment:
+      POSTGRES_USER: ${BACKUP_POSTGRES_USER:-bankadmin}
+      POSTGRES_PASSWORD: ${BACKUP_POSTGRES_PASSWORD:?set BACKUP_POSTGRES_PASSWORD}
+      POSTGRES_DB: bankcore_test_auth
+    volumes:
+      - backup_target_data:/var/lib/postgresql/data
+      - ./infra/postgres/test-init.sql:/docker-entrypoint-initdb.d/test-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    networks: [bankcore_backup_net]
+
+  migrate-auth-backup:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${BACKUP_POSTGRES_USER:-bankadmin}:${BACKUP_POSTGRES_PASSWORD}@backup-source:5432/bankcore_test_auth
+      REDIS_URL: redis://unused
+      JWT_ACTIVE_KID: backup-test
+      AUTH_SERVICE_TOKEN: backup-test
+      BANKCORE_TESTING: "true"
+    command: ["python", "/app/migrate.py", "--service", "auth"]
+    depends_on:
+      backup-source:
+        condition: service_healthy
+    networks: [bankcore_backup_net]
+
+  migrate-transactions-backup:
+    build:
+      context: .
+      dockerfile: services/transactions-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${BACKUP_POSTGRES_USER:-bankadmin}:${BACKUP_POSTGRES_PASSWORD}@backup-source:5432/bankcore_test_transactions
+      REDIS_URL: redis://unused
+      JWT_ACTIVE_KID: backup-test
+      AUTH_SERVICE_TOKEN: backup-test
+      BANKCORE_TESTING: "true"
+    command: ["python", "/app/migrate.py", "--service", "transactions"]
+    depends_on:
+      backup-source:
+        condition: service_healthy
+    networks: [bankcore_backup_net]
+
+  backup-runner:
+    build:
+      context: .
+      dockerfile: tests/Backup.Dockerfile
+    environment:
+      BACKUP_SOURCE_HOST: backup-source
+      BACKUP_TARGET_HOST: backup-target
+      BACKUP_POSTGRES_USER: ${BACKUP_POSTGRES_USER:-bankadmin}
+      BACKUP_POSTGRES_PASSWORD: ${BACKUP_POSTGRES_PASSWORD}
+    command: ["scenario", "--artifacts", "/artifacts"]
+    volumes:
+      - ${BACKUP_ARTIFACT_DIR:?set BACKUP_ARTIFACT_DIR}:/artifacts
+    depends_on:
+      migrate-auth-backup:
+        condition: service_completed_successfully
+      migrate-transactions-backup:
+        condition: service_completed_successfully
+      backup-target:
+        condition: service_healthy
+    networks: [bankcore_backup_net]
+
+volumes:
+  backup_source_data:
+  backup_target_data:
+
+networks:
+  bankcore_backup_net:
