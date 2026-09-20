@@ -176,6 +176,8 @@ class OutboxPublisher:
             for event in events:
                 try:
                     await self._publish_one(active_producer, event)
+                    if settings.OUTBOX_CRASH_AFTER_KAFKA_ACK:
+                        raise SystemExit(97)
                     if await self.mark_published(event.id):
                         published += 1
                 except Exception as error:

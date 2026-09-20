@@ -102,6 +102,8 @@ class AuditConsumer:
             if message_key != str(event.data.transaction_id):
                 raise InvalidAuditEvent("Kafka message key does not match transaction_id")
         await self.persist(event)
+        if settings.CRASH_AFTER_DB_COMMIT:
+            raise SystemExit(97)
         if kafka_consumer is not None:
             await kafka_consumer.commit()
         return event

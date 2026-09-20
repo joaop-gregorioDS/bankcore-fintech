@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     MAX_RETRIES: int = 3
     LOCAL_RETRY_ATTEMPTS: int = 1
     LOCAL_RETRY_DELAY_SECONDS: float = 0.05
+    CRASH_AFTER_DB_COMMIT: bool = False
     CONSUMER_VERSION: str = "audit-consumer-v1"
 
 

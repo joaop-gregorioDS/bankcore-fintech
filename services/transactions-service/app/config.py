@@ -24,5 +24,6 @@ class Settings(BaseSettings):
     OUTBOX_POLL_INTERVAL_SECONDS: float = 1.0
     OUTBOX_LEASE_SECONDS: int = 30
     OUTBOX_PUBLISHER_ID: str = ""
+    OUTBOX_CRASH_AFTER_KAFKA_ACK: bool = False
 
 settings = Settings()
