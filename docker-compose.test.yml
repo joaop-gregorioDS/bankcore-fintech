@@ -40,7 +40,6 @@ services:
       dockerfile: services/transactions-service/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
-      REDIS_URL: redis://unused
       JWT_ACTIVE_KID: test-runner
       AUTH_SERVICE_TOKEN: test-runner
       RATE_LIMIT_KEY_SECRET: test-rate-limit-key

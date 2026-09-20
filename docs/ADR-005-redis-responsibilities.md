@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted locally — P4-A audit, P4-B distributed login rate limiting and P4-C
-Redis operational hardening implemented.
+Accepted locally — P4-A audit, P4-B distributed login rate limiting, P4-C
+Redis operational hardening and P4-D dead dependency cleanup implemented.
 
 ## Scope and evidence boundary
 
@@ -18,7 +18,7 @@ verified**.
 | --- | --- | --- | --- |
 | Auth login rate limit | Atomic Redis Lua increment with first-increment TTL; versioned HMAC-derived key; configurable 5 attempts/900 seconds; successful login deletes the key | Ephemeral security-control state; loss weakens throttling but does not alter money | **Critical supporting control; reconstructible** |
 | Auth Redis outage fallback | Per-process dictionary, same configurable budget, protected by an async lock; bounded entry cleanup; Redis connection timeouts | Ephemeral local protection; not globally consistent across replicas | **Critical fallback; bounded but degraded** |
-| Transactions Redis client | `redis.asyncio` client is created at startup and closed at shutdown; `get_redis` exists, but no production route currently uses it and no Redis key/TTL was found | No current business state | **Dispensable/latent dependency** |
+| Transactions Redis client | Removed in P4-D; Transactions has no Redis package, configuration, client or startup connection | No current business state | **Removed; no financial impact** |
 | Transactions internal-token cache | In-process dictionary keyed by `("bankcore-internal", scope)`; expiry is the token lifetime minus five seconds | Reconstructible credential cache; not Redis-backed | **Reconstructible; outside Redis scope** |
 | Financial state | Balances, ledger, idempotency, outbox and event delivery state are PostgreSQL/Kafka-owned | Durable authoritative state | **Must never move to Redis** |
 | Client-side caches/sessions | Mobile/desktop/browser local caches and session state; not Redis | Presentation/session convenience state | **Not a server Redis responsibility** |
@@ -65,11 +65,11 @@ observed local configuration fact, not a claim about the VPS.
 
 Auth and Transactions do not declare a Redis health dependency. Auth readiness
 checks PostgreSQL only, and Transactions readiness checks PostgreSQL only.
-Auth intentionally falls back to a local limiter when Redis fails. Transactions
-creates a lazy client without a connectivity probe, and its current Redis
-dependency has no observed business effect. The Redis container healthcheck
-proves only that the broker answers `PING`; it does not prove the application
-contract or rate-limit behavior.
+Auth intentionally falls back to a local limiter when Redis fails. P4-D
+removed the unused Transactions Redis client, so Transactions now has no Redis
+startup or shutdown behavior. The Redis container healthcheck proves only that
+the broker answers `PING`; it does not prove the application contract or
+rate-limit behavior.
 
 Redis AOF and the named volume allow local restart persistence, but P1-D does
 not back up or restore Redis. This is correct for the current financial design:
@@ -80,9 +80,10 @@ durability behavior of a production Redis instance remains not verified.
 
 The disposable P3 E2E environment starts Redis because it composes the normal
 Auth/Transactions stack, but its financial assertions use PostgreSQL, Kafka and
-the service APIs. Several migration/unit/integration Compose environments set
-`REDIS_URL=redis://unused` and do not start Redis, which is consistent with the
-absence of Redis use in those paths. P4-B now proves the multi-replica
+the service APIs. Auth retains its Redis configuration; Transactions,
+Transactions migrations and Transactions outbox workers no longer receive
+`REDIS_URL`. The shared test runner may still define `REDIS_URL=redis://unused`
+for Auth imports/tests. P4-B now proves the multi-replica
 distributed rate-limit contract in a disposable Compose environment.
 
 The development override enables Uvicorn `--reload`; that is an explicit
@@ -94,7 +95,7 @@ development-only override and is not part of the production-like base Compose.
 | --- | --- | --- |
 | Redis unavailable during login | Auth applies a local limit of 5/900s per process; global enforcement degrades across replicas | **Mitigated, not distributed** |
 | Redis restart/flush | Login counters disappear or are reconstructed locally; users and money remain intact | **Acceptable for ephemeral control; document behavior** |
-| Transactions Redis unavailable | Current observed financial path remains PostgreSQL/Kafka-backed; no route uses `get_redis` | **No current financial impact; remove or make optional later** |
+| Transactions Redis unavailable | Transactions has no Redis client or configuration; its financial path remains PostgreSQL/Kafka-backed | **No dependency; verified by P4-D** |
 | Redis memory pressure | `noeviction` rejects new writes; Auth catches the Redis error and applies the bounded local fallback | **Explicitly degraded but protected** |
 | Redis network exposure | No host port in repository Compose; production exposure is not verified | **Locally constrained; production not verified** |
 | Redis data corruption/loss | No financial loss by design; rate-limit state is lost | **Acceptable only for current data class** |
@@ -141,6 +142,25 @@ recovery. It also checked that Transactions routes do not consume the Redis
 dependency. PostgreSQL, ledger, balances, idempotency, outbox and Kafka state
 were not placed in Redis and were not modified by this phase.
 
+## P4-D implementation and evidence
+
+P4-D removed the dead Redis dependency from Transactions: the service no longer
+declares `REDIS_URL`, imports or initializes a Redis client, ships the Redis
+Python package, or passes Redis configuration to its migration and outbox
+publisher containers. Auth's Redis rate limiter and the shared test harness
+remain unchanged where they are required.
+
+The resulting boundary is explicit: Redis is an Auth supporting service for
+distributed login throttling, while Transactions uses PostgreSQL for accounts,
+balances, ledger, idempotency and outbox state and Kafka for event propagation.
+Validation covers Transactions source/configuration search, Compose parsing, a
+64-test full-suite run, and the disposable
+`scripts/p4d-transactions-no-redis.py` financial path. That smoke test starts
+PostgreSQL and Kafka but deliberately does not start Redis, then validates the
+Auth → Transactions → Risk → Ledger → Kafka happy path. The complete P3 E2E
+also passed its happy, recovery, idempotency, risk-rejection and poison/DLQ
+scenarios with Redis available to Auth.
+
 ## Proposed P4-A policy
 
 1. PostgreSQL is authoritative for users, accounts, balances, ledger entries,
@@ -166,8 +186,8 @@ were not placed in Redis and were not modified by this phase.
 - **P4-C — Redis operational hardening:** **implemented locally** with a
   versioned config, bounded memory, `noeviction`, AOF continuity semantics and
   failure/recovery validation.
-- **P4-D — Dead dependency cleanup:** re-audit Transactions and remove its
-  unused Redis client only if the functional boundary remains unchanged.
+- **P4-D — Dead dependency cleanup:** **implemented locally**; Transactions no
+  longer carries a Redis client, package, configuration or Compose wiring.
 - **P4-E — Failure modes:** extend tests for offline, restart, flush, timeout
   and recovery with PostgreSQL financial assertions unchanged.
   with PostgreSQL financial assertions unchanged.
@@ -179,7 +199,5 @@ were not placed in Redis and were not modified by this phase.
 
 ## Open decisions before implementation
 
-- Whether the unused Transactions Redis client should be removed or retained as
-  an explicitly optional integration seam.
 - Whether a safe cache-aside candidate exists in a future phase; if not, keep
   cache-aside intentionally out of scope rather than adding cache complexity.

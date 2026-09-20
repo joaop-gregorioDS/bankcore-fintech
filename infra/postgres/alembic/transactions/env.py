@@ -15,7 +15,6 @@ if not database_url:
     raise RuntimeError("DATABASE_URL is required for Transactions migrations.")
 config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 os.environ.setdefault("DATABASE_URL", database_url)
-os.environ.setdefault("REDIS_URL", "redis://unused")
 os.environ.setdefault("JWT_ACTIVE_KID", "migration")
 os.environ.setdefault("AUTH_SERVICE_TOKEN", "migration")
 

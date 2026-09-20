@@ -3,7 +3,6 @@ from typing import Literal
 
 class Settings(BaseSettings):
     DATABASE_URL: str
-    REDIS_URL: str
     JWT_ALGORITHM: Literal["RS256"] = "RS256"
     JWT_ISSUER: str = "bankcore-auth"
     JWT_AUDIENCE: str = "bankcore-api"
