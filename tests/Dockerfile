@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir --disable-pip-version-check \
 
 COPY --chown=bankcore:bankcore services ./services
 COPY --chown=bankcore:bankcore infra ./infra
+COPY --chown=bankcore:bankcore docs ./docs
 COPY --chown=bankcore:bankcore tests ./tests
 COPY --chown=bankcore:bankcore scripts ./scripts
 COPY --chown=bankcore:bankcore pytest.ini conftest.py ./

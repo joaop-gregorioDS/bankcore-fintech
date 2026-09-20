@@ -4,6 +4,9 @@
 apps
 frontend
 docs
+!docs/
+!docs/events/
+!docs/events/transaction.completed.v1.json
 work
 **/__pycache__
 **/*.pyc

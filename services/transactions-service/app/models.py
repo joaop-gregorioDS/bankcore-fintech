@@ -1,8 +1,8 @@
 import uuid
 import enum
-from datetime import datetime
-from sqlalchemy import Column, String, BigInteger, Boolean, DateTime, ForeignKey, Index, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from datetime import datetime, timezone
+from sqlalchemy import Column, String, BigInteger, Integer, Boolean, DateTime, ForeignKey, Index, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from app.database import Base
 
 class TransactionType(str, enum.Enum):
@@ -79,3 +79,39 @@ class LedgerEntry(Base):
     side = Column(String(6), nullable=False)
     amount_cents = Column(BigInteger, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class OutboxEvent(Base):
+    __tablename__ = "outbox_events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    aggregate_type = Column(String(50), nullable=False)
+    aggregate_id = Column(UUID(as_uuid=True), nullable=False)
+    event_type = Column(String(100), nullable=False)
+    event_version = Column(Integer, nullable=False)
+    message_key = Column(String(255), nullable=False)
+    payload = Column(JSONB, nullable=False)
+    occurred_at = Column(DateTime(timezone=True), nullable=False)
+    published_at = Column(DateTime(timezone=True), nullable=True)
+    attempts = Column(Integer, nullable=False, default=0)
+    last_error = Column(String(2000), nullable=True)
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "aggregate_id",
+            "event_type",
+            "event_version",
+            name="uq_outbox_aggregate_event_version",
+        ),
+        Index(
+            "idx_outbox_pending",
+            "published_at",
+            "occurred_at",
+            "attempts",
+        ),
+    )

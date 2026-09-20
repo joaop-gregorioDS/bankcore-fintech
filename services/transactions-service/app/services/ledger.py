@@ -3,10 +3,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import HTTPException
-from app.models import Account, IdempotencyRecord, LedgerTransaction, LedgerEntry, TransactionType, TransactionStatus
+from app.models import Account, IdempotencyRecord, LedgerTransaction, LedgerEntry, OutboxEvent, TransactionType, TransactionStatus
 from app.money import BIGINT_MAX_CENTS
 from app.idempotency import build_request_fingerprint
 from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
+from app.events import build_transaction_completed_v1
 
 IDEM_PROCESSING = "PROCESSING"
 IDEM_COMPLETED = "COMPLETED"
@@ -290,6 +291,19 @@ async def transfer_funds(
             (source_acc, DEBIT, amount_cents),
             (dest_acc, CREDIT, amount_cents),
         ])
+        event = build_transaction_completed_v1(tx)
+        db.add(
+            OutboxEvent(
+                id=event.event_id,
+                aggregate_type="transaction",
+                aggregate_id=tx.id,
+                event_type=event.event_type,
+                event_version=event.event_version,
+                message_key=str(tx.id),
+                payload=event.payload(),
+                occurred_at=event.occurred_at,
+            )
+        )
         _complete_idempotency(record, tx)
         await db.commit()
         await db.refresh(tx)
