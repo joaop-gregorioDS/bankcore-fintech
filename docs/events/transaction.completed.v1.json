@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bankcore.invalid/events/transaction.completed.v1.json",
+  "title": "BankCore transaction.completed v1",
+  "description": "Committed financial transaction fact emitted by Transactions after the ledger transaction commits.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_version",
+    "occurred_at",
+    "producer",
+    "correlation_id",
+    "data"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "const": "transaction.completed"
+    },
+    "event_version": {
+      "const": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the committed fact was recorded."
+    },
+    "producer": {
+      "const": "transactions-service"
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transaction_id",
+        "source_account_id",
+        "destination_account_id",
+        "amount_cents",
+        "operation_type",
+        "risk_assessment_id",
+        "risk_rules_version"
+      ],
+      "properties": {
+        "transaction_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_account_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "destination_account_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "amount_cents": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "operation_type": {
+          "type": "string",
+          "enum": ["PIX"]
+        },
+        "risk_assessment_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "risk_rules_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    }
+  }
+}
