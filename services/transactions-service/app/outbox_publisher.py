@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.config import settings
 from app.database import AsyncSessionLocal, engine
 from app.models import OutboxEvent
+from common.metrics import configure_metrics
 from common.observability import log_event, set_correlation_id
 from common.tracing import configure_tracing, inject_trace_headers, tracer
 from app.metrics import outbox_publish_duration, outbox_published, set_outbox_state
@@ -268,6 +269,7 @@ async def main() -> int:
     from common.observability import configure_logging
 
     configure_logging("outbox-publisher")
+    configure_metrics("outbox-publisher")
     configure_tracing("outbox-publisher")
     publisher = OutboxPublisher()
     if args.once:

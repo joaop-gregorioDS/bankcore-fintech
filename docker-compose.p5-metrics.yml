@@ -52,3 +52,8 @@ services:
     environment:
       OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_METRICS_INSECURE: "true"
+
+  p3-e2e-runner:
+    environment:
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_METRICS_INSECURE: "true"

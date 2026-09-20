@@ -75,15 +75,31 @@ def list_metric_names(port: str) -> set[str]:
     return set(payload["data"])
 
 
+def wait_for_metrics(port: str, required: set[str], timeout: int = 30) -> set[str]:
+    deadline = time.monotonic() + timeout
+    last_missing = sorted(required)
+    while time.monotonic() < deadline:
+        available_names = list_metric_names(port)
+        last_missing = sorted(
+            name for name in required
+            if name not in available_names and f"{name}_total" not in available_names
+        )
+        if not last_missing:
+            return available_names
+        time.sleep(2)
+    raise RuntimeError(
+        f"Prometheus metrics did not become available within {timeout}s: {', '.join(last_missing)}"
+    )
+
+
 def assert_metrics(port: str) -> None:
-    available_names = list_metric_names(port)
     required = {
         "bankcore_auth_login_attempts",
         "bankcore_auth_login_results",
         "bankcore_auth_rate_limit_decisions",
         "bankcore_auth_redis_failures",
         "bankcore_auth_redis_recoveries",
-        "bankcore_transactions_http_requests",
+        "bankcore_transactions_service_http_requests",
         "bankcore_transactions_risk_requests",
         "bankcore_transactions_ledger_commits",
         "bankcore_transactions_outbox_events_created",
@@ -96,12 +112,12 @@ def assert_metrics(port: str) -> None:
         "bankcore_kafka_retries",
         "bankcore_kafka_dlq",
     }
-    missing = sorted(
-        name for name in required
-        if name not in available_names and f"{name}_total" not in available_names
-    )
-    if missing:
-        raise RuntimeError(f"Prometheus metrics missing: {', '.join(missing)}")
+    available_names = wait_for_metrics(port, required)
+    for metric in ("bankcore_outbox_publish", "bankcore_risk_assessments", "bankcore_kafka_retries"):
+        exported_name = metric if metric in available_names else f"{metric}_total"
+        result = query_prometheus(port, exported_name).get("result", [])
+        if not result or not any(float(item["value"][1]) > 0 for item in result):
+            raise RuntimeError(f"Prometheus metric has no positive observation: {exported_name}")
 
     series = query_prometheus(port, '{__name__=~"bankcore_.*"}')
     forbidden = {"request_id", "correlation_id", "trace_id", "transaction_id", "event_id", "user_id", "account_id"}
@@ -141,6 +157,7 @@ def main() -> int:
             require(project, environment, "run", "--rm", "--no-deps", "p3-e2e-runner", "python", "tests/p3g_e2e.py", "happy")
             require(project, environment, "run", "--rm", "--no-deps", "p3-e2e-runner", "python", "tests/p3g_e2e.py", "risk-rejected")
             require(project, environment, "run", "--rm", "--no-deps", "p3-e2e-runner", "python", "tests/p3g_e2e.py", "poison")
+            require(project, environment, "run", "--rm", "--no-deps", "p3-e2e-runner", "python", "tests/p5_metrics_e2e.py", "kafka-retry")
             require(project, environment, "stop", "outbox-publisher", "kafka")
             require(project, environment, "run", "--rm", "--no-deps", "p3-e2e-runner", "python", "tests/p3g_e2e.py", "create-pending")
             require(project, environment, "up", "-d", "--wait", "kafka")
@@ -151,7 +168,6 @@ def main() -> int:
             require(project, environment, "up", "-d", "redis")
             require(project, environment, "run", "--rm", "--no-deps", "p3-e2e-runner", "python", "tests/p5_metrics_e2e.py", "redis-fallback")
             wait_for_prometheus(prometheus_port)
-            time.sleep(5)
             assert_metrics(prometheus_port)
             print("P5-D METRICS PASS: bounded Prometheus series, success/failure/recovery scenarios verified")
             exit_code = 0
