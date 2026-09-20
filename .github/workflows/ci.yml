@@ -20,19 +20,17 @@ concurrency:
   group: bankcore-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-env:
-  POSTGRES_PASSWORD: ci-validation-only
-  JWT_ACTIVE_KID: ci-validation
-  AUTH_SERVICE_TOKEN: ci-service-token-validation
-  GATEWAY_PORT: "18080"
-  TEST_VALIDATE_MIGRATIONS: "true"
-  TEST_FORCE_FAILURE: ${{ inputs.force_failure || 'false' }}
-
 jobs:
   quality:
     name: Quality gates
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    env:
+      POSTGRES_PASSWORD: ci-validation-only
+      JWT_ACTIVE_KID: ci-validation
+      AUTH_SERVICE_TOKEN: ci-service-token-validation
+      TEST_VALIDATE_MIGRATIONS: "true"
+      TEST_FORCE_FAILURE: ${{ inputs.force_failure || 'false' }}
 
     steps:
       - name: Checkout
@@ -51,7 +49,7 @@ jobs:
           python -m pip install --disable-pip-version-check --no-cache-dir ruff==0.6.9
           ruff check --select E9,F63,F7,F82 services infra scripts tests conftest.py
 
-      - name: Dependency audit
+      - name: Python dependency audit
         run: |
           python -m pip install --disable-pip-version-check --no-cache-dir pip-audit==2.7.3
           pip-audit -r services/auth-service/requirements.txt
@@ -63,25 +61,129 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate production Compose
-        env:
-          POSTGRES_PASSWORD: ci-validation-only
-          JWT_ACTIVE_KID: ci-validation
-          AUTH_SERVICE_TOKEN: ci-service-token-validation
         run: docker compose -f docker-compose.yml config --quiet
 
-      - name: Validate test Compose
+      - name: Validate disposable Compose files
         env:
           TEST_POSTGRES_PASSWORD: ci-validation-only
-        run: docker compose -f docker-compose.test.yml config --quiet
+          RISK_TEST_POSTGRES_PASSWORD: ci-validation-only
+        run: |
+          docker compose -f docker-compose.test.yml config --quiet
+          docker compose -f docker-compose.risk-test.yml config --quiet
+          docker compose -f docker-compose.yml -f docker-compose.e2e.yml config --quiet
 
       - name: Build application images
-        env:
-          POSTGRES_PASSWORD: ci-validation-only
-          JWT_ACTIVE_KID: ci-validation
-          AUTH_SERVICE_TOKEN: ci-service-token-validation
         run: |
-          docker compose -f docker-compose.yml build auth-service transactions-service
+          docker compose -f docker-compose.yml build auth-service transactions-service risk-service
           docker compose -f docker-compose.yml pull nginx
 
-      - name: Run disposable test infrastructure
+      - name: Run disposable Python and Transactions gates
         run: bash scripts/test.sh all
+
+  dotnet:
+    name: .NET build, tests and EF validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore .NET solution
+        run: dotnet restore services/risk-service/BankCore.Risk.sln
+
+      - name: Restore Risk PostgreSQL integration project
+        run: dotnet restore services/risk-service/tests/BankCore.Risk.IntegrationTests/BankCore.Risk.IntegrationTests.csproj
+
+      - name: NuGet dependency audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet list services/risk-service/BankCore.Risk.sln package --vulnerable --include-transitive | tee "$RUNNER_TEMP/nuget-audit.txt"
+          dotnet list services/risk-service/tests/BankCore.Risk.IntegrationTests/BankCore.Risk.IntegrationTests.csproj package --vulnerable --include-transitive | tee -a "$RUNNER_TEMP/nuget-audit.txt"
+          if grep -Eq '(^|[[:space:]])(Critical|High|Moderate|Low)([[:space:]]|$)|CVE-|GHSA-' "$RUNNER_TEMP/nuget-audit.txt"; then
+            echo "NuGet vulnerabilities detected."
+            exit 1
+          fi
+
+      - name: Build .NET solution
+        run: dotnet build services/risk-service/BankCore.Risk.sln --configuration Release --no-restore
+
+      - name: Test .NET unit and API contracts
+        run: dotnet test services/risk-service/BankCore.Risk.sln --configuration Release --no-build --no-restore --logger "trx;LogFileName=risk-tests.trx"
+
+      - name: Install EF Core CLI
+        run: dotnet tool install --global dotnet-ef --version 8.0.11
+
+      - name: Validate EF migrations and model snapshot
+        shell: bash
+        env:
+          RISK_DATABASE_CONNECTION: Host=localhost;Port=5432;Database=bankcore_test_risk;Username=bankadmin;Password=ci-validation-only
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet ef migrations list \
+            --project services/risk-service/src/BankCore.Risk.Infrastructure/BankCore.Risk.Infrastructure.csproj \
+            --startup-project services/risk-service/src/BankCore.Risk.Migrator/BankCore.Risk.Migrator.csproj \
+            --configuration Release --no-build
+          dotnet ef migrations has-pending-model-changes \
+            --project services/risk-service/src/BankCore.Risk.Infrastructure/BankCore.Risk.Infrastructure.csproj \
+            --startup-project services/risk-service/src/BankCore.Risk.Migrator/BankCore.Risk.Migrator.csproj \
+            --configuration Release --no-build
+          dotnet ef migrations script --idempotent \
+            --project services/risk-service/src/BankCore.Risk.Infrastructure/BankCore.Risk.Infrastructure.csproj \
+            --startup-project services/risk-service/src/BankCore.Risk.Migrator/BankCore.Risk.Migrator.csproj \
+            --configuration Release --no-build --output "$RUNNER_TEMP/risk-migrations.sql"
+          test -s "$RUNNER_TEMP/risk-migrations.sql"
+
+  risk-integration:
+    name: Risk PostgreSQL integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run disposable Risk PostgreSQL integration
+        shell: bash
+        env:
+          RISK_TEST_POSTGRES_PASSWORD: risk-ci-validation-only
+        run: |
+          set -euo pipefail
+          project="bankcore-risk-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          trap 'docker compose -p "$project" -f docker-compose.risk-test.yml down -v --remove-orphans' EXIT
+          docker compose -p "$project" -f docker-compose.risk-test.yml build
+          docker compose -p "$project" -f docker-compose.risk-test.yml up -d --wait postgres-risk-test
+          docker compose -p "$project" -f docker-compose.risk-test.yml run --rm migrate-risk-test
+          docker compose -p "$project" -f docker-compose.risk-test.yml run --rm risk-integration-tests
+
+  e2e:
+    name: Disposable Auth to Risk E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install E2E key-generation dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir cryptography==50.0.1
+
+      - name: Run disposable full-stack E2E
+        run: python scripts/e2e.py

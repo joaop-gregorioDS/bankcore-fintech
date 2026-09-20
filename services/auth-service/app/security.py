@@ -71,12 +71,13 @@ def create_access_token(data: dict) -> str:
     )
 
 
-def create_internal_service_token(service_name: str) -> str:
+def create_internal_service_token(service_name: str, scope: str | None = None) -> str:
+    token_scope = scope or f"service:{service_name}"
     return _encode_token(
         {"sub": f"service:{service_name}"},
         audience="bankcore-internal",
         expires_in=settings.INTERNAL_TOKEN_EXPIRE_SECONDS,
-        scope=f"service:{service_name}",
+        scope=token_scope,
     )
 
 
@@ -148,13 +149,18 @@ def require_internal_service(
 def validate_internal_service_secret(
     x_service_token: str | None = Header(default=None, alias="X-Service-Token"),
     x_service_name: str | None = Header(default=None, alias="X-Service-Name"),
-) -> None:
+    x_service_scope: str | None = Header(default=None, alias="X-Service-Scope"),
+) -> str:
+    allowed_scopes = {"service:transactions", "risk:assess"}
+    requested_scope = x_service_scope or "service:transactions"
     if (
         x_service_name != "transactions"
         or not x_service_token
         or not secrets.compare_digest(x_service_token, settings.AUTH_SERVICE_TOKEN)
+        or requested_scope not in allowed_scopes
     ):
         raise _unauthorized("Credencial de serviço inválida.")
+    return requested_scope
 
 def get_current_user(creds: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> dict:
     if creds is None or not creds.credentials:

@@ -1,0 +1,48 @@
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    image: bankcore-fintech-e2e-auth-service
+
+  transactions-service:
+    build:
+      context: .
+      dockerfile: services/transactions-service/Dockerfile
+    image: bankcore-fintech-e2e-transactions-service
+
+  risk-service:
+    build:
+      context: .
+      dockerfile: services/risk-service/Dockerfile
+    image: bankcore-fintech-e2e-risk-service
+
+  migrate-auth:
+    image: bankcore-fintech-e2e-auth-service
+
+  migrate-transactions:
+    image: bankcore-fintech-e2e-transactions-service
+
+  migrate-risk:
+    image: bankcore-fintech-e2e-risk-service
+
+  nginx:
+    ports:
+      - "${E2E_GATEWAY_PORT:-18080}:8080"
+
+  e2e-runner:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    command: ["python", "tests/e2e_smoke.py"]
+    environment:
+      E2E_BASE_URL: http://nginx:8080
+      E2E_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
+      E2E_RISK_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_risk
+    depends_on:
+      nginx:
+        condition: service_healthy
+      risk-service:
+        condition: service_healthy
+    networks:
+      - bankcore_net

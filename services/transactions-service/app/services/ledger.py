@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -224,6 +224,10 @@ async def transfer_funds(
     amount_cents: int,
     idempotency_key: str,
     description: str | None = None,
+    transaction_id: UUID | None = None,
+    risk_assessment_id: UUID | None = None,
+    risk_decision: str | None = None,
+    risk_rules_version: str | None = None,
 ) -> LedgerTransaction:
     _validate_amount_cents(amount_cents)
     if amount_cents <= 0:
@@ -253,6 +257,10 @@ async def transfer_funds(
         if existing:
             return existing
 
+        stable_transaction_id = transaction_id or uuid4()
+        if risk_assessment_id is None or risk_decision != "APPROVED" or not risk_rules_version:
+            raise HTTPException(status_code=503, detail="RISK_UNAVAILABLE")
+
         locked = await _lock_accounts(db, source_account_id, destination_account_id)
         source_acc = locked.get(source_account_id)
         dest_acc = locked.get(destination_account_id)
@@ -264,6 +272,7 @@ async def transfer_funds(
             raise HTTPException(status_code=400, detail="Saldo insuficiente para transferência Pix.")
 
         tx = LedgerTransaction(
+            id=stable_transaction_id,
             idempotency_key=idempotency_key,
             source_account_id=source_account_id,
             destination_account_id=destination_account_id,
@@ -271,6 +280,9 @@ async def transfer_funds(
             transaction_type=TransactionType.TRANSFER.value,
             status=TransactionStatus.COMPLETED.value,
             description=normalized_description,
+            risk_assessment_id=risk_assessment_id,
+            risk_decision=risk_decision,
+            risk_rules_version=risk_rules_version,
         )
         db.add(tx)
         await db.flush()
@@ -284,6 +296,10 @@ async def transfer_funds(
         return tx
     except IntegrityError:
         await db.rollback()
+        if transaction_id:
+            replay = await db.get(LedgerTransaction, transaction_id)
+            if replay is not None:
+                return replay
         raise HTTPException(status_code=409, detail="Chave de idempotência já utilizada.")
     except HTTPException:
         await db.rollback()

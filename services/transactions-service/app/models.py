@@ -36,6 +36,9 @@ class LedgerTransaction(Base):
     transaction_type = Column(String(20), nullable=False)
     status = Column(String(20), default="COMPLETED", nullable=False)
     description = Column(String(255), nullable=True)
+    risk_assessment_id = Column(UUID(as_uuid=True), nullable=True, index=True)
+    risk_decision = Column(String(16), nullable=True)
+    risk_rules_version = Column(String(64), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     __table_args__ = (

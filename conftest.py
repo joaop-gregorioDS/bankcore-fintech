@@ -9,6 +9,8 @@ MARKERS_BY_FILE = {
     "test_idempotency_postgres.py": ("integration", "postgres"),
     "test_migrations.py": ("unit",),
     "test_monetary_correctness.py": ("unit",),
+    "test_p2f_risk_gate.py": ("integration", "postgres"),
+    "test_p2g_resilience.py": ("unit", "security"),
 }
 
 

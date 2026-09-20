@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     JWT_PUBLIC_KEYS_DIR: str = "/run/secrets/jwt-public"
     AUTH_SERVICE_URL: str = "http://auth-service:8000"
     AUTH_SERVICE_TOKEN: str
+    RISK_SERVICE_URL: str = "http://risk-service:8080"
+    RISK_TIMEOUT_SECONDS: float = 3.0
+    RISK_RETRY_COUNT: int = 1
+    RISK_RETRY_DELAY_SECONDS: float = 0.1
+    RISK_CIRCUIT_FAILURE_THRESHOLD: int = 3
+    RISK_CIRCUIT_OPEN_SECONDS: float = 5.0
     DEMO_MODE: bool = False
 
 settings = Settings()

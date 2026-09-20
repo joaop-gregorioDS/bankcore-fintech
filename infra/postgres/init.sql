@@ -5,3 +5,6 @@ WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'bankcore_accounts')\g
 
 SELECT 'CREATE DATABASE bankcore_transactions'
 WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'bankcore_transactions')\gexec
+
+SELECT 'CREATE DATABASE bankcore_risk'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'bankcore_risk')\gexec
