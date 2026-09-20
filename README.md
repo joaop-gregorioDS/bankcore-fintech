@@ -110,6 +110,21 @@ Suítes disponíveis: `unit`, `security`, `integration`, `postgres` e `all`. A U
 
 Para verificar deliberadamente o caminho de falha e teardown, use `.\scripts\test.ps1 -ForceFailure`; o comando deve retornar código diferente de zero e remover o ambiente temporário.
 
+### Backup e restore local
+
+O fluxo P1-D valida backups PostgreSQL separados para Auth e Transactions em
+containers descartáveis. Ele usa `pg_dump`/`pg_restore` dentro do ambiente
+PostgreSQL, restaura em bancos vazios, compara dados financeiros e rejeita
+adulteração ou alvos que não sejam explicitamente `bankcore_test_`:
+
+```powershell
+.\scripts\backup-restore.ps1
+```
+
+O manifest contém apenas metadados e SHA-256. Redis não é fonte da verdade
+financeira; a fonte autoritativa é o PostgreSQL e seu ledger. O fluxo não acessa
+a VPS e remove containers, volumes e artefatos temporários ao terminar.
+
 ---
 
 ## Licença
