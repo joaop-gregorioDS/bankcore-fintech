@@ -44,6 +44,8 @@ Exemplo:
 }
 ```
 
+No P2-D, `assessment_id` é um identificador efêmero da resposta HTTP; ainda não representa um registro durável nem fornece idempotência persistente. A durabilidade por `transaction_id` + fingerprint será adicionada junto com o banco no P2-E.
+
 ### Response
 
 ```json
@@ -187,10 +189,10 @@ O domínio ainda não implementa velocity, histórico do cliente, destinatário 
 | Fase | Escopo |
 | --- | --- |
 | P2-B | solução .NET, projetos, build e testes unitários mínimos |
-| P2-C | domínio determinístico e contrato HTTP |
-| P2-D | PostgreSQL `bankcore_risk`, EF Core e migrations próprias |
-| P2-E | autenticação interna `risk:assess`, chaves públicas e integração Auth |
+| P2-C | domínio determinístico e regras sintéticas |
+| P2-D | API interna segura, DTO estrito e autenticação `risk:assess` |
+| P2-E | EF Core, PostgreSQL `bankcore_risk` e migrations próprias |
 | P2-F | cliente Risk em Transactions, timeout, idempotência e fail-closed |
-| P2-G | Compose, health/readiness, testes de integração e CI |
+| P2-G | resiliência, testes de integração e CI |
 
 Kafka, observabilidade avançada, IaC e ML permanecem fora destas fases iniciais.

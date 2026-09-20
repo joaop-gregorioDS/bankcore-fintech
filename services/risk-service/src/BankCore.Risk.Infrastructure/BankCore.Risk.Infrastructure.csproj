@@ -8,5 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BankCore.Risk.Domain\BankCore.Risk.Domain.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.30" />
   </ItemGroup>
 </Project>

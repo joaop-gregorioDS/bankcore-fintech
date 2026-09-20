@@ -126,6 +126,11 @@ services:
       ASPNETCORE_ENVIRONMENT: ${RISK_ASPNETCORE_ENVIRONMENT:-Production}
       RISK__SERVICE_NAME: ${RISK_SERVICE_NAME:-bankcore-risk}
       RISK__ENVIRONMENT_NAME: ${RISK_ENVIRONMENT_NAME:-Production}
+      RiskJwt__Issuer: ${JWT_ISSUER:-bankcore-auth}
+      RiskJwt__Audience: bankcore-internal
+      RiskJwt__PublicKeysDirectory: /run/secrets/jwt-public
+    volumes:
+      - ${JWT_PUBLIC_KEYS_HOST_DIR:-./secrets/jwt-public}:/run/secrets/jwt-public:ro
     expose:
       - "8080"
     healthcheck:
