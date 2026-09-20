@@ -3,7 +3,8 @@
 ## Status
 
 Accepted locally — P4-A audit, P4-B distributed login rate limiting, P4-C
-Redis operational hardening and P4-D dead dependency cleanup implemented.
+Redis operational hardening, P4-D dead dependency cleanup and P4-E CI
+completion implemented.
 
 ## Scope and evidence boundary
 
@@ -161,6 +162,21 @@ Auth → Transactions → Risk → Ledger → Kafka happy path. The complete P3 
 also passed its happy, recovery, idempotency, risk-rejection and poison/DLQ
 scenarios with Redis available to Auth.
 
+## P4-E CI completion and evidence
+
+The GitHub Actions workflow now has a dedicated `redis-resilience` job. It
+validates the Redis policy and Transactions ownership boundary, audits all
+Python service requirements, runs the two-Auth distributed limiter suite,
+exercises Redis memory-pressure rejection, offline fallback and restart
+recovery, and runs the disposable Transactions-without-Redis financial smoke
+test. The job reuses the same disposable runners used locally and has no
+production or VPS dependency.
+
+The architecture gate fails if a Redis client, `REDIS_URL` or Redis import is
+reintroduced anywhere under `services/transactions-service/`. It also checks
+that `infra/redis/redis.conf` retains AOF, `appendfsync everysec`, a positive
+memory limit and `maxmemory-policy noeviction`.
+
 ## Proposed P4-A policy
 
 1. PostgreSQL is authoritative for users, accounts, balances, ledger entries,
@@ -188,14 +204,13 @@ scenarios with Redis available to Auth.
   failure/recovery validation.
 - **P4-D — Dead dependency cleanup:** **implemented locally**; Transactions no
   longer carries a Redis client, package, configuration or Compose wiring.
-- **P4-E — Failure modes:** extend tests for offline, restart, flush, timeout
-  and recovery with PostgreSQL financial assertions unchanged.
-  with PostgreSQL financial assertions unchanged.
-- **P4-F — Redis observability:** add bounded metrics/logging for latency, hit
-  rate, limiter fallback and connection failures without logging identifiers or
-  credentials.
-- **P4-G — E2E and CI:** exercise the Redis contract in disposable Compose and
-  GitHub Actions environments; do not add production secrets or VPS access.
+- **P4-E — Redis resilience CI completion:** **implemented locally** with a
+  dedicated GitHub Actions job, dependency audits, architecture regression
+  gate and disposable resilience/financial runners.
+- **P4-F — Redis observability:** deferred to the broader P5 observability
+  phase; no metrics or logging surface was added by P4.
+- **P4-G — E2E and CI:** absorbed into P4-E through the dedicated disposable
+  runners and GitHub Actions job; no separate production or VPS stage exists.
 
 ## Open decisions before implementation
 
