@@ -1,0 +1,176 @@
+services:
+  postgres:
+    volumes:
+      - ./infra/postgres/p3-init.sql:/docker-entrypoint-initdb.d/p3-init.sql:ro
+
+  kafka:
+    image: apache/kafka:3.9.0
+    hostname: kafka
+    environment:
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: INTERNAL://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    volumes:
+      - p3_kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:9092 >/dev/null 2>&1
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - bankcore_net
+
+  migrate-audit:
+    build:
+      context: .
+      dockerfile: services/audit-service/Dockerfile
+    image: bankcore-fintech-p3-e2e-audit-service
+    command: ["python", "/app/migrate_audit.py"]
+    environment:
+      AUDIT_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_audit
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bankcore_net
+
+  outbox-publisher:
+    image: bankcore-fintech-e2e-transactions-service
+    command: ["python", "-m", "app.outbox_publisher"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
+      REDIS_URL: redis://redis:6379/0
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      OUTBOX_BATCH_SIZE: "10"
+      OUTBOX_POLL_INTERVAL_SECONDS: "1"
+      OUTBOX_LEASE_SECONDS: "3"
+      OUTBOX_PUBLISHER_ID: p3-e2e-publisher
+      OUTBOX_CRASH_AFTER_KAFKA_ACK: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - bankcore_net
+
+  publisher-crash:
+    image: bankcore-fintech-e2e-transactions-service
+    command: ["python", "-m", "app.outbox_publisher", "--once"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
+      REDIS_URL: redis://redis:6379/0
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      OUTBOX_BATCH_SIZE: "10"
+      OUTBOX_LEASE_SECONDS: "3"
+      OUTBOX_PUBLISHER_ID: p3-e2e-crash-publisher
+      OUTBOX_CRASH_AFTER_KAFKA_ACK: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - bankcore_net
+
+  audit-consumer:
+    build:
+      context: .
+      dockerfile: services/audit-service/Dockerfile
+    image: bankcore-fintech-p3-e2e-audit-service
+    command: ["python", "-m", "audit_app.consumer"]
+    environment:
+      AUDIT_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_audit
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_RETRY_TOPIC: bankcore.transaction.completed.v1.retry
+      KAFKA_DLQ_TOPIC: bankcore.transaction.completed.v1.dlq
+      KAFKA_GROUP_ID: bankcore-audit-v1
+      KAFKA_RETRY_GROUP_ID: bankcore-audit-retry-v1
+      MAX_RETRIES: "3"
+      LOCAL_RETRY_ATTEMPTS: "1"
+      CONSUMER_VERSION: audit-consumer-v1
+      CRASH_AFTER_DB_COMMIT: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      migrate-audit:
+        condition: service_completed_successfully
+    networks:
+      - bankcore_net
+
+  audit-consumer-crash:
+    image: bankcore-fintech-p3-e2e-audit-service
+    command: ["python", "-m", "audit_app.consumer", "--once"]
+    environment:
+      AUDIT_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_audit
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_RETRY_TOPIC: bankcore.transaction.completed.v1.retry
+      KAFKA_DLQ_TOPIC: bankcore.transaction.completed.v1.dlq
+      KAFKA_GROUP_ID: bankcore-audit-v1
+      KAFKA_RETRY_GROUP_ID: bankcore-audit-retry-v1
+      MAX_RETRIES: "3"
+      LOCAL_RETRY_ATTEMPTS: "1"
+      CONSUMER_VERSION: audit-consumer-v1
+      CRASH_AFTER_DB_COMMIT: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      migrate-audit:
+        condition: service_completed_successfully
+    networks:
+      - bankcore_net
+
+  p3-e2e-runner:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    command: ["python", "tests/p3g_e2e.py", "happy"]
+    environment:
+      E2E_BASE_URL: http://nginx:8080
+      E2E_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
+      E2E_RISK_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_risk
+      E2E_AUDIT_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_audit
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_RETRY_TOPIC: bankcore.transaction.completed.v1.retry
+      KAFKA_DLQ_TOPIC: bankcore.transaction.completed.v1.dlq
+    depends_on:
+      nginx:
+        condition: service_healthy
+      risk-service:
+        condition: service_healthy
+      outbox-publisher:
+        condition: service_started
+      audit-consumer:
+        condition: service_started
+    networks:
+      - bankcore_net
+
+volumes:
+  p3_kafka_data:
