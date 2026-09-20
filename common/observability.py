@@ -53,6 +53,8 @@ _ALLOWED_FIELDS = {
     "consumer_group",
     "method",
     "mode",
+    "trace_id",
+    "span_id",
 }
 
 
@@ -133,6 +135,12 @@ def log_event(logger: logging.Logger, event: str, level: int = logging.INFO, **f
             safe_fields[key] = value
     safe_fields.setdefault("request_id", current_request_id())
     safe_fields.setdefault("correlation_id", current_correlation_id())
+    try:
+        from common.tracing import current_trace_fields
+
+        safe_fields.update({key: value for key, value in current_trace_fields().items() if key not in safe_fields})
+    except ImportError:
+        pass
     safe_fields = {key: value for key, value in safe_fields.items() if value is not None}
     logger.log(level, event, extra={"bankcore_event": event, **safe_fields})
 

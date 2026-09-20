@@ -10,3 +10,7 @@ httpx==0.27.2
 PyJWT[crypto]==2.14.0
 alembic==1.13.3
 aiokafka==0.12.0
+opentelemetry-api==1.44.0
+opentelemetry-sdk==1.44.0
+opentelemetry-exporter-otlp-proto-grpc==1.44.0
+opentelemetry-instrumentation-fastapi==0.65b0

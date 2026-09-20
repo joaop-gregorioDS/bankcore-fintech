@@ -8,11 +8,34 @@ using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
+
+var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"]
+    ?? builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+builder.Services
+    .AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(
+        serviceName: builder.Configuration["RISK:ServiceName"]
+            ?? builder.Configuration["RISK__SERVICE_NAME"]
+            ?? "bankcore-risk",
+        serviceVersion: "1.0.0"))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddSource("BankCore.Risk")
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation();
+        if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+        {
+            tracing.AddOtlpExporter(options => options.Endpoint = new Uri(otlpEndpoint));
+        }
+    });
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -40,6 +63,7 @@ builder.Services.AddScoped<RiskDatabaseReadiness>();
 builder.Services.AddRiskAuthentication(builder.Configuration);
 
 var app = builder.Build();
+var riskActivitySource = new ActivitySource("BankCore.Risk");
 
 app.Use(async (context, next) =>
 {
@@ -105,12 +129,18 @@ app.MapPost("/internal/risk/assessments", async (
 {
     try
     {
+        using var assessmentActivity = riskActivitySource.StartActivity("risk.assess");
+        assessmentActivity?.SetTag("risk.operation_type", request.OperationType);
         var result = await service.AssessAsync(request.ToCommand(), cancellationToken);
+        assessmentActivity?.SetTag("risk.decision", result.Assessment.Decision.ToString().ToUpperInvariant());
+        assessmentActivity?.SetTag("risk.rules_version", result.Assessment.RulesVersion);
         app.Logger.LogInformation(
-            "{Event} {RequestId} {CorrelationId} {TransactionId} {RiskAssessmentId} {Decision} {RulesVersion} {Status}",
+            "{Event} {RequestId} {CorrelationId} {TraceId} {SpanId} {TransactionId} {RiskAssessmentId} {Decision} {RulesVersion} {Status}",
             "risk.assessment.completed",
             context.Items["BankCore.RequestId"],
             context.Items["BankCore.CorrelationId"],
+            Activity.Current?.TraceId.ToString(),
+            Activity.Current?.SpanId.ToString(),
             request.TransactionId,
             result.AssessmentId,
             result.Assessment.Decision.ToString().ToUpperInvariant(),

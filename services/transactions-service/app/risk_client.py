@@ -10,8 +10,10 @@ from fastapi import HTTPException
 from app.config import settings
 from app.internal_auth import get_internal_service_token, invalidate_internal_service_token
 from common.observability import current_correlation_id, current_request_id, log_event
+from common.tracing import inject_trace_headers, tracer
 
 logger = logging.getLogger("bankcore.transactions.risk")
+_tracer = tracer("bankcore.transactions")
 
 
 @dataclass(frozen=True)
@@ -104,23 +106,27 @@ async def assess_transaction_risk(
         try:
             service_token = await get_internal_service_token(scope="risk:assess")
             async with httpx.AsyncClient(timeout=settings.RISK_TIMEOUT_SECONDS) as client:
-                response = await client.post(
-                    f"{settings.RISK_SERVICE_URL}/internal/risk/assessments",
-                    headers={
-                        "Authorization": f"Bearer {service_token}",
-                        **(
-                            {"X-Request-ID": current_request_id()}
-                            if current_request_id()
-                            else {}
-                        ),
-                        **(
-                            {"X-Correlation-ID": current_correlation_id()}
-                            if current_correlation_id()
-                            else {}
-                        ),
-                    },
-                    json=request_body,
-                )
+                request_headers = {
+                    "Authorization": f"Bearer {service_token}",
+                    **(
+                        {"X-Request-ID": current_request_id()}
+                        if current_request_id()
+                        else {}
+                    ),
+                    **(
+                        {"X-Correlation-ID": current_correlation_id()}
+                        if current_correlation_id()
+                        else {}
+                    ),
+                }
+                with _tracer.start_as_current_span("risk.assess") as span:
+                    span.set_attribute("risk.attempt", transient_attempt + 1)
+                    inject_trace_headers(request_headers)
+                    response = await client.post(
+                        f"{settings.RISK_SERVICE_URL}/internal/risk/assessments",
+                        headers=request_headers,
+                        json=request_body,
+                    )
         except httpx.TimeoutException as exc:
             if transient_attempt < settings.RISK_RETRY_COUNT:
                 transient_attempt += 1

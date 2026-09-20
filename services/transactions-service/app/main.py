@@ -9,8 +9,10 @@ from app.routes import accounts, transactions
 from app.deps import validate_public_key_material
 from app.seed import seed_demo_accounts
 from common.observability import RequestContextMiddleware, configure_logging
+from common.tracing import configure_tracing, instrument_fastapi
 
 configure_logging("transactions-service")
+configure_tracing("transactions-service")
 
 ALLOWED_ORIGINS = [
     "https://bankcore.vortexsoftware.tech",
@@ -39,6 +41,7 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Accept", "X-Request-ID", "X-Correlation-ID"],
     expose_headers=["X-Request-ID", "X-Correlation-ID"],
 )
+instrument_fastapi(app, "transactions-service")
 app.add_middleware(RequestContextMiddleware, service="transactions-service")
 
 

@@ -19,8 +19,10 @@ from app.config import settings
 from app.database import AsyncSessionLocal, engine
 from app.models import OutboxEvent
 from common.observability import log_event, set_correlation_id
+from common.tracing import configure_tracing, inject_trace_headers, tracer
 
 logger = logging.getLogger("bankcore.outbox-publisher")
+_tracer = tracer("bankcore.outbox-publisher")
 
 
 SENSITIVE_ERROR = re.compile(
@@ -162,18 +164,20 @@ class OutboxPublisher:
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
-        await producer.send_and_wait(
-            settings.KAFKA_TOPIC,
-            key=event.message_key.encode("utf-8"),
-            value=payload,
-            headers=[
-                ("x-event-id", str(event.payload.get("event_id", event.id)).encode("ascii")),
-                (
-                    "x-correlation-id",
-                    str(event.payload.get("correlation_id", "")).encode("ascii"),
-                ),
-            ],
-        )
+        kafka_headers = {
+            "x-event-id": str(event.payload.get("event_id", event.id)),
+            "x-correlation-id": str(event.payload.get("correlation_id", "")),
+        }
+        with _tracer.start_as_current_span("kafka.produce transaction.completed.v1") as span:
+            span.set_attribute("messaging.destination.name", settings.KAFKA_TOPIC)
+            span.set_attribute("messaging.operation", "publish")
+            inject_trace_headers(kafka_headers)
+            await producer.send_and_wait(
+                settings.KAFKA_TOPIC,
+                key=event.message_key.encode("utf-8"),
+                value=payload,
+                headers=[(key, value.encode("ascii")) for key, value in kafka_headers.items()],
+            )
 
     async def run_once(self, producer: AIOKafkaProducer | None = None) -> tuple[int, int]:
         events = await self.claim_pending()
@@ -241,6 +245,7 @@ async def main() -> int:
     from common.observability import configure_logging
 
     configure_logging("outbox-publisher")
+    configure_tracing("outbox-publisher")
     publisher = OutboxPublisher()
     if args.once:
         await publisher.run_once()

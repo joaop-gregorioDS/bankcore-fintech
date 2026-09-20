@@ -15,9 +15,11 @@ from audit_app.contracts import InvalidAuditEvent, validate_transaction_complete
 from audit_app.database import AuditSessionLocal, engine
 from audit_app.models import AuditEvent
 from common.observability import configure_logging, log_event, set_correlation_id
+from common.tracing import configure_tracing, extract_trace_context, inject_trace_headers, tracer
 
 
 logger = logging.getLogger("bankcore.audit-consumer")
+_tracer = tracer("bankcore.audit-consumer")
 
 RETRY_COUNT_HEADER = "retry-count"
 ORIGINAL_TOPIC_HEADER = "original-topic"
@@ -89,7 +91,7 @@ class AuditConsumer:
             await session.commit()
             return result.rowcount == 1
 
-    async def process_record(self, record: Any, kafka_consumer: Any = None) -> Any:
+    async def _process_record(self, record: Any, kafka_consumer: Any = None) -> Any:
         payload = record.value
         if isinstance(payload, bytes):
             try:
@@ -112,7 +114,9 @@ class AuditConsumer:
                 raise InvalidAuditEvent("Invalid Kafka message key") from error
             if message_key != str(event.data.transaction_id):
                 raise InvalidAuditEvent("Kafka message key does not match transaction_id")
-        persisted = await self.persist(event)
+        with _tracer.start_as_current_span("audit.persist") as span:
+            span.set_attribute("messaging.operation", "persist")
+            persisted = await self.persist(event)
         log_event(
             logger,
             "audit.event.persisted" if persisted else "audit.event.duplicate",
@@ -125,6 +129,21 @@ class AuditConsumer:
         if kafka_consumer is not None:
             await kafka_consumer.commit()
         return event
+
+    async def process_record(self, record: Any, kafka_consumer: Any = None) -> Any:
+        trace_headers = {
+            key: value
+            for key in ("traceparent", "tracestate")
+            if (value := _header_value(record, key)) is not None
+        }
+        context = extract_trace_context(trace_headers)
+        with _tracer.start_as_current_span(
+            "kafka.consume transaction.completed.v1",
+            context=context,
+        ) as span:
+            span.set_attribute("messaging.destination.name", getattr(record, "topic", settings.KAFKA_TOPIC))
+            span.set_attribute("messaging.operation", "receive")
+            return await self._process_record(record, kafka_consumer)
 
     def create_consumer(self) -> AIOKafkaConsumer:
         return self.create_topic_consumer(settings.KAFKA_TOPIC, self.group_id)
@@ -185,6 +204,9 @@ class AuditConsumer:
         retry_count: int,
     ) -> None:
         headers = self._failure_headers(record, failure_class, error)
+        trace_headers: dict[str, str] = {}
+        inject_trace_headers(trace_headers)
+        headers.extend((key, value.encode("ascii")) for key, value in trace_headers.items())
         headers = [
             (RETRY_COUNT_HEADER, str(retry_count).encode("ascii")) if key == RETRY_COUNT_HEADER else (key, value)
             for key, value in headers
@@ -298,6 +320,7 @@ async def main() -> int:
     parser = argparse.ArgumentParser(description="BankCore idempotent audit consumer")
     parser.add_argument("--once", action="store_true", help="process one Kafka record")
     args = parser.parse_args()
+    configure_tracing("audit-consumer")
     consumer = AuditConsumer()
     if args.once:
         await consumer.run_once()

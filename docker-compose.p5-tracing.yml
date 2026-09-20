@@ -1,0 +1,72 @@
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./infra/otel/collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    expose:
+      - "4317"
+      - "4318"
+      - "13133"
+    healthcheck:
+      test: ["CMD", "/otelcol-contrib", "validate", "--config=/etc/otelcol-contrib/config.yaml"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - bankcore_net
+
+  auth-service:
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  transactions-service:
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  risk-service:
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  outbox-publisher:
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  publisher-crash:
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  audit-consumer:
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  audit-consumer-crash:
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+    depends_on:
+      otel-collector:
+        condition: service_started

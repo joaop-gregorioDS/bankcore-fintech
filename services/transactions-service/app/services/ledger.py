@@ -8,11 +8,13 @@ from app.money import BIGINT_MAX_CENTS
 from app.idempotency import build_request_fingerprint
 from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 from app.events import build_transaction_completed_v1
+from common.tracing import tracer
 
 IDEM_PROCESSING = "PROCESSING"
 IDEM_COMPLETED = "COMPLETED"
 DEBIT = "DEBIT"
 CREDIT = "CREDIT"
+_tracer = tracer("bankcore.transactions")
 
 
 def _validate_amount_cents(amount_cents: int) -> None:
@@ -203,7 +205,8 @@ async def deposit_funds(
             (dest, CREDIT, amount_cents),
         ])
         _complete_idempotency(record, tx)
-        await db.commit()
+        with _tracer.start_as_current_span("ledger.commit"):
+            await db.commit()
         await db.refresh(tx)
         return tx
     except IntegrityError:
@@ -292,20 +295,23 @@ async def transfer_funds(
             (dest_acc, CREDIT, amount_cents),
         ])
         event = build_transaction_completed_v1(tx)
-        db.add(
-            OutboxEvent(
-                id=event.event_id,
-                aggregate_type="transaction",
-                aggregate_id=tx.id,
-                event_type=event.event_type,
-                event_version=event.event_version,
-                message_key=str(tx.id),
-                payload=event.payload(),
-                occurred_at=event.occurred_at,
+        with _tracer.start_as_current_span("outbox.persist") as span:
+            span.set_attribute("messaging.destination.name", event.event_type)
+            db.add(
+                OutboxEvent(
+                    id=event.event_id,
+                    aggregate_type="transaction",
+                    aggregate_id=tx.id,
+                    event_type=event.event_type,
+                    event_version=event.event_version,
+                    message_key=str(tx.id),
+                    payload=event.payload(),
+                    occurred_at=event.occurred_at,
+                )
             )
-        )
         _complete_idempotency(record, tx)
-        await db.commit()
+        with _tracer.start_as_current_span("ledger.commit"):
+            await db.commit()
         await db.refresh(tx)
         return tx
     except IntegrityError:
