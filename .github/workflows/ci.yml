@@ -29,6 +29,7 @@ jobs:
       POSTGRES_PASSWORD: ci-validation-only
       JWT_ACTIVE_KID: ci-validation
       AUTH_SERVICE_TOKEN: ci-service-token-validation
+      RATE_LIMIT_KEY_SECRET: ci-rate-limit-key-validation
       TEST_VALIDATE_MIGRATIONS: "true"
       TEST_FORCE_FAILURE: ${{ inputs.force_failure || 'false' }}
 
@@ -71,6 +72,7 @@ jobs:
           POSTGRES_PASSWORD: ci-validation-only
           JWT_ACTIVE_KID: ci-validation
           AUTH_SERVICE_TOKEN: ci-service-token-validation
+          RATE_LIMIT_KEY_SECRET: ci-rate-limit-key-validation
         run: |
           docker compose -f docker-compose.test.yml config --quiet
           docker compose -f docker-compose.risk-test.yml config --quiet

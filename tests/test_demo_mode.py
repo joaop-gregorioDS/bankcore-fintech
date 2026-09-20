@@ -24,6 +24,7 @@ class DemoModePolicyTests(unittest.TestCase):
             "REDIS_URL": "redis://test",
             "JWT_ACTIVE_KID": "test-key",
             "AUTH_SERVICE_TOKEN": "test-service-token",
+            "RATE_LIMIT_KEY_SECRET": "test-rate-limit-key",
         }
         with patch.dict(os.environ, base_env, clear=False):
             os.environ.pop("DEMO_MODE", None)

@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     INTERNAL_TOKEN_EXPIRE_SECONDS: int = 60
     AUTH_SERVICE_TOKEN: str
+    RATE_LIMIT_KEY_SECRET: str
+    RATE_LIMIT_MAX_ATTEMPTS: int = 5
+    RATE_LIMIT_WINDOW_SECONDS: int = 900
+    RATE_LIMIT_REDIS_TIMEOUT_SECONDS: float = 1.0
     DEMO_MODE: bool = False
 
 settings = Settings()

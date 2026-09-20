@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — P4-A audit, no runtime implementation yet.
+Accepted locally — P4-A audit and P4-B distributed login rate limiting implemented.
 
 ## Scope and evidence boundary
 
@@ -15,8 +15,8 @@ verified**.
 
 | Area | Current behavior | Data semantics | Classification |
 | --- | --- | --- | --- |
-| Auth login rate limit | `INCR auth:login:{normalized_tax_id}`; first increment sets a 900-second TTL; values above 15 return `429`; successful login deletes the key | Ephemeral security-control state; loss weakens throttling but does not alter money | **Critical supporting control; reconstructible** |
-| Auth Redis outage fallback | Per-process dictionary, 5 attempts per 900 seconds, protected by an async lock; dictionary is cleared above 10,000 entries | Ephemeral local protection; not globally consistent across replicas | **Critical fallback; bounded but degraded** |
+| Auth login rate limit | Atomic Redis Lua increment with first-increment TTL; versioned HMAC-derived key; configurable 5 attempts/900 seconds; successful login deletes the key | Ephemeral security-control state; loss weakens throttling but does not alter money | **Critical supporting control; reconstructible** |
+| Auth Redis outage fallback | Per-process dictionary, same configurable budget, protected by an async lock; bounded entry cleanup; Redis connection timeouts | Ephemeral local protection; not globally consistent across replicas | **Critical fallback; bounded but degraded** |
 | Transactions Redis client | `redis.asyncio` client is created at startup and closed at shutdown; `get_redis` exists, but no production route currently uses it and no Redis key/TTL was found | No current business state | **Dispensable/latent dependency** |
 | Transactions internal-token cache | In-process dictionary keyed by `("bankcore-internal", scope)`; expiry is the token lifetime minus five seconds | Reconstructible credential cache; not Redis-backed | **Reconstructible; outside Redis scope** |
 | Financial state | Balances, ledger, idempotency, outbox and event delivery state are PostgreSQL/Kafka-owned | Durable authoritative state | **Must never move to Redis** |
@@ -27,18 +27,16 @@ outbox ownership, Kafka offsets, Pix directory ownership or durable sessions.
 
 ## Keys, TTLs and namespaces
 
-The only observed Redis key is:
+The P4-B Redis key is:
 
 ```text
-auth:login:{normalized_tax_id}
+auth:login:v1:{hmac_sha256(rate_limit_key_secret, normalized_tax_id)}
 ```
 
-Its intended TTL is 900 seconds. The key contains the normalized tax identifier
-in the Redis key name; this is not emitted by the application logs observed in
-the repository, but it is still sensitive operational data and should be
-reviewed before a distributed redesign. There is no explicit environment,
-version or service namespace beyond the `auth:login:` prefix, and the default
-Compose URL uses Redis database `0`.
+Its default TTL is 900 seconds and the default budget is five attempts. The
+dedicated HMAC secret is separate from JWT keys, so the Redis key does not
+contain the raw tax identifier or a reversible encoding of it. The namespace
+is explicitly versioned; the default Compose URL still uses Redis database `0`.
 
 P4 should define a versioned, environment-scoped namespace and preferably avoid
 placing a raw tax identifier in a key. Any new key contract must specify owner,
@@ -80,8 +78,8 @@ The disposable P3 E2E environment starts Redis because it composes the normal
 Auth/Transactions stack, but its financial assertions use PostgreSQL, Kafka and
 the service APIs. Several migration/unit/integration Compose environments set
 `REDIS_URL=redis://unused` and do not start Redis, which is consistent with the
-absence of Redis use in those paths. No test currently proves a multi-replica
-distributed rate-limit contract.
+absence of Redis use in those paths. P4-B now proves the multi-replica
+distributed rate-limit contract in a disposable Compose environment.
 
 The development override enables Uvicorn `--reload`; that is an explicit
 development-only override and is not part of the production-like base Compose.
@@ -99,8 +97,29 @@ development-only override and is not part of the production-like base Compose.
 
 The fallback is not fail-open in the narrow sense of unlimited login attempts,
 but it is fail-open with respect to a globally coordinated limit: each Auth
-replica can apply its own local counter. P4-B must preserve availability while
-making this degradation explicit and bounded.
+replica can apply its own local counter. P4-B preserves availability while
+making this degradation explicit and bounded. Redis connection and command
+timeouts prevent an outage from blocking login indefinitely.
+
+## P4-B implementation and evidence
+
+The local implementation adds:
+
+- atomic Redis `INCR` plus first-increment `EXPIRE` through one Lua script;
+- `auth:login:v1` HMAC-SHA256 keys using a dedicated required secret;
+- configurable attempt budget, window and Redis timeout;
+- the existing bounded local fallback, with automatic Redis recovery through
+  the normal client reconnect path;
+- a disposable Compose environment with two Auth instances and a real Redis
+  outage/restart sequence.
+
+The real local validation passed with disposable PostgreSQL, Redis and two Auth
+containers: shared limits across instances, 20 concurrent requests with the
+expected five allowed and fifteen rejected, TTL expiry, opaque key inspection,
+local fallback during Redis downtime, recovery without restarting Auth, and
+complete container/volume/network teardown. The official test runner passed
+64 tests; the security subset passed 23 tests. No financial or Transactions
+behavior was changed by the limiter.
 
 ## Proposed P4-A policy
 
@@ -121,10 +140,9 @@ making this degradation explicit and bounded.
 
 ## P4 backlog proposal
 
-- **P4-B — Distributed rate limiting:** move only the login limiter to a
-  versioned Redis key contract, retain a bounded local fallback, define the
-  availability/security trade-off, and test single-node and multi-instance
-  behavior.
+- **P4-B — Distributed rate limiting:** **implemented locally** with a
+  versioned HMAC key contract, atomic operation, bounded local fallback,
+  timeout/recovery behavior and multi-instance validation.
 - **P4-C — Safe cache-aside:** identify one non-financial, reconstructible read
   model before adding cache behavior. Do not cache balances as authority or
   cache authorization decisions without an explicit invalidation contract.
@@ -140,10 +158,6 @@ making this degradation explicit and bounded.
 
 ## Open decisions before implementation
 
-- Whether the P4-B limiter should hash the tax identifier in the key and which
-  environment prefix format to standardize.
-- The exact local-fallback budget and whether it should be configurable per
-  process without weakening the default.
 - Whether the unused Transactions Redis client should be removed or retained as
   an explicitly optional integration seam.
 - The memory ceiling and eviction policy for each environment.

@@ -1,0 +1,114 @@
+services:
+  auth-migrate-p4:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_auth
+      REDIS_URL: redis://redis:6379/0
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID}
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN}
+      RATE_LIMIT_KEY_SECRET: ${RATE_LIMIT_KEY_SECRET:?set RATE_LIMIT_KEY_SECRET}
+      BANKCORE_TESTING: "true"
+    command: ["python", "/app/migrate.py", "--service", "auth"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bankcore_net
+
+  auth-a:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    image: bankcore-p4-auth-a
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_auth
+      REDIS_URL: redis://redis:6379/0
+      JWT_ALGORITHM: RS256
+      JWT_ISSUER: bankcore-auth
+      JWT_AUDIENCE: bankcore-api
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID}
+      JWT_PRIVATE_KEY_PATH: /run/secrets/jwt-private.pem
+      JWT_PUBLIC_KEYS_DIR: /run/secrets/jwt-public
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN}
+      RATE_LIMIT_KEY_SECRET: ${RATE_LIMIT_KEY_SECRET:?set RATE_LIMIT_KEY_SECRET}
+      RATE_LIMIT_MAX_ATTEMPTS: ${RATE_LIMIT_MAX_ATTEMPTS:-5}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-900}
+      RATE_LIMIT_REDIS_TIMEOUT_SECONDS: ${RATE_LIMIT_REDIS_TIMEOUT_SECONDS:-1.0}
+      DEMO_MODE: "false"
+    volumes:
+      - ${JWT_PRIVATE_KEY_FILE:?set JWT_PRIVATE_KEY_FILE}:/run/secrets/jwt-private.pem:ro
+      - ${JWT_PUBLIC_KEYS_HOST_DIR:?set JWT_PUBLIC_KEYS_HOST_DIR}:/run/secrets/jwt-public:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      auth-migrate-p4:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/auth/readiness', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+    networks:
+      - bankcore_net
+
+  auth-b:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    image: bankcore-p4-auth-b
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_auth
+      REDIS_URL: redis://redis:6379/0
+      JWT_ALGORITHM: RS256
+      JWT_ISSUER: bankcore-auth
+      JWT_AUDIENCE: bankcore-api
+      JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID}
+      JWT_PRIVATE_KEY_PATH: /run/secrets/jwt-private.pem
+      JWT_PUBLIC_KEYS_DIR: /run/secrets/jwt-public
+      AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN}
+      RATE_LIMIT_KEY_SECRET: ${RATE_LIMIT_KEY_SECRET:?set RATE_LIMIT_KEY_SECRET}
+      RATE_LIMIT_MAX_ATTEMPTS: ${RATE_LIMIT_MAX_ATTEMPTS:-5}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-900}
+      RATE_LIMIT_REDIS_TIMEOUT_SECONDS: ${RATE_LIMIT_REDIS_TIMEOUT_SECONDS:-1.0}
+      DEMO_MODE: "false"
+    volumes:
+      - ${JWT_PRIVATE_KEY_FILE:?set JWT_PRIVATE_KEY_FILE}:/run/secrets/jwt-private.pem:ro
+      - ${JWT_PUBLIC_KEYS_HOST_DIR:?set JWT_PUBLIC_KEYS_HOST_DIR}:/run/secrets/jwt-public:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      auth-migrate-p4:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/auth/readiness', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+    networks:
+      - bankcore_net
+
+  p4-rate-limit-runner:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    environment:
+      P4_AUTH_A_URL: http://auth-a:8000
+      P4_AUTH_B_URL: http://auth-b:8000
+      P4_REDIS_URL: redis://redis:6379/0
+      RATE_LIMIT_MAX_ATTEMPTS: ${RATE_LIMIT_MAX_ATTEMPTS:-5}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-900}
+    depends_on:
+      auth-a:
+        condition: service_healthy
+      auth-b:
+        condition: service_healthy
+    networks:
+      - bankcore_net
