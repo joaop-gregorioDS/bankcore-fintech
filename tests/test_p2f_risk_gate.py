@@ -86,7 +86,7 @@ class PixRiskGatePostgresTests(unittest.IsolatedAsyncioTestCase):
 
         return RiskAssessment(uuid4(), decision, "risk-rules-v1")
 
-    async def invoke(self, payload, risk_result=None, risk_side_effect=None):
+    async def invoke(self, payload, risk_result=None, risk_side_effect=None, transfer_side_effect=None):
         from app.routes.transactions import _resolve_pix_destination, pix_transfer
 
         async with self.sessions() as session:
@@ -97,11 +97,22 @@ class PixRiskGatePostgresTests(unittest.IsolatedAsyncioTestCase):
             with patch("app.routes.transactions._resolve_pix_destination", resolver), patch(
                 "app.routes.transactions.assess_transaction_risk", assessor
             ):
-                result = await pix_transfer(
-                    payload,
-                    db=session,
-                    current_user={"sub": str(self.user_id)},
-                )
+                if transfer_side_effect is None:
+                    result = await pix_transfer(
+                        payload,
+                        db=session,
+                        current_user={"sub": str(self.user_id)},
+                    )
+                else:
+                    with patch(
+                        "app.routes.transactions.transfer_funds",
+                        AsyncMock(side_effect=transfer_side_effect),
+                    ):
+                        result = await pix_transfer(
+                            payload,
+                            db=session,
+                            current_user={"sub": str(self.user_id)},
+                        )
             return result, assessor
 
     async def counts(self):
@@ -151,6 +162,47 @@ class PixRiskGatePostgresTests(unittest.IsolatedAsyncioTestCase):
             first_assessor.await_args.kwargs["transaction_id"],
             second_assessor.await_args.kwargs["transaction_id"],
         )
+        self.assertEqual(await self.counts(), (1, 2))
+
+    async def test_approved_then_ledger_failure_retries_with_same_transaction_id(self):
+        from app.routes import transactions as transaction_routes
+
+        assessment = self.risk()
+        calls = 0
+        real_transfer = transaction_routes.transfer_funds
+
+        async def fail_once_then_commit(**kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise HTTPException(status_code=503, detail="LEDGER_UNAVAILABLE")
+            return await real_transfer(**kwargs)
+
+        with self.assertRaises(HTTPException) as context:
+            await self.invoke(
+                self.payload(),
+                risk_result=assessment,
+                transfer_side_effect=fail_once_then_commit,
+            )
+        self.assertEqual(context.exception.status_code, 503)
+
+        result, assessor = await self.invoke(
+            self.payload(),
+            risk_result=assessment,
+            transfer_side_effect=fail_once_then_commit,
+        )
+
+        self.assertEqual(calls, 2)
+        self.assertEqual(
+            assessor.await_args.kwargs["transaction_id"],
+            transaction_routes.build_transaction_id(
+                user_id=self.user_id,
+                account_id=self.source_id,
+                operation_type="TRANSFER",
+                idempotency_key="p2f-key",
+            ),
+        )
+        self.assertEqual(result.status, "COMPLETED")
         self.assertEqual(await self.counts(), (1, 2))
 
     async def test_payload_change_with_same_key_is_rejected_before_ledger(self):

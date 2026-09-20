@@ -92,7 +92,7 @@ sub   = service:transactions
 
 O Risk deverá fixar `RS256`, validar `kid`, issuer, audience, scope, subject e claims temporais. A chave privada nunca será copiada para a imagem ou para o ambiente do Risk.
 
-O atual mecanismo de Auth emite/aceita o escopo específico de Transactions para o diretório Pix. A extensão para `risk:assess` será uma mudança explícita do contrato de autenticação em uma etapa posterior; não deve ser improvisada dentro do endpoint de avaliação.
+Auth emite o capability `risk:assess` somente para o chamador interno Transactions. Transactions mantém cache separado por audience/scope e invalida esse token quando Risk responde `401/403`, obtendo uma credencial nova uma única vez.
 
 ## Modelo e ownership
 
@@ -166,7 +166,19 @@ Regras de sequência:
 4. `APPROVED` é necessário para o caminho financeiro;
 5. `REVIEW`, `REJECTED`, timeout e erro de infraestrutura não lançam no ledger;
 6. o Risk não reexecuta nem confirma a operação financeira;
-7. a estratégia final para crash entre a claim de idempotência e a avaliação será definida antes do P2-F.
+7. retry de rede, timeout e `500/502/503/504` é limitado a uma tentativa curta; `400`, `409`, `REVIEW` e `REJECTED` não são repetidos;
+8. após falhas transitórias consecutivas, um circuit breaker local abre e falha fechado até uma tentativa half-open;
+9. um `APPROVED` seguido de falha antes do commit pode ser repetido com o mesmo `transaction_id`; o Risk devolve o mesmo assessment e o ledger mantém um único efeito.
+
+## P2-G — Resiliência e E2E
+
+O teste unitário de resiliência cobre timeout, indisponibilidade, `5xx`, resposta inválida, refresh de token, conflito sem retry e recuperação do circuito. A validação ponta a ponta descartável usa o Compose completo:
+
+```text
+python scripts/e2e.py
+```
+
+O runner gera chaves temporárias, executa as migrations de Auth, Transactions e Risk, sobe Auth, Transactions, Risk e Nginx, registra dois usuários, cria contas, financia somente a conta de teste, executa um Pix aprovado pelo gateway e confere `risk_assessment_id`, decisão, versão das regras, uma avaliação e dois lançamentos diretamente nos bancos separados. O teardown remove containers, volumes e rede mesmo em caso de falha.
 
 ## Regras determinísticas iniciais — `risk-rules-v1`
 
@@ -214,7 +226,8 @@ O domínio ainda não implementa velocity, histórico do cliente, destinatário 
 | P2-C | domínio determinístico e regras sintéticas |
 | P2-D | API interna segura, DTO estrito e autenticação `risk:assess` |
 | P2-E | EF Core, PostgreSQL `bankcore_risk`, migrations próprias e persistência idempotente ✅ |
-| P2-F | cliente Risk em Transactions, timeout, idempotência e fail-closed |
-| P2-G | resiliência, testes de integração e CI |
+| P2-F | cliente Risk em Transactions, timeout, idempotência e fail-closed ✅ |
+| P2-G | resiliência, circuit breaker e validação E2E local ✅ |
+| P2-H | CI: .NET, Risk PostgreSQL, E2E descartável e quality gates |
 
 Kafka, observabilidade avançada, IaC e ML permanecem fora destas fases iniciais.

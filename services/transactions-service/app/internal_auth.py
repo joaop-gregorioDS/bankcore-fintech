@@ -40,3 +40,7 @@ async def get_internal_service_token(*, scope: str = "service:transactions") -> 
             raise HTTPException(status_code=502, detail="Credencial interna indisponível.") from exc
         _tokens[cache_key] = (token, time.monotonic() + max(1, expires_in - 5))
         return token
+
+
+async def invalidate_internal_service_token(*, scope: str = "service:transactions") -> None:
+    _tokens.pop(("bankcore-internal", scope), None)

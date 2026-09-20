@@ -1,0 +1,21 @@
+services:
+  nginx:
+    ports:
+      - "${E2E_GATEWAY_PORT:-18080}:8080"
+
+  e2e-runner:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    command: ["python", "tests/e2e_smoke.py"]
+    environment:
+      E2E_BASE_URL: http://nginx:8080
+      E2E_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
+      E2E_RISK_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_risk
+    depends_on:
+      nginx:
+        condition: service_healthy
+      risk-service:
+        condition: service_healthy
+    networks:
+      - bankcore_net
