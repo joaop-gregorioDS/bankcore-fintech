@@ -95,6 +95,8 @@ class OutboxEvent(Base):
     published_at = Column(DateTime(timezone=True), nullable=True)
     attempts = Column(Integer, nullable=False, default=0)
     last_error = Column(String(2000), nullable=True)
+    locked_by = Column(String(100), nullable=True)
+    locked_until = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
