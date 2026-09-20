@@ -1,4 +1,31 @@
 services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    image: bankcore-fintech-e2e-auth-service
+
+  transactions-service:
+    build:
+      context: .
+      dockerfile: services/transactions-service/Dockerfile
+    image: bankcore-fintech-e2e-transactions-service
+
+  risk-service:
+    build:
+      context: .
+      dockerfile: services/risk-service/Dockerfile
+    image: bankcore-fintech-e2e-risk-service
+
+  migrate-auth:
+    image: bankcore-fintech-e2e-auth-service
+
+  migrate-transactions:
+    image: bankcore-fintech-e2e-transactions-service
+
+  migrate-risk:
+    image: bankcore-fintech-e2e-risk-service
+
   nginx:
     ports:
       - "${E2E_GATEWAY_PORT:-18080}:8080"
