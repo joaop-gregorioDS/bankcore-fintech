@@ -53,7 +53,6 @@ services:
       dockerfile: services/transactions-service/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://${BACKUP_POSTGRES_USER:-bankadmin}:${BACKUP_POSTGRES_PASSWORD}@backup-source:5432/bankcore_test_transactions
-      REDIS_URL: redis://unused
       JWT_ACTIVE_KID: backup-test
       AUTH_SERVICE_TOKEN: backup-test
       BANKCORE_TESTING: "true"

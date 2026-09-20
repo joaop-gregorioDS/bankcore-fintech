@@ -44,6 +44,7 @@ class AuthenticationHardeningTests(unittest.TestCase):
                 "JWT_PRIVATE_KEY_PATH": str(cls.private_path),
                 "JWT_PUBLIC_KEYS_DIR": str(cls.keys_dir),
                 "AUTH_SERVICE_TOKEN": "service-test-token",
+                "RATE_LIMIT_KEY_SECRET": "test-rate-limit-key",
             },
         )
         cls.env.start()
@@ -173,7 +174,7 @@ class AuthenticationHardeningTests(unittest.TestCase):
 
         async def exercise():
             with patch.object(limiter, "_redis", new=unavailable):
-                for _ in range(limiter.LOCAL_LIMIT):
+                for _ in range(limiter.settings.RATE_LIMIT_MAX_ATTEMPTS):
                     await limiter.assert_login_allowed("12345678900")
                 with self.assertRaises(HTTPException) as context:
                     await limiter.assert_login_allowed("12345678900")
@@ -182,6 +183,53 @@ class AuthenticationHardeningTests(unittest.TestCase):
         import asyncio
         asyncio.run(exercise())
         limiter._local_attempts.clear()
+
+    def test_rate_limit_key_is_versioned_hmac_without_raw_identifier(self):
+        limiter = importlib.import_module("app.limiter")
+
+        key = limiter._rate_limit_key("12345678900")
+
+        self.assertTrue(key.startswith("auth:login:v1:"))
+        self.assertNotIn("12345678900", key)
+        self.assertEqual(len(key.rsplit(":", 1)[-1]), 64)
+
+    def test_redis_counter_uses_atomic_increment_and_configured_limit(self):
+        limiter = importlib.import_module("app.limiter")
+
+        class FakeRedis:
+            def __init__(self):
+                self.calls = []
+                self.count = 0
+
+            async def eval(self, script, number_of_keys, key, window):
+                self.calls.append((script, number_of_keys, key, window))
+                self.count += 1
+                return self.count
+
+            async def delete(self, key):
+                return 1
+
+        async def exercise():
+            fake = FakeRedis()
+            limiter._client = fake
+            limiter.settings.RATE_LIMIT_MAX_ATTEMPTS = 5
+            limiter.settings.RATE_LIMIT_WINDOW_SECONDS = 900
+            for _ in range(5):
+                await limiter.assert_login_allowed("12345678900")
+            with self.assertRaises(HTTPException) as context:
+                await limiter.assert_login_allowed("12345678900")
+            self.assertEqual(context.exception.status_code, 429)
+            self.assertEqual(len(fake.calls), 6)
+            script, key_count, key, window = fake.calls[0]
+            self.assertIn("INCR", script)
+            self.assertIn("EXPIRE", script)
+            self.assertEqual(key_count, 1)
+            self.assertEqual(window, 900)
+            self.assertNotIn("12345678900", key)
+            limiter._client = None
+
+        import asyncio
+        asyncio.run(exercise())
 
 
 if __name__ == "__main__":

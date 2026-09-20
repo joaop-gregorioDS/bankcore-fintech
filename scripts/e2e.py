@@ -59,6 +59,7 @@ def main() -> int:
             {
                 "POSTGRES_PASSWORD": secrets.token_urlsafe(24),
                 "AUTH_SERVICE_TOKEN": secrets.token_urlsafe(32),
+                "RATE_LIMIT_KEY_SECRET": secrets.token_urlsafe(32),
                 "JWT_ACTIVE_KID": "e2e",
                 "JWT_PRIVATE_KEY_FILE": (key_dir / "jwt-private.pem").as_posix(),
                 "JWT_PUBLIC_KEYS_HOST_DIR": (key_dir / "jwt-public").as_posix(),

@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from app.config import settings
-from app.database import engine, init_redis, close_redis
+from app.database import engine
 from app.demo_mode import is_demo_mode_enabled
 from app.routes import accounts, transactions
 from app.deps import validate_public_key_material
@@ -40,7 +40,6 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     validate_public_key_material()
-    await init_redis()
     try:
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1 FROM accounts LIMIT 0"))
@@ -58,11 +57,6 @@ async def startup():
             break
         except Exception:
             await asyncio.sleep(2)
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await close_redis()
 
 
 @app.get("/health")

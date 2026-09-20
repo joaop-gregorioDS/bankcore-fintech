@@ -53,7 +53,6 @@ services:
     command: ["python", "-m", "app.outbox_publisher"]
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
-      REDIS_URL: redis://redis:6379/0
       JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
       AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -76,7 +75,6 @@ services:
     command: ["python", "-m", "app.outbox_publisher", "--once"]
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
-      REDIS_URL: redis://redis:6379/0
       JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
       AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092

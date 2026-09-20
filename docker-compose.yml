@@ -34,9 +34,10 @@ services:
     image: redis:7.4.1-alpine3.20
     container_name: bankcore-redis
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--maxmemory", "${REDIS_MAXMEMORY:-64mb}"]
     volumes:
       - redis_data:/data
+      - ./infra/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -65,6 +66,10 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       INTERNAL_TOKEN_EXPIRE_SECONDS: ${INTERNAL_TOKEN_EXPIRE_SECONDS:-60}
       AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
+      RATE_LIMIT_KEY_SECRET: ${RATE_LIMIT_KEY_SECRET:?set RATE_LIMIT_KEY_SECRET in .env}
+      RATE_LIMIT_MAX_ATTEMPTS: ${RATE_LIMIT_MAX_ATTEMPTS:-5}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-900}
+      RATE_LIMIT_REDIS_TIMEOUT_SECONDS: ${RATE_LIMIT_REDIS_TIMEOUT_SECONDS:-1.0}
       DEMO_MODE: ${DEMO_MODE:-false}
     volumes:
       - ${JWT_PRIVATE_KEY_FILE:-./secrets/jwt-private.pem}:/run/secrets/jwt-private.pem:ro
@@ -90,7 +95,6 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
-      REDIS_URL: redis://redis:6379/0
       JWT_ALGORITHM: ${JWT_ALGORITHM:-RS256}
       JWT_ISSUER: ${JWT_ISSUER:-bankcore-auth}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-bankcore-api}
@@ -194,6 +198,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
       AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
+      RATE_LIMIT_KEY_SECRET: ${RATE_LIMIT_KEY_SECRET:?set RATE_LIMIT_KEY_SECRET in .env}
     depends_on:
       postgres:
         condition: service_healthy
@@ -206,7 +211,6 @@ services:
     command: ["python", "/app/migrate.py", "--service", "transactions"]
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
-      REDIS_URL: redis://redis:6379/0
       JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:?set JWT_ACTIVE_KID in .env}
       AUTH_SERVICE_TOKEN: ${AUTH_SERVICE_TOKEN:?set AUTH_SERVICE_TOKEN in .env}
     depends_on:

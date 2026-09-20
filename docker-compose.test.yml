@@ -25,6 +25,7 @@ services:
       REDIS_URL: redis://unused
       JWT_ACTIVE_KID: test-runner
       AUTH_SERVICE_TOKEN: test-runner
+      RATE_LIMIT_KEY_SECRET: test-rate-limit-key
       BANKCORE_TESTING: "true"
     command: ["python", "/app/migrate.py", "--service", "auth"]
     depends_on:
@@ -39,9 +40,9 @@ services:
       dockerfile: services/transactions-service/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
-      REDIS_URL: redis://unused
       JWT_ACTIVE_KID: test-runner
       AUTH_SERVICE_TOKEN: test-runner
+      RATE_LIMIT_KEY_SECRET: test-rate-limit-key
       BANKCORE_TESTING: "true"
     command: ["python", "/app/migrate.py", "--service", "transactions"]
     depends_on:
@@ -63,6 +64,7 @@ services:
       REDIS_URL: redis://unused
       JWT_ACTIVE_KID: test-runner
       AUTH_SERVICE_TOKEN: test-runner
+      RATE_LIMIT_KEY_SECRET: test-rate-limit-key
     depends_on:
       migrate-auth-test:
         condition: service_completed_successfully
