@@ -116,4 +116,10 @@ class OutboxEvent(Base):
             "occurred_at",
             "attempts",
         ),
+        Index(
+            "idx_outbox_claimable",
+            "published_at",
+            "locked_until",
+            "occurred_at",
+        ),
     )
