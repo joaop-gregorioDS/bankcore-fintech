@@ -103,6 +103,7 @@ services:
       P4_AUTH_A_URL: http://auth-a:8000
       P4_AUTH_B_URL: http://auth-b:8000
       P4_REDIS_URL: redis://redis:6379/0
+      P4_REDIS_MAXMEMORY: ${REDIS_MAXMEMORY:-64mb}
       RATE_LIMIT_MAX_ATTEMPTS: ${RATE_LIMIT_MAX_ATTEMPTS:-5}
       RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-900}
     depends_on:

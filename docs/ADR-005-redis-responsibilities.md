@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted locally — P4-A audit and P4-B distributed login rate limiting implemented.
+Accepted locally — P4-A audit, P4-B distributed login rate limiting and P4-C
+Redis operational hardening implemented.
 
 ## Scope and evidence boundary
 
@@ -52,7 +53,10 @@ The main Compose file uses `redis:7.4.1-alpine3.20` with:
 - `redis-cli ping` healthcheck;
 - no published host port;
 - the shared `bankcore_net` bridge network;
-- no explicit `maxmemory` or eviction policy;
+- versioned `infra/redis/redis.conf` mounted read-only;
+- configurable `maxmemory` defaulting to `64mb`;
+- `maxmemory-policy noeviction`;
+- AOF with `appendfsync everysec`;
 - no Redis password, ACL or TLS settings in the repository Compose definition.
 
 The container has `no-new-privileges`, but the Redis service does not inherit
@@ -91,7 +95,7 @@ development-only override and is not part of the production-like base Compose.
 | Redis unavailable during login | Auth applies a local limit of 5/900s per process; global enforcement degrades across replicas | **Mitigated, not distributed** |
 | Redis restart/flush | Login counters disappear or are reconstructed locally; users and money remain intact | **Acceptable for ephemeral control; document behavior** |
 | Transactions Redis unavailable | Current observed financial path remains PostgreSQL/Kafka-backed; no route uses `get_redis` | **No current financial impact; remove or make optional later** |
-| Redis memory pressure | No explicit maxmemory/eviction policy is configured | **Unspecified operational risk** |
+| Redis memory pressure | `noeviction` rejects new writes; Auth catches the Redis error and applies the bounded local fallback | **Explicitly degraded but protected** |
 | Redis network exposure | No host port in repository Compose; production exposure is not verified | **Locally constrained; production not verified** |
 | Redis data corruption/loss | No financial loss by design; rate-limit state is lost | **Acceptable only for current data class** |
 
@@ -121,6 +125,22 @@ complete container/volume/network teardown. The official test runner passed
 64 tests; the security subset passed 23 tests. No financial or Transactions
 behavior was changed by the limiter.
 
+## P4-C implementation and evidence
+
+Redis operational behavior is now versioned in `infra/redis/redis.conf` and
+parameterized only where the environment must choose a memory ceiling. The
+Compose service publishes no Redis port; its `bind 0.0.0.0` and disabled
+protected mode are therefore scoped to the private Docker network. Production
+ACL/TLS configuration remains environment-specific and was not verified here.
+
+The disposable P4-C runner validated the configured AOF and `noeviction` policy,
+bounded memory pressure with a rejected write, Auth readiness while Redis was
+stopped, local protection in both Auth instances during the outage, `FLUSHDB`
+state loss without financial state, Redis restart and distributed limiter
+recovery. It also checked that Transactions routes do not consume the Redis
+dependency. PostgreSQL, ledger, balances, idempotency, outbox and Kafka state
+were not placed in Redis and were not modified by this phase.
+
 ## Proposed P4-A policy
 
 1. PostgreSQL is authoritative for users, accounts, balances, ledger entries,
@@ -143,12 +163,13 @@ behavior was changed by the limiter.
 - **P4-B — Distributed rate limiting:** **implemented locally** with a
   versioned HMAC key contract, atomic operation, bounded local fallback,
   timeout/recovery behavior and multi-instance validation.
-- **P4-C — Safe cache-aside:** identify one non-financial, reconstructible read
-  model before adding cache behavior. Do not cache balances as authority or
-  cache authorization decisions without an explicit invalidation contract.
-- **P4-D — TTL and eviction policy:** set explicit TTLs, namespace/version rules,
-  memory limits and eviction behavior; verify that eviction cannot affect money.
-- **P4-E — Failure modes:** test offline, restart, flush, timeout and recovery
+- **P4-C — Redis operational hardening:** **implemented locally** with a
+  versioned config, bounded memory, `noeviction`, AOF continuity semantics and
+  failure/recovery validation.
+- **P4-D — Dead dependency cleanup:** re-audit Transactions and remove its
+  unused Redis client only if the functional boundary remains unchanged.
+- **P4-E — Failure modes:** extend tests for offline, restart, flush, timeout
+  and recovery with PostgreSQL financial assertions unchanged.
   with PostgreSQL financial assertions unchanged.
 - **P4-F — Redis observability:** add bounded metrics/logging for latency, hit
   rate, limiter fallback and connection failures without logging identifiers or
@@ -160,6 +181,5 @@ behavior was changed by the limiter.
 
 - Whether the unused Transactions Redis client should be removed or retained as
   an explicitly optional integration seam.
-- The memory ceiling and eviction policy for each environment.
-- Whether a safe cache-aside candidate exists; if not, P4-C should be closed as
-  intentionally unnecessary rather than adding cache complexity.
+- Whether a safe cache-aside candidate exists in a future phase; if not, keep
+  cache-aside intentionally out of scope rather than adding cache complexity.
