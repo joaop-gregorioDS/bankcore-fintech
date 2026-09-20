@@ -1,0 +1,1 @@
+"""BankCore audit consumer service."""

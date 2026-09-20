@@ -1,0 +1,138 @@
+services:
+  postgres-test:
+    image: postgres:16.4-alpine3.20
+    environment:
+      POSTGRES_USER: ${TEST_POSTGRES_USER:-bankadmin}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD:?set TEST_POSTGRES_PASSWORD}
+      POSTGRES_DB: bankcore_test_auth
+    volumes:
+      - audit_test_postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/audit-test-init.sql:/docker-entrypoint-initdb.d/audit-test-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    networks:
+      - audit_test_net
+
+  kafka:
+    image: apache/kafka:3.9.0
+    hostname: kafka
+    environment:
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: INTERNAL://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    volumes:
+      - audit_test_kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:9092 >/dev/null 2>&1
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - audit_test_net
+
+  migrate-transactions-test:
+    build:
+      context: .
+      dockerfile: services/transactions-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
+      REDIS_URL: redis://unused
+      JWT_ACTIVE_KID: test-runner
+      AUTH_SERVICE_TOKEN: test-runner
+      BANKCORE_TESTING: "true"
+    command: ["python", "/app/migrate.py", "--service", "transactions"]
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    networks:
+      - audit_test_net
+
+  migrate-audit-test:
+    build:
+      context: .
+      dockerfile: services/audit-service/Dockerfile
+    environment:
+      AUDIT_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_audit
+    command: ["python", "/app/migrate_audit.py"]
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    networks:
+      - audit_test_net
+
+  audit-consumer:
+    build:
+      context: .
+      dockerfile: services/audit-service/Dockerfile
+    environment:
+      AUDIT_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_audit
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_GROUP_ID: bankcore-audit-v1
+      CONSUMER_VERSION: audit-consumer-v1
+    profiles: ["consumer"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+      migrate-audit-test:
+        condition: service_completed_successfully
+    networks:
+      - audit_test_net
+
+  audit-tests:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    environment:
+      BANKCORE_TESTING: "true"
+      BANKCORE_TEST_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
+      AUDIT_TEST_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_audit
+      DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_transactions
+      AUDIT_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_audit
+      REDIS_URL: redis://unused
+      JWT_ACTIVE_KID: test-runner
+      AUTH_SERVICE_TOKEN: test-runner
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_GROUP_ID: bankcore-audit-v1
+      CONSUMER_VERSION: audit-consumer-v1
+      OUTBOX_BATCH_SIZE: "10"
+      OUTBOX_LEASE_SECONDS: "3"
+      OUTBOX_PUBLISHER_ID: audit-e2e-publisher
+    command: ["python", "-m", "pytest", "-q", "tests/p3e_audit_consumer_tests.py"]
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      migrate-transactions-test:
+        condition: service_completed_successfully
+      migrate-audit-test:
+        condition: service_completed_successfully
+    networks:
+      - audit_test_net
+
+volumes:
+  audit_test_postgres_data:
+  audit_test_kafka_data:
+
+networks:
+  audit_test_net:
+    internal: true

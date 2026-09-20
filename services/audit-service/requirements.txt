@@ -1,0 +1,6 @@
+aiokafka==0.12.0
+alembic==1.13.3
+asyncpg==0.29.0
+pydantic==2.9.2
+pydantic-settings==2.5.2
+sqlalchemy==2.0.35

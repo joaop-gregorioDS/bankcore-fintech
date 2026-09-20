@@ -11,9 +11,11 @@ RUN groupadd --system --gid 10001 bankcore && \
 
 COPY services/auth-service/requirements.txt /tmp/auth-requirements.txt
 COPY services/transactions-service/requirements.txt /tmp/transactions-requirements.txt
+COPY services/audit-service/requirements.txt /tmp/audit-requirements.txt
 RUN pip install --no-cache-dir --disable-pip-version-check \
     -r /tmp/auth-requirements.txt \
     -r /tmp/transactions-requirements.txt \
+    -r /tmp/audit-requirements.txt \
     pytest==8.3.3
 
 COPY --chown=bankcore:bankcore services ./services

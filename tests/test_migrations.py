@@ -26,6 +26,9 @@ class MigrationContractTests(unittest.TestCase):
         self.assertTrue((transactions / "versions/tx_003_risk_audit_linkage.py").exists())
         self.assertTrue((transactions / "versions/tx_004_transactional_outbox.py").exists())
         self.assertTrue((transactions / "versions/tx_005_outbox_leases.py").exists())
+        audit = ROOT / "infra/postgres/alembic/audit"
+        self.assertTrue((audit / "env.py").exists())
+        self.assertTrue((audit / "versions/audit_001_audit_events.py").exists())
 
     def test_manual_migration_is_no_longer_active_source_of_truth(self):
         self.assertFalse((ROOT / "infra/postgres/migrations/001_idempotency_ownership.sql").exists())
