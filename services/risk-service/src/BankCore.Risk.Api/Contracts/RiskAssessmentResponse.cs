@@ -23,16 +23,16 @@ public sealed class RiskAssessmentResponse
     [JsonPropertyName("rules_version")]
     public string RulesVersion { get; init; } = string.Empty;
 
-    public static RiskAssessmentResponse From(AssessRiskResult result)
+    public static RiskAssessmentResponse From(PersistedRiskAssessment result)
     {
         return new RiskAssessmentResponse
         {
-            AssessmentId = Guid.NewGuid(),
+            AssessmentId = result.AssessmentId,
             TransactionId = result.Assessment.TransactionId,
-            Decision = result.Decision.ToString().ToUpperInvariant(),
-            RiskScore = result.RiskScore,
-            Reasons = result.Reasons.Select(reason => reason.Code).ToArray(),
-            RulesVersion = result.RulesVersion,
+            Decision = result.Assessment.Decision.ToString().ToUpperInvariant(),
+            RiskScore = result.Assessment.RiskScore,
+            Reasons = result.Assessment.Reasons.Select(reason => reason.Code).ToArray(),
+            RulesVersion = result.Assessment.RulesVersion,
         };
     }
 }

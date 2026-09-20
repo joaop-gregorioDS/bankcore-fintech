@@ -44,7 +44,7 @@ Exemplo:
 }
 ```
 
-No P2-D, `assessment_id` é um identificador efêmero da resposta HTTP; ainda não representa um registro durável nem fornece idempotência persistente. A durabilidade por `transaction_id` + fingerprint será adicionada junto com o banco no P2-E.
+No P2-D, `assessment_id` ainda era efêmero. No P2-E ele passa a ser o UUID persistido da avaliação; replay do mesmo `transaction_id` e fingerprint devolve o mesmo identificador.
 
 ### Response
 
@@ -113,10 +113,32 @@ request_fingerprint        CHAR(64)
 created_at                 timestamp with timezone
 ```
 
-Constraint mínima:
+Constraints mínimas:
 
 ```text
-UNIQUE (transaction_id, rules_version)
+PRIMARY KEY (id)
+UNIQUE (transaction_id)
+```
+
+O `request_fingerprint` é SHA-256 da forma canônica normalizada de `transaction_id`, contas, `amount_cents` e `operation_type`. A primeira avaliação é inserida com a decisão e seus reasons na mesma operação de persistência. Uma corrida que viola a constraint única é relida deliberadamente: fingerprint igual é replay; fingerprint diferente retorna `409 Conflict`.
+
+O banco `bankcore_risk` possui histórico Alembic/EF Core próprio e não é migrado automaticamente pelo processo da API. Antes de iniciar o Risk, a migration one-shot deve ser executada explicitamente:
+
+```text
+docker compose build risk-service
+docker compose --profile migration run --rm migrate-risk
+docker compose up -d --wait risk-service
+```
+
+O `/health` permanece liveness independente. O `/readiness` só responde pronto quando consegue consultar a tabela `risk_assessments`; banco ausente, schema ausente ou conexão indisponível resultam em `503`.
+
+Para validação descartável da persistência, use `docker-compose.risk-test.yml`: ele mantém um PostgreSQL exclusivo de teste, executa o migrador, roda os quatro testes de integração (migration, replay após novo serviço, conflito e 20 requisições concorrentes) e deve ser destruído com `down --volumes`:
+
+```text
+docker compose -f docker-compose.risk-test.yml up -d postgres-risk-test
+docker compose -f docker-compose.risk-test.yml run --build --rm migrate-risk-test
+docker compose -f docker-compose.risk-test.yml run --build --no-deps --rm risk-integration-tests
+docker compose -f docker-compose.risk-test.yml down --volumes --remove-orphans
 ```
 
 O UUID das contas é uma referência lógica ao domínio de Transactions, não uma foreign key entre bancos. A consistência dessa referência será verificada pelo contrato de chamada, sem permitir acesso cruzado ao schema.
@@ -191,7 +213,7 @@ O domínio ainda não implementa velocity, histórico do cliente, destinatário 
 | P2-B | solução .NET, projetos, build e testes unitários mínimos |
 | P2-C | domínio determinístico e regras sintéticas |
 | P2-D | API interna segura, DTO estrito e autenticação `risk:assess` |
-| P2-E | EF Core, PostgreSQL `bankcore_risk` e migrations próprias |
+| P2-E | EF Core, PostgreSQL `bankcore_risk`, migrations próprias e persistência idempotente ✅ |
 | P2-F | cliente Risk em Transactions, timeout, idempotência e fail-closed |
 | P2-G | resiliência, testes de integração e CI |
 

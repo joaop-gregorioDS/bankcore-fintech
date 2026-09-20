@@ -1,0 +1,45 @@
+services:
+  postgres-risk-test:
+    image: postgres:16.4-alpine3.20
+    environment:
+      POSTGRES_USER: ${RISK_TEST_POSTGRES_USER:-bankadmin}
+      POSTGRES_PASSWORD: ${RISK_TEST_POSTGRES_PASSWORD:?set RISK_TEST_POSTGRES_PASSWORD}
+      POSTGRES_DB: bankcore_test_risk
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    networks:
+      - risk_test_net
+
+  migrate-risk-test:
+    build:
+      context: .
+      dockerfile: services/risk-service/Dockerfile
+    image: bankcore-fintech-audit-risk-service-test
+    entrypoint: ["dotnet"]
+    command: ["/app/migrator/BankCore.Risk.Migrator.dll"]
+    environment:
+      RISK_DATABASE_CONNECTION: Host=postgres-risk-test;Port=5432;Database=bankcore_test_risk;Username=${RISK_TEST_POSTGRES_USER:-bankadmin};Password=${RISK_TEST_POSTGRES_PASSWORD}
+    depends_on:
+      postgres-risk-test:
+        condition: service_healthy
+    networks:
+      - risk_test_net
+
+  risk-integration-tests:
+    build:
+      context: .
+      dockerfile: services/risk-service/tests/BankCore.Risk.IntegrationTests/Dockerfile
+    environment:
+      RISK_TEST_DATABASE_CONNECTION: Host=postgres-risk-test;Port=5432;Database=bankcore_test_risk;Username=${RISK_TEST_POSTGRES_USER:-bankadmin};Password=${RISK_TEST_POSTGRES_PASSWORD}
+    depends_on:
+      migrate-risk-test:
+        condition: service_completed_successfully
+    networks:
+      - risk_test_net
+
+networks:
+  risk_test_net:
+    driver: bridge

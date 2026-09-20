@@ -28,7 +28,7 @@ public sealed class RiskAssessmentRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public RiskOperationType OperationType { get; init; }
 
-    public AssessRiskCommand ToCommand()
+    public PersistentRiskAssessmentCommand ToCommand()
     {
         if (TransactionId == Guid.Empty)
         {
@@ -55,6 +55,11 @@ public sealed class RiskAssessmentRequest
             throw new ArgumentException("operation_type is not supported.", nameof(OperationType));
         }
 
-        return new AssessRiskCommand(TransactionId, AmountCents, OperationType.ToString());
+        return new PersistentRiskAssessmentCommand(
+            TransactionId,
+            SourceAccountId,
+            DestinationAccountId,
+            AmountCents,
+            OperationType.ToString());
     }
 }

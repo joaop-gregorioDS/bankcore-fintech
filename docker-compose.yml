@@ -120,6 +120,7 @@ services:
     build:
       context: .
       dockerfile: services/risk-service/Dockerfile
+    image: bankcore-fintech-audit-risk-service
     container_name: bankcore-risk-service
     restart: unless-stopped
     environment:
@@ -129,16 +130,34 @@ services:
       RiskJwt__Issuer: ${JWT_ISSUER:-bankcore-auth}
       RiskJwt__Audience: bankcore-internal
       RiskJwt__PublicKeysDirectory: /run/secrets/jwt-public
+      ConnectionStrings__RiskDatabase: Host=postgres;Port=5432;Database=bankcore_risk;Username=${POSTGRES_USER:-bankadmin};Password=${POSTGRES_PASSWORD}
     volumes:
       - ${JWT_PUBLIC_KEYS_HOST_DIR:-./secrets/jwt-public}:/run/secrets/jwt-public:ro
     expose:
       - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/readiness > /dev/null"]
       interval: 5s
       timeout: 3s
       retries: 10
       start_period: 10s
+    networks:
+      - bankcore_net
+
+  migrate-risk:
+    <<: *container-hardening
+    image: bankcore-fintech-audit-risk-service
+    profiles: ["migration"]
+    entrypoint: ["dotnet"]
+    command: ["/app/migrator/BankCore.Risk.Migrator.dll"]
+    environment:
+      RISK_DATABASE_CONNECTION: Host=postgres;Port=5432;Database=bankcore_risk;Username=${POSTGRES_USER:-bankadmin};Password=${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - bankcore_net
 

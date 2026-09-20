@@ -4,10 +4,16 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Concurrent;
+using BankCore.Risk.Application.AssessRisk;
+using BankCore.Risk.Domain.Assessments;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 
 namespace BankCore.Risk.UnitTests;
@@ -187,7 +193,7 @@ public sealed class RiskApiContractTests : IClassFixture<RiskApiFactory>
     }
 
     [Fact]
-    public async Task Repeated_request_keeps_domain_result_deterministic_but_ids_are_not_durable_yet()
+    public async Task Repeated_request_replays_the_same_persisted_assessment_id()
     {
         using var client = _factory.CreateClient();
         var token = _factory.CreateToken();
@@ -201,7 +207,7 @@ public sealed class RiskApiContractTests : IClassFixture<RiskApiFactory>
 
         Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
-        Assert.NotEqual(
+        Assert.Equal(
             first.RootElement.GetProperty("assessment_id").GetGuid(),
             second.RootElement.GetProperty("assessment_id").GetGuid());
         Assert.Equal(
@@ -298,6 +304,12 @@ public sealed class RiskApiFactory : WebApplicationFactory<Program>
         builder.UseSetting("RiskJwt:Issuer", Issuer);
         builder.UseSetting("RiskJwt:Audience", Audience);
         builder.UseSetting("RiskJwt:PublicKeysDirectory", _publicKeysDirectory);
+        builder.UseSetting("ConnectionStrings:RiskDatabase", "Host=localhost;Database=bankcore_test_risk;Username=test;Password=test-only");
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<IPersistentRiskAssessmentService>();
+            services.AddSingleton<IPersistentRiskAssessmentService, InMemoryRiskAssessmentService>();
+        });
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
             configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -305,6 +317,7 @@ public sealed class RiskApiFactory : WebApplicationFactory<Program>
                 ["RiskJwt:Issuer"] = Issuer,
                 ["RiskJwt:Audience"] = Audience,
                 ["RiskJwt:PublicKeysDirectory"] = _publicKeysDirectory,
+                ["ConnectionStrings:RiskDatabase"] = "Host=localhost;Database=bankcore_test_risk;Username=test;Password=test-only",
             });
         });
     }
@@ -320,5 +333,29 @@ public sealed class RiskApiFactory : WebApplicationFactory<Program>
                 Directory.Delete(_publicKeysDirectory, recursive: true);
             }
         }
+    }
+}
+
+internal sealed class InMemoryRiskAssessmentService : IPersistentRiskAssessmentService
+{
+    private readonly AssessRiskHandler _handler = new();
+    private readonly ConcurrentDictionary<Guid, (string Fingerprint, PersistedRiskAssessment Result)> _assessments = new();
+
+    public Task<PersistedRiskAssessment> AssessAsync(
+        PersistentRiskAssessmentCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var fingerprint = RiskRequestFingerprint.Compute(command);
+        var result = new PersistedRiskAssessment(
+            Guid.NewGuid(),
+            _handler.Handle(command.ToDomainCommand()).Assessment);
+        var stored = _assessments.GetOrAdd(command.TransactionId, (fingerprint, result));
+        if (!string.Equals(stored.Fingerprint, fingerprint, StringComparison.Ordinal))
+        {
+            throw new RiskAssessmentConflictException(command.TransactionId);
+        }
+
+        return Task.FromResult(stored.Result);
     }
 }

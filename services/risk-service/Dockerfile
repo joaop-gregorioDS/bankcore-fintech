@@ -8,6 +8,11 @@ RUN dotnet publish services/risk-service/src/BankCore.Risk.Api/BankCore.Risk.Api
     --no-restore \
     --output /app/publish \
     /p:UseAppHost=false
+RUN dotnet publish services/risk-service/src/BankCore.Risk.Migrator/BankCore.Risk.Migrator.csproj \
+    --configuration Release \
+    --no-restore \
+    --output /app/migrator \
+    /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine@sha256:628ffa789119d231880f32653b75aca3f528968058fdc3cdfb6969e583f8243a AS runtime
 RUN addgroup -S -g 10001 bankcore \
@@ -16,6 +21,7 @@ RUN addgroup -S -g 10001 bankcore \
 
 WORKDIR /app
 COPY --from=build /app/publish .
+COPY --from=build /app/migrator ./migrator
 
 ENV ASPNETCORE_URLS=http://+:8080 \
     DOTNET_EnableDiagnostics=0
