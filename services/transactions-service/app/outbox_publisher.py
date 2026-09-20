@@ -6,13 +6,14 @@ import json
 import logging
 import re
 import socket
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 from uuid import UUID
 
 from aiokafka import AIOKafkaProducer
-from sqlalchemy import or_, select, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import settings
@@ -20,6 +21,7 @@ from app.database import AsyncSessionLocal, engine
 from app.models import OutboxEvent
 from common.observability import log_event, set_correlation_id
 from common.tracing import configure_tracing, inject_trace_headers, tracer
+from app.metrics import outbox_publish_duration, outbox_published, set_outbox_state
 
 logger = logging.getLogger("bankcore.outbox-publisher")
 _tracer = tracer("bankcore.outbox-publisher")
@@ -89,6 +91,16 @@ class OutboxPublisher:
                 .with_for_update(skip_locked=True)
             )
             rows = (await session.execute(statement)).scalars().all()
+            pending_count = await session.scalar(
+                select(func.count(OutboxEvent.id)).where(OutboxEvent.published_at.is_(None))
+            )
+            oldest = await session.scalar(
+                select(func.min(OutboxEvent.occurred_at)).where(OutboxEvent.published_at.is_(None))
+            )
+            set_outbox_state(
+                int(pending_count or 0),
+                (now - oldest).total_seconds() if oldest else 0.0,
+            )
             if not rows:
                 return []
 
@@ -197,9 +209,12 @@ class OutboxPublisher:
                 except Exception as error:
                     for event in events:
                         await self.mark_failed(event.id, error)
+                        outbox_published.add(1, {"outcome": "failure"})
                     return 0, len(events)
 
             for event in events:
+                started_at = time.perf_counter()
+                outcome = "failure"
                 try:
                     await self._publish_one(active_producer, event)
                     set_correlation_id(str(event.payload.get("correlation_id", "")))
@@ -214,6 +229,8 @@ class OutboxPublisher:
                         raise SystemExit(97)
                     if await self.mark_published(event.id):
                         published += 1
+                        outcome = "success"
+                        outbox_published.add(1, {"outcome": outcome})
                 except Exception as error:
                     failed += 1
                     set_correlation_id(str(event.payload.get("correlation_id", "")))
@@ -227,6 +244,12 @@ class OutboxPublisher:
                         error_type=type(error).__name__,
                     )
                     await self.mark_failed(event.id, error)
+                    outbox_published.add(1, {"outcome": outcome})
+                finally:
+                    outbox_publish_duration.record(
+                        time.perf_counter() - started_at,
+                        {"outcome": outcome},
+                    )
         finally:
             if owns_producer and producer_started:
                 await active_producer.stop()

@@ -16,6 +16,8 @@ from audit_app.database import AuditSessionLocal, engine
 from audit_app.models import AuditEvent
 from common.observability import configure_logging, log_event, set_correlation_id
 from common.tracing import configure_tracing, extract_trace_context, inject_trace_headers, tracer
+from common.metrics import configure_metrics
+from audit_app.metrics import events_persisted, events_received, finished, kafka_dlq, kafka_retries, started
 
 
 logger = logging.getLogger("bankcore.audit-consumer")
@@ -93,6 +95,7 @@ class AuditConsumer:
 
     async def _process_record(self, record: Any, kafka_consumer: Any = None) -> Any:
         payload = record.value
+        events_received.add(1, {"topic": "transaction.completed.v1"})
         if isinstance(payload, bytes):
             try:
                 payload = json.loads(payload.decode("utf-8"))
@@ -124,6 +127,7 @@ class AuditConsumer:
             transaction_id=str(event.data.transaction_id),
             status=200,
         )
+        events_persisted.add(1, {"outcome": "inserted" if persisted else "duplicate"})
         if settings.CRASH_AFTER_DB_COMMIT:
             raise SystemExit(97)
         if kafka_consumer is not None:
@@ -224,6 +228,7 @@ class AuditConsumer:
         kafka_consumer: Any,
         producer: AIOKafkaProducer,
     ) -> str:
+        started_at = started()
         retry_count = _header_int(record, RETRY_COUNT_HEADER)
         last_error: BaseException | None = None
         for attempt in range(settings.LOCAL_RETRY_ATTEMPTS + 1):
@@ -231,6 +236,7 @@ class AuditConsumer:
                 await self.process_record(record)
                 await kafka_consumer.commit()
                 log_event(logger, "audit.event.processed", event_id=_header_value(record, "x-event-id"))
+                finished(started_at, "processed")
                 return "processed"
             except InvalidAuditEvent as error:
                 await self.publish_failure(
@@ -243,6 +249,8 @@ class AuditConsumer:
                 )
                 await kafka_consumer.commit()
                 log_event(logger, "audit.event.dlq", level=logging.WARNING, failure_class=PERMANENT)
+                kafka_dlq.add(1, {"failure_class": "permanent"})
+                finished(started_at, "dlq")
                 return "dlq"
             except Exception as error:
                 last_error = error
@@ -261,6 +269,8 @@ class AuditConsumer:
             )
             await kafka_consumer.commit()
             log_event(logger, "audit.event.retry", level=logging.WARNING, retry_count=retry_count + 1)
+            kafka_retries.add(1, {"failure_class": "transient"})
+            finished(started_at, "retry")
             return "retry"
 
         await self.publish_failure(
@@ -273,6 +283,8 @@ class AuditConsumer:
         )
         await kafka_consumer.commit()
         log_event(logger, "audit.event.dlq", level=logging.WARNING, failure_class=TRANSIENT, retry_count=retry_count)
+        kafka_dlq.add(1, {"failure_class": "transient"})
+        finished(started_at, "dlq")
         return "dlq"
 
     async def _consume_loop(
@@ -321,6 +333,7 @@ async def main() -> int:
     parser.add_argument("--once", action="store_true", help="process one Kafka record")
     args = parser.parse_args()
     configure_tracing("audit-consumer")
+    configure_metrics("audit-consumer")
     consumer = AuditConsumer()
     if args.once:
         await consumer.run_once()

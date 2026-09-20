@@ -14,6 +14,10 @@ processors:
 exporters:
   debug:
     verbosity: detailed
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    resource_to_telemetry_conversion:
+      enabled: true
 
 extensions:
   health_check:
@@ -26,3 +30,7 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]

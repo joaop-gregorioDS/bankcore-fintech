@@ -10,6 +10,8 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using System.Diagnostics.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,12 @@ builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
 
 var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"]
     ?? builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+var otlpMetricsEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"]
+    ?? builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+var riskMeter = new Meter("BankCore.Risk", "1.0.0");
+var riskAssessments = riskMeter.CreateCounter<long>("bankcore_risk_assessments", "{assessment}");
+var riskAssessmentDuration = riskMeter.CreateHistogram<double>(
+    "bankcore_risk_assessment_duration_seconds", "s");
 builder.Services
     .AddOpenTelemetry()
     .ConfigureResource(resource => resource.AddService(
@@ -34,6 +42,17 @@ builder.Services
         if (!string.IsNullOrWhiteSpace(otlpEndpoint))
         {
             tracing.AddOtlpExporter(options => options.Endpoint = new Uri(otlpEndpoint));
+        }
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddMeter("BankCore.Risk")
+            .AddAspNetCoreInstrumentation()
+            .AddRuntimeInstrumentation();
+        if (!string.IsNullOrWhiteSpace(otlpMetricsEndpoint))
+        {
+            metrics.AddOtlpExporter(options => options.Endpoint = new Uri(otlpMetricsEndpoint));
         }
     });
 
@@ -127,12 +146,18 @@ app.MapPost("/internal/risk/assessments", async (
     HttpContext context,
     CancellationToken cancellationToken) =>
 {
+    var assessmentStarted = Stopwatch.GetTimestamp();
     try
     {
         using var assessmentActivity = riskActivitySource.StartActivity("risk.assess");
         assessmentActivity?.SetTag("risk.operation_type", request.OperationType);
         var result = await service.AssessAsync(request.ToCommand(), cancellationToken);
-        assessmentActivity?.SetTag("risk.decision", result.Assessment.Decision.ToString().ToUpperInvariant());
+        var decision = result.Assessment.Decision.ToString().ToUpperInvariant();
+        riskAssessments.Add(1, new KeyValuePair<string, object?>("decision", decision));
+        riskAssessmentDuration.Record(
+            Stopwatch.GetElapsedTime(assessmentStarted).TotalSeconds,
+            new KeyValuePair<string, object?>("decision", decision));
+        assessmentActivity?.SetTag("risk.decision", decision);
         assessmentActivity?.SetTag("risk.rules_version", result.Assessment.RulesVersion);
         app.Logger.LogInformation(
             "{Event} {RequestId} {CorrelationId} {TraceId} {SpanId} {TransactionId} {RiskAssessmentId} {Decision} {RulesVersion} {Status}",

@@ -11,6 +11,7 @@ from app.config import settings
 from app.internal_auth import get_internal_service_token, invalidate_internal_service_token
 from common.observability import current_correlation_id, current_request_id, log_event
 from common.tracing import inject_trace_headers, tracer
+from app.metrics import risk_duration, risk_requests
 
 logger = logging.getLogger("bankcore.transactions.risk")
 _tracer = tracer("bankcore.transactions")
@@ -75,6 +76,11 @@ def _unavailable(status_code: int = 503, detail: str = "RISK_UNAVAILABLE") -> HT
     return HTTPException(status_code=status_code, detail=detail)
 
 
+def _record_risk_metric(outcome: str, started_at: float) -> None:
+    risk_requests.add(1, {"outcome": outcome})
+    risk_duration.record(time.perf_counter() - started_at, {"outcome": outcome})
+
+
 async def assess_transaction_risk(
     *,
     transaction_id: UUID,
@@ -83,7 +89,9 @@ async def assess_transaction_risk(
     amount_cents: int,
     operation_type: str,
 ) -> RiskAssessment:
+    started_at = time.perf_counter()
     if not await circuit_breaker.allow_request():
+        _record_risk_metric("circuit_open", started_at)
         raise _unavailable(detail="RISK_CIRCUIT_OPEN")
 
     request_body = {
@@ -141,6 +149,7 @@ async def assess_transaction_risk(
                 status=504,
                 error_type=type(exc).__name__,
             )
+            _record_risk_metric("timeout", started_at)
             raise _unavailable(status_code=504) from exc
         except httpx.RequestError as exc:
             if transient_attempt < settings.RISK_RETRY_COUNT:
@@ -156,6 +165,7 @@ async def assess_transaction_risk(
                 status=503,
                 error_type=type(exc).__name__,
             )
+            _record_risk_metric("unavailable", started_at)
             raise _unavailable() from exc
 
         if response.status_code in (401, 403) and not token_refreshed:
@@ -177,6 +187,7 @@ async def assess_transaction_risk(
                 transaction_id=str(transaction_id),
                 status=response.status_code,
             )
+            _record_risk_metric("unavailable", started_at)
             raise _unavailable()
 
         if response.status_code == 409:
@@ -188,10 +199,12 @@ async def assess_transaction_risk(
                 transaction_id=str(transaction_id),
                 status=409,
             )
+            _record_risk_metric("conflict", started_at)
             raise _unavailable(status_code=409, detail="RISK_ASSESSMENT_CONFLICT")
 
         if response.status_code != 200:
             await circuit_breaker.record_success()
+            _record_risk_metric("unexpected_status", started_at)
             raise _unavailable()
 
         try:
@@ -211,6 +224,7 @@ async def assess_transaction_risk(
                 status=503,
                 error_type=type(exc).__name__,
             )
+            _record_risk_metric("invalid_response", started_at)
             raise _unavailable() from exc
 
         await circuit_breaker.record_success()
@@ -223,4 +237,5 @@ async def assess_transaction_risk(
             rules_version=assessment.rules_version,
             status=200,
         )
+        _record_risk_metric(assessment.decision.lower(), started_at)
         return assessment

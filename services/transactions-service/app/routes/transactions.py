@@ -16,6 +16,7 @@ from app.schemas import DepositRequest, PixTransferRequest, TransactionResponse
 from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 from app.services.ledger import deposit_funds, transfer_funds
 from app.risk_client import assess_transaction_risk
+from app.metrics import ledger_commits, operation_results, outbox_events_created
 from common.observability import (
     current_correlation_id,
     current_request_id,
@@ -152,6 +153,8 @@ async def deposit(
         operation_type="DEPOSIT",
         status=200,
     )
+    ledger_commits.add(1, {"operation": "deposit"})
+    operation_results.add(1, {"operation": "deposit", "outcome": "success"})
     return _tx_response(tx, "CREDIT")
 
 
@@ -187,7 +190,6 @@ async def pix_transfer(
         transaction_id=str(transaction_id),
         operation_type="PIX",
     )
-
     # End the pre-flight session transaction before any network call to Risk.
     await db.rollback()
     risk = await assess_transaction_risk(
@@ -217,6 +219,8 @@ async def pix_transfer(
         risk_decision=risk.decision,
         risk_rules_version=risk.rules_version,
     )
+    ledger_commits.add(1, {"operation": "pix"})
+    operation_results.add(1, {"operation": "pix", "outcome": "success"})
     log_event(
         logger,
         "transactions.ledger.committed",
@@ -225,6 +229,7 @@ async def pix_transfer(
         operation_type="PIX",
         status=200,
     )
+    outbox_events_created.add(1, {"event_type": "transaction.completed.v1"})
     log_event(
         logger,
         "transactions.outbox.created",

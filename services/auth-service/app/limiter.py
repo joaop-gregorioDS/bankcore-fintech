@@ -8,6 +8,7 @@ import redis.asyncio as redis
 from fastapi import HTTPException, status
 from app.config import settings
 from common.observability import log_event
+from app.metrics import rate_limit_decisions, redis_failures, redis_recoveries
 
 _client = None
 _local_attempts: dict[str, tuple[int, float]] = {}
@@ -60,17 +61,21 @@ async def assert_login_allowed(tax_id: str) -> None:
         key = _rate_limit_key(tax_id)
         n = int(await r.eval(_INCREMENT_WITH_TTL, 1, key, settings.RATE_LIMIT_WINDOW_SECONDS))
         if _redis_degraded:
+            redis_recoveries.add(1)
             log_event(_logger, "auth.redis.recovered", mode="redis")
             _redis_degraded = False
         if n > settings.RATE_LIMIT_MAX_ATTEMPTS:
+            rate_limit_decisions.add(1, {"mode": "distributed", "outcome": "limited"})
             log_event(_logger, "auth.rate_limit.exceeded", level=logging.WARNING, status=429, mode="redis")
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="Muitas tentativas. Aguarde alguns minutos.",
             )
+        rate_limit_decisions.add(1, {"mode": "distributed", "outcome": "allowed"})
     except HTTPException:
         raise
     except Exception:
+        redis_failures.add(1)
         if not _redis_degraded:
             log_event(_logger, "auth.redis.degraded", level=logging.WARNING, mode="local-fallback")
             _redis_degraded = True
@@ -84,11 +89,13 @@ async def assert_login_allowed(tax_id: str) -> None:
             if len(_local_attempts) > 10000:
                 _local_attempts.clear()
             if count > _local_limit():
+                rate_limit_decisions.add(1, {"mode": "local_fallback", "outcome": "limited"})
                 log_event(_logger, "auth.rate_limit.exceeded", level=logging.WARNING, status=429, mode="local")
                 raise HTTPException(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                     detail="Muitas tentativas. Aguarde alguns minutos.",
                 )
+            rate_limit_decisions.add(1, {"mode": "local_fallback", "outcome": "allowed"})
 
 
 async def clear_login_failures(tax_id: str) -> None:
