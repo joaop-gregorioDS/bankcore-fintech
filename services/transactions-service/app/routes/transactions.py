@@ -8,11 +8,13 @@ from app.database import get_db
 from app.demo_mode import require_demo_mode
 from app.deps import get_current_user
 from app.internal_auth import get_internal_service_token
+from app.idempotency import build_transaction_id
 from app.models import Account
 from app.money import cents_to_reais, reais_to_cents
 from app.schemas import DepositRequest, PixTransferRequest, TransactionResponse
 from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 from app.services.ledger import deposit_funds, transfer_funds
+from app.risk_client import assess_transaction_risk
 
 router = APIRouter(prefix="/transactions", tags=["Transações Financeiras"])
 PIX_DESTINATION_NOT_FOUND = "Destinatário não encontrado."
@@ -142,14 +144,42 @@ async def pix_transfer(
     if dest_account_id == payload.source_account_id:
         raise HTTPException(status_code=400, detail="Não é permitido fazer Pix para a própria conta.")
 
+    amount_cents = reais_to_cents(payload.amount_reais)
+    transaction_id = build_transaction_id(
+        user_id=user_id,
+        account_id=payload.source_account_id,
+        operation_type="TRANSFER",
+        idempotency_key=payload.idempotency_key,
+    )
+
+    # End the pre-flight session transaction before any network call to Risk.
+    await db.rollback()
+    risk = await assess_transaction_risk(
+        transaction_id=transaction_id,
+        source_account_id=payload.source_account_id,
+        destination_account_id=dest_account_id,
+        amount_cents=amount_cents,
+        operation_type="PIX",
+    )
+    if risk.decision == "REVIEW":
+        raise HTTPException(status_code=409, detail="RISK_REVIEW_REQUIRED")
+    if risk.decision == "REJECTED":
+        raise HTTPException(status_code=422, detail="RISK_REJECTED")
+    if risk.decision != "APPROVED":
+        raise HTTPException(status_code=503, detail="RISK_UNAVAILABLE")
+
     tx = await transfer_funds(
         db=db,
         user_id=user_id,
         source_account_id=payload.source_account_id,
         destination_account_id=dest_account_id,
-        amount_cents=reais_to_cents(payload.amount_reais),
+        amount_cents=amount_cents,
         idempotency_key=payload.idempotency_key,
         description=payload.description or "Transferência Pix BankCore",
+        transaction_id=transaction_id,
+        risk_assessment_id=risk.assessment_id,
+        risk_decision=risk.decision,
+        risk_rules_version=risk.rules_version,
     )
     return _tx_response(tx, "DEBIT")
 

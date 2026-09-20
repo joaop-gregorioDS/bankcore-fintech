@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     JWT_PUBLIC_KEYS_DIR: str = "/run/secrets/jwt-public"
     AUTH_SERVICE_URL: str = "http://auth-service:8000"
     AUTH_SERVICE_TOKEN: str
+    RISK_SERVICE_URL: str = "http://risk-service:8080"
+    RISK_TIMEOUT_SECONDS: float = 3.0
     DEMO_MODE: bool = False
 
 settings = Settings()

@@ -23,6 +23,7 @@ class MigrationContractTests(unittest.TestCase):
         self.assertTrue((transactions / "env.py").exists())
         self.assertTrue((transactions / "versions/tx_001_initial_schema.py").exists())
         self.assertTrue((transactions / "versions/tx_002_idempotency_ownership.py").exists())
+        self.assertTrue((transactions / "versions/tx_003_risk_audit_linkage.py").exists())
 
     def test_manual_migration_is_no_longer_active_source_of_truth(self):
         self.assertFalse((ROOT / "infra/postgres/migrations/001_idempotency_ownership.sql").exists())

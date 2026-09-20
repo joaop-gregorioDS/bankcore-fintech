@@ -1,6 +1,8 @@
 import hashlib
 import json
-from uuid import UUID
+from uuid import UUID, uuid5
+
+TRANSACTION_NAMESPACE = UUID("9f5a7b35-1f73-4b3f-9e84-3df1d39f4d88")
 
 
 def build_request_fingerprint(
@@ -24,3 +26,14 @@ def build_request_fingerprint(
     }
     canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def build_transaction_id(
+    *,
+    user_id: UUID,
+    account_id: UUID,
+    operation_type: str,
+    idempotency_key: str,
+) -> UUID:
+    scope = "|".join((str(user_id), str(account_id), operation_type, idempotency_key))
+    return uuid5(TRANSACTION_NAMESPACE, scope)

@@ -71,9 +71,9 @@ async def login(payload: UserLoginRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/internal-token", response_model=TokenResponse, include_in_schema=False)
-async def internal_token(_: None = Depends(validate_internal_service_secret)):
+async def internal_token(scope: str = Depends(validate_internal_service_secret)):
     return TokenResponse(
-        access_token=create_internal_service_token("transactions"),
+        access_token=create_internal_service_token("transactions", scope=scope),
         expires_in=settings.INTERNAL_TOKEN_EXPIRE_SECONDS,
     )
 
