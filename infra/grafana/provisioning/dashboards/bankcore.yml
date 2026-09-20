@@ -1,0 +1,11 @@
+apiVersion: 1
+providers:
+  - name: BankCore
+    orgId: 1
+    folder: BankCore
+    type: file
+    disableDeletion: true
+    editable: false
+    updateIntervalSeconds: 5
+    options:
+      path: /var/lib/grafana/dashboards
