@@ -45,6 +45,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
       - name: Python syntax and focused lint
         run: |
           python -m compileall -q services infra scripts tests conftest.py
@@ -61,6 +66,15 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore .NET solution
+        run: dotnet restore services/risk-service/BankCore.Risk.sln
+
+      - name: Build .NET solution
+        run: dotnet build services/risk-service/BankCore.Risk.sln --configuration Release --no-restore
+
+      - name: Test .NET solution
+        run: dotnet test services/risk-service/BankCore.Risk.sln --configuration Release --no-build --no-restore --logger "trx;LogFileName=risk-tests.trx"
 
       - name: Validate production Compose
         env:
@@ -80,7 +94,7 @@ jobs:
           JWT_ACTIVE_KID: ci-validation
           AUTH_SERVICE_TOKEN: ci-service-token-validation
         run: |
-          docker compose -f docker-compose.yml build auth-service transactions-service
+          docker compose -f docker-compose.yml build auth-service transactions-service risk-service
           docker compose -f docker-compose.yml pull nginx
 
       - name: Run disposable test infrastructure

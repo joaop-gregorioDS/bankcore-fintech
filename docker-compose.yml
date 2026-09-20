@@ -115,6 +115,28 @@ services:
     networks:
       - bankcore_net
 
+  risk-service:
+    <<: *container-hardening
+    build:
+      context: .
+      dockerfile: services/risk-service/Dockerfile
+    container_name: bankcore-risk-service
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${RISK_ASPNETCORE_ENVIRONMENT:-Production}
+      RISK__SERVICE_NAME: ${RISK_SERVICE_NAME:-bankcore-risk}
+      RISK__ENVIRONMENT_NAME: ${RISK_ENVIRONMENT_NAME:-Production}
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/readiness > /dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - bankcore_net
+
   nginx:
     <<: *container-hardening
     image: nginxinc/nginx-unprivileged:1.27.1-alpine

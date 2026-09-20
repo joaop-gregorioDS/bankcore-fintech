@@ -15,6 +15,10 @@ redis_data/
 .DS_Store
 artifacts/p1d-*/
 
+# .NET
+**/bin/
+**/obj/
+
 # Android
 apps/android/.gradle/
 apps/android/**/build/
