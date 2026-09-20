@@ -85,7 +85,12 @@ services:
       AUDIT_DATABASE_URL: postgresql+asyncpg://${TEST_POSTGRES_USER:-bankadmin}:${TEST_POSTGRES_PASSWORD}@postgres-test:5432/bankcore_test_audit
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_RETRY_TOPIC: bankcore.transaction.completed.v1.retry
+      KAFKA_DLQ_TOPIC: bankcore.transaction.completed.v1.dlq
       KAFKA_GROUP_ID: bankcore-audit-v1
+      KAFKA_RETRY_GROUP_ID: bankcore-audit-retry-v1
+      MAX_RETRIES: "3"
+      LOCAL_RETRY_ATTEMPTS: "1"
       CONSUMER_VERSION: audit-consumer-v1
     profiles: ["consumer"]
     depends_on:
@@ -111,7 +116,12 @@ services:
       AUTH_SERVICE_TOKEN: test-runner
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_RETRY_TOPIC: bankcore.transaction.completed.v1.retry
+      KAFKA_DLQ_TOPIC: bankcore.transaction.completed.v1.dlq
       KAFKA_GROUP_ID: bankcore-audit-v1
+      KAFKA_RETRY_GROUP_ID: bankcore-audit-retry-v1
+      MAX_RETRIES: "3"
+      LOCAL_RETRY_ATTEMPTS: "1"
       CONSUMER_VERSION: audit-consumer-v1
       OUTBOX_BATCH_SIZE: "10"
       OUTBOX_LEASE_SECONDS: "3"
