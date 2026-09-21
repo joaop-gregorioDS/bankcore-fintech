@@ -41,6 +41,7 @@ jobs:
     env:
       IMAGE: ghcr.io/joaop-gregoriods/bankcore-${{ matrix.name }}
       RELEASE_VERSION: ${{ inputs.release_version }}
+      SBOM_PATH: release/sbom/${{ matrix.name }}.cdx.json
 
     steps:
       - name: Checkout
@@ -80,13 +81,24 @@ jobs:
           provenance: false
           sbom: false
 
+      - name: Prepare SBOM output directory
+        run: mkdir -p release/sbom
+
       - name: Generate CycloneDX SBOM
         uses: anchore/sbom-action@v0
         with:
           image: ${{ env.IMAGE }}@${{ steps.push.outputs.digest }}
           format: cyclonedx-json
-          output-file: release/sbom/${{ matrix.name }}.cdx.json
+          output-file: ${{ env.SBOM_PATH }}
           upload-artifact: false
+
+      - name: Validate generated SBOM
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Generated SBOM files:"
+          find release/sbom -maxdepth 1 -type f -print
+          test -s "$SBOM_PATH"
 
       - name: Attest image provenance
         uses: actions/attest@v4
@@ -101,7 +113,7 @@ jobs:
         with:
           subject-name: ${{ env.IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
-          sbom-path: release/sbom/${{ matrix.name }}.cdx.json
+          sbom-path: ${{ env.SBOM_PATH }}
           push-to-registry: true
           create-storage-record: false
 
