@@ -3,21 +3,37 @@ services:
     build:
       context: .
       dockerfile: services/auth-service/Dockerfile
+      args:
+        OCI_SOURCE: ${OCI_SOURCE:-https://github.com/joaop-gregorioDS/bankcore-fintech}
+        OCI_REVISION: ${BANKCORE_GIT_COMMIT:-local}
+        OCI_VERSION: ${BANKCORE_RELEASE_VERSION:?set BANKCORE_RELEASE_VERSION for the production bundle}
 
   transactions-service:
     build:
       context: .
       dockerfile: services/transactions-service/Dockerfile
+      args:
+        OCI_SOURCE: ${OCI_SOURCE:-https://github.com/joaop-gregorioDS/bankcore-fintech}
+        OCI_REVISION: ${BANKCORE_GIT_COMMIT:-local}
+        OCI_VERSION: ${BANKCORE_RELEASE_VERSION:?set BANKCORE_RELEASE_VERSION for the production bundle}
 
   risk-service:
     build:
       context: .
       dockerfile: services/risk-service/Dockerfile
+      args:
+        OCI_SOURCE: ${OCI_SOURCE:-https://github.com/joaop-gregorioDS/bankcore-fintech}
+        OCI_REVISION: ${BANKCORE_GIT_COMMIT:-local}
+        OCI_VERSION: ${BANKCORE_RELEASE_VERSION:?set BANKCORE_RELEASE_VERSION for the production bundle}
 
   migrate-audit:
     build:
       context: .
       dockerfile: services/audit-service/Dockerfile
+      args:
+        OCI_SOURCE: ${OCI_SOURCE:-https://github.com/joaop-gregorioDS/bankcore-fintech}
+        OCI_REVISION: ${BANKCORE_GIT_COMMIT:-local}
+        OCI_VERSION: ${BANKCORE_RELEASE_VERSION:?set BANKCORE_RELEASE_VERSION for the production bundle}
 
   p6b-e2e-runner:
     build:

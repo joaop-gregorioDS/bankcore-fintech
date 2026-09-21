@@ -1,4 +1,17 @@
+ARG OCI_SOURCE="https://github.com/joaop-gregorioDS/bankcore-fintech"
+ARG OCI_REVISION="unknown"
+ARG OCI_VERSION="dev"
+
 FROM python:3.12.8-slim-bookworm
+
+ARG OCI_SOURCE
+ARG OCI_REVISION
+ARG OCI_VERSION
+
+LABEL org.opencontainers.image.source="${OCI_SOURCE}" \
+      org.opencontainers.image.revision="${OCI_REVISION}" \
+      org.opencontainers.image.version="${OCI_VERSION}" \
+      org.opencontainers.image.title="BankCore Audit Consumer"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
