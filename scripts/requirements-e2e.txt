@@ -1,0 +1,3 @@
+# Host-side dependencies for scripts/e2e.py and scripts/p6d-ghcr-e2e.py.
+# The containerized E2E runner installs the service requirements separately.
+cryptography==50.0.1
