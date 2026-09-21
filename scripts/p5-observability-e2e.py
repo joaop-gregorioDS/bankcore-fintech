@@ -55,6 +55,9 @@ def run_stage(label: str, script: str) -> None:
 
 def main() -> int:
     validate_observability_surfaces()
+    if len(sys.argv) > 1 and sys.argv[1] == "--static-only":
+        print("P5-H OBSERVABILITY QUALITY PASS: static redaction and cardinality guards")
+        return 0
     for label, script in STAGES:
         run_stage(label, script)
     print("P5-G OBSERVABILITY E2E PASS: logs/traces, metrics, dashboards and alerts agree across disposable validations")
