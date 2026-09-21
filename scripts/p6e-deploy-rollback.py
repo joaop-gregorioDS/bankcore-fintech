@@ -35,6 +35,7 @@ MIGRATION_SERVICES = ("migrate-auth", "migrate-transactions", "migrate-risk", "m
 READY_SERVICES = ("auth-service", "transactions-service", "risk-service", "nginx")
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 EXPECTED_IMAGES = set(CUSTOM_SERVICES)
+P6E_JWT_KID = "p6e"
 SENSITIVE_MARKERS = (
     "BEGIN PRIVATE KEY",
     "Authorization: Bearer",
@@ -204,6 +205,17 @@ def write_override(path: Path, manifest: dict[str, object], *, fail_readiness: b
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def key_material_paths(key_dir: Path, kid: str = P6E_JWT_KID) -> tuple[Path, Path]:
+    return key_dir / "jwt-private" / f"{kid}.pem", key_dir / "jwt-public" / f"{kid}.pem"
+
+
+def validate_key_material(key_dir: Path, kid: str = P6E_JWT_KID) -> None:
+    private_path, public_path = key_material_paths(key_dir, kid)
+    missing = [str(path) for path in (private_path, public_path) if not path.is_file() or not path.stat().st_size]
+    if missing:
+        raise RuntimeError(f"P6-E key preflight failed for kid {kid}: missing key material: {', '.join(missing)}")
+
+
 def compose(
     project: str,
     environment: dict[str, str],
@@ -307,6 +319,7 @@ def write_state(path: Path, current: dict[str, str], previous: dict[str, str] | 
 
 
 def deployment_environment(key_dir: Path, release: str, revision: str) -> dict[str, str]:
+    private_path, public_path = key_material_paths(key_dir)
     environment = os.environ.copy()
     environment.update(
         {
@@ -314,9 +327,9 @@ def deployment_environment(key_dir: Path, release: str, revision: str) -> dict[s
             "AUTH_SERVICE_TOKEN": secrets.token_urlsafe(32),
             "RATE_LIMIT_KEY_SECRET": secrets.token_urlsafe(32),
             "GRAFANA_ADMIN_PASSWORD": secrets.token_urlsafe(24),
-            "JWT_ACTIVE_KID": "p6e",
-            "JWT_PRIVATE_KEY_FILE": str(key_dir / "jwt-private.pem"),
-            "JWT_PUBLIC_KEYS_HOST_DIR": str(key_dir / "jwt-public"),
+            "JWT_ACTIVE_KID": P6E_JWT_KID,
+            "JWT_PRIVATE_KEY_FILE": str(private_path),
+            "JWT_PUBLIC_KEYS_HOST_DIR": str(public_path.parent),
             "BANKCORE_RELEASE_VERSION": release,
             "BANKCORE_GIT_COMMIT": revision,
             "GATEWAY_PORT": os.environ.get("P6E_GATEWAY_PORT", "18092"),
@@ -367,7 +380,8 @@ def run_scenario(args: argparse.Namespace) -> int:
         temporary = Path(temporary_root)
         key_dir = temporary / "keys"
         key_dir.mkdir()
-        generate_keys(key_dir)
+        generate_keys(key_dir, kid=P6E_JWT_KID, private_filename=Path("jwt-private") / f"{P6E_JWT_KID}.pem")
+        validate_key_material(key_dir)
         state_root = Path(args.state_dir) if args.state_dir else temporary / "state"
         state_path = state_root / "release-pointers.json"
         release_a_identity = {"release": str(manifest_a["release"]), "git_commit": str(manifest_a["git_commit"])}

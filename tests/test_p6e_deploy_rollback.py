@@ -16,6 +16,9 @@ CUSTOM_SERVICES = MODULE.CUSTOM_SERVICES
 load_verified_manifest = MODULE.load_verified_manifest
 validate_migration_policy = MODULE.validate_migration_policy
 write_override = MODULE.write_override
+key_material_paths = MODULE.key_material_paths
+validate_key_material = MODULE.validate_key_material
+generate_keys = MODULE.generate_keys
 
 
 def manifest(tmp_path: Path) -> Path:
@@ -69,6 +72,24 @@ class P6EDeploymentRollbackTests(unittest.TestCase):
             (version_dir / "bad.py").write_text("def upgrade():\n    op.drop_table('accounts')\n\ndef downgrade():\n    pass\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "Destructive migration"):
                 validate_migration_policy(root, changed_paths=[version_dir / "bad.py"])
+
+    def test_p6e_key_material_uses_active_kid(self):
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            generate_keys(root, kid="p6e", private_filename=Path("jwt-private") / "p6e.pem")
+            private_path, public_path = key_material_paths(root, "p6e")
+            self.assertTrue(private_path.is_file())
+            self.assertTrue(public_path.is_file())
+            validate_key_material(root, "p6e")
+
+    def test_p6e_key_preflight_fails_before_rollout(self):
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(RuntimeError, "key preflight failed"):
+                validate_key_material(Path(directory), "p6e")
 
 
 if __name__ == "__main__":
