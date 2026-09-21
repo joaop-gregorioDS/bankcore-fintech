@@ -1,0 +1,91 @@
+groups:
+  - name: bankcore.operational
+    rules:
+      - alert: RedisFallbackActive
+        expr: sum(rate(bankcore_auth_rate_limit_decisions_total{mode="local_fallback"}[5m])) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Auth is using the local Redis fallback
+          description: Login rate limiting is degraded to per-process protection.
+
+      - alert: OutboxBacklogGrowing
+        expr: deriv(bankcore_outbox_pending[5m]) > 0 and bankcore_outbox_pending > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Transactional outbox backlog is growing
+          description: Committed financial events are accumulating faster than they are published.
+
+      - alert: OutboxOldestEventTooOld
+        expr: bankcore_outbox_oldest_age_seconds > 60
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Oldest outbox event is too old
+          description: A committed event has remained pending beyond the initial operational threshold.
+
+      - alert: KafkaRetriesDetected
+        expr: increase(bankcore_kafka_retries_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Kafka consumer retries detected
+          description: The Audit Consumer encountered a transient processing failure.
+
+      - alert: KafkaDLQDetected
+        expr: increase(bankcore_kafka_dlq_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Kafka dead-letter events detected
+          description: An event could not be processed normally and was sent to the DLQ.
+
+      - alert: AuditPersistenceFailures
+        expr: increase(bankcore_audit_processing_results_total{outcome=~"retry|dlq"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Audit persistence is failing
+          description: Audit processing is retrying or sending events to the DLQ.
+
+      # Risk currently exports business decisions only. This remains dormant until
+      # a technical outcome is emitted, while keeping the alert contract explicit.
+      - alert: RiskServiceErrors
+        expr: increase(bankcore_risk_assessments_total{decision=~"ERROR|UNAVAILABLE"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Risk service technical errors detected
+          description: Risk assessment requests are reporting a technical failure outcome.
+
+      - alert: HttpServerErrorRateHigh
+        expr: |
+          (
+            sum(rate(bankcore_transactions_service_http_requests_total{http_response_status_class="5xx"}[5m]))
+            /
+            sum(rate(bankcore_transactions_service_http_requests_total[5m]))
+          ) > 0.05
+          and sum(rate(bankcore_transactions_service_http_requests_total[5m])) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Transactions HTTP 5xx rate is high
+          description: More than five percent of observed Transactions requests are returning 5xx responses.
+
+      - alert: ObservabilityTargetDown
+        expr: up{job="bankcore-otel-collector"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: OpenTelemetry Collector scrape target is down
+          description: Prometheus is no longer collecting telemetry from the Collector.
