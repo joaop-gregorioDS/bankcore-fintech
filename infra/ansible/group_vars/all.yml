@@ -1,0 +1,44 @@
+---
+# Non-secret host contract. Secrets are intentionally absent from this file.
+bankcore_environment: disposable
+bankcore_deploy_user: bankcore
+bankcore_deploy_group: bankcore
+bankcore_deploy_home: "/home/{{ bankcore_deploy_user }}"
+bankcore_root: /opt/bankcore
+
+# Host preparation is opt-in. The P6-F1 validation does not install packages,
+# alter Docker, or change firewall state on the machine running the validator.
+bankcore_install_host_packages: false
+bankcore_verify_docker_contract: false
+bankcore_enable_rootless_linger: false
+bankcore_docker_mode: rootless
+
+bankcore_host_packages:
+  - ca-certificates
+  - curl
+  - dbus-user-session
+  - fuse-overlayfs
+  - python3
+  - python3-venv
+  - slirp4netns
+  - uidmap
+
+bankcore_host_directories:
+  - {path: "{{ bankcore_root }}", owner: "{{ bankcore_deploy_user }}", group: "{{ bankcore_deploy_group }}", mode: "0750"}
+  - {path: "{{ bankcore_root }}/releases", owner: "{{ bankcore_deploy_user }}", group: "{{ bankcore_deploy_group }}", mode: "0750"}
+  - {path: "{{ bankcore_root }}/config", owner: "{{ bankcore_deploy_user }}", group: "{{ bankcore_deploy_group }}", mode: "0750"}
+  - {path: "{{ bankcore_root }}/secrets", owner: "{{ bankcore_deploy_user }}", group: "{{ bankcore_deploy_group }}", mode: "0700"}
+  - {path: "{{ bankcore_root }}/backups", owner: "{{ bankcore_deploy_user }}", group: "{{ bankcore_deploy_group }}", mode: "0750"}
+  - {path: "{{ bankcore_root }}/logs", owner: "{{ bankcore_deploy_user }}", group: "{{ bankcore_deploy_group }}", mode: "0750"}
+  - {path: "{{ bankcore_root }}/run", owner: "{{ bankcore_deploy_user }}", group: "{{ bankcore_deploy_group }}", mode: "0750"}
+
+# A release pointer is created only by the deployment runner after a verified
+# rollout. The host role never points current at an unverified release.
+bankcore_current_release: ""
+bankcore_previous_release: ""
+
+# This is a documentation/validation contract, not a firewall task. Applying
+# firewall rules remains a separately reviewed staging operation.
+bankcore_public_tcp_ports: [80, 443]
+bankcore_loopback_tcp_ports: [13005, 19095]
+bankcore_internal_tcp_ports: [5432, 6379, 8080, 9092, 9093, 3000, 4317, 4318, 8889, 13133]

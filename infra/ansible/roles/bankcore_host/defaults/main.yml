@@ -1,0 +1,16 @@
+---
+bankcore_environment: disposable
+bankcore_deploy_user: bankcore
+bankcore_deploy_group: bankcore
+bankcore_deploy_home: "/home/{{ bankcore_deploy_user }}"
+bankcore_deploy_shell: /bin/bash
+bankcore_root: /opt/bankcore
+bankcore_install_host_packages: false
+bankcore_verify_docker_contract: false
+bankcore_enable_rootless_linger: false
+bankcore_manage_subids: false
+bankcore_subuid_start: 100000
+bankcore_subuid_count: 65536
+bankcore_docker_mode: rootless
+bankcore_current_release: ""
+bankcore_previous_release: ""
