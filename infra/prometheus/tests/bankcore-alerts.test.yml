@@ -1,0 +1,192 @@
+rule_files:
+  - ../rules/bankcore-alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_auth_rate_limit_decisions_total{mode="local_fallback",outcome="allowed"}'
+        values: '0 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: RedisFallbackActive
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: RedisFallbackActive
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Auth is using the local Redis fallback
+              description: Login rate limiting is degraded to per-process protection.
+      - eval_time: 10m
+        alertname: RedisFallbackActive
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_outbox_pending'
+        values: '0 1 2 3 4 5 5 5 5 5 5'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: OutboxBacklogGrowing
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: OutboxBacklogGrowing
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Transactional outbox backlog is growing
+              description: Committed financial events are accumulating faster than they are published.
+      - eval_time: 10m
+        alertname: OutboxBacklogGrowing
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_outbox_oldest_age_seconds'
+        values: '0 30 70 80 90 0'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: OutboxOldestEventTooOld
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: OutboxOldestEventTooOld
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: Oldest outbox event is too old
+              description: A committed event has remained pending beyond the initial operational threshold.
+      - eval_time: 5m
+        alertname: OutboxOldestEventTooOld
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_kafka_retries_total{failure_class="transient"}'
+        values: '0 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: KafkaRetriesDetected
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: KafkaRetriesDetected
+        exp_alerts:
+          - exp_labels:
+              failure_class: transient
+              severity: warning
+            exp_annotations:
+              summary: Kafka consumer retries detected
+              description: The Audit Consumer encountered a transient processing failure.
+      - eval_time: 10m
+        alertname: KafkaRetriesDetected
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_kafka_dlq_total{failure_class="permanent"}'
+        values: '0 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: KafkaDLQDetected
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: KafkaDLQDetected
+        exp_alerts:
+          - exp_labels:
+              failure_class: permanent
+              severity: critical
+            exp_annotations:
+              summary: Kafka dead-letter events detected
+              description: An event could not be processed normally and was sent to the DLQ.
+      - eval_time: 10m
+        alertname: KafkaDLQDetected
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_audit_processing_results_total{outcome="retry"}'
+        values: '0 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: AuditPersistenceFailures
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: AuditPersistenceFailures
+        exp_alerts:
+          - exp_labels:
+              outcome: retry
+              severity: critical
+            exp_annotations:
+              summary: Audit persistence is failing
+              description: Audit processing is retrying or sending events to the DLQ.
+      - eval_time: 10m
+        alertname: AuditPersistenceFailures
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_risk_assessments_total{decision="ERROR"}'
+        values: '0 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: RiskServiceErrors
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: RiskServiceErrors
+        exp_alerts:
+          - exp_labels:
+              decision: ERROR
+              severity: critical
+            exp_annotations:
+              summary: Risk service technical errors detected
+              description: Risk assessment requests are reporting a technical failure outcome.
+      - eval_time: 10m
+        alertname: RiskServiceErrors
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'bankcore_transactions_service_http_requests_total{http_response_status_class="5xx"}'
+        values: '0 10 20 30 40 40 40 40 40 40 40'
+      - series: 'bankcore_transactions_service_http_requests_total{http_response_status_class="2xx"}'
+        values: '0 10 20 30 40 40 40 40 40 40 40'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: HttpServerErrorRateHigh
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: HttpServerErrorRateHigh
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: Transactions HTTP 5xx rate is high
+              description: More than five percent of observed Transactions requests are returning 5xx responses.
+      - eval_time: 10m
+        alertname: HttpServerErrorRateHigh
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'up{job="bankcore-otel-collector"}'
+        values: '1 0 0 0 1 1'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: ObservabilityTargetDown
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: ObservabilityTargetDown
+        exp_alerts:
+          - exp_labels:
+              job: bankcore-otel-collector
+              severity: critical
+            exp_annotations:
+              summary: OpenTelemetry Collector scrape target is down
+              description: Prometheus is no longer collecting telemetry from the Collector.
+      - eval_time: 5m
+        alertname: ObservabilityTargetDown
+        exp_alerts: []

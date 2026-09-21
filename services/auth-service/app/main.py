@@ -8,6 +8,13 @@ from app.demo_mode import is_demo_mode_enabled
 from app.routes import auth
 from app.security import validate_key_material
 from app.seed import seed_demo_users
+from common.observability import RequestContextMiddleware, configure_logging
+from common.metrics import HttpMetricsMiddleware, configure_metrics
+from common.tracing import configure_tracing, instrument_fastapi
+
+configure_logging("auth-service")
+configure_tracing("auth-service")
+configure_metrics("auth-service")
 
 ALLOWED_ORIGINS = [
     "https://bankcore.vortexsoftware.tech",
@@ -33,8 +40,12 @@ app.add_middleware(
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "Accept"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-Request-ID", "X-Correlation-ID"],
+    expose_headers=["X-Request-ID", "X-Correlation-ID"],
 )
+instrument_fastapi(app, "auth-service")
+app.add_middleware(HttpMetricsMiddleware, service_name="auth_service")
+app.add_middleware(RequestContextMiddleware, service="auth-service")
 
 
 @app.on_event("startup")

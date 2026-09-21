@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,8 +25,11 @@ from app.security import (
 )
 from app.seed import normalize_tax_id
 from app.limiter import assert_login_allowed, clear_login_failures
+from app.metrics import login_attempts, login_results
+from common.observability import log_event
 
 router = APIRouter(prefix="/auth", tags=["Autenticação Bancária"])
+logger = logging.getLogger("bankcore.auth")
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -51,19 +55,33 @@ async def register(payload: UserRegisterRequest, db: AsyncSession = Depends(get_
 @router.post("/login", response_model=TokenResponse)
 async def login(payload: UserLoginRequest, db: AsyncSession = Depends(get_db)):
     tax_id = normalize_tax_id(payload.tax_id)
-    await assert_login_allowed(tax_id)
+    login_attempts.add(1)
+    log_event(logger, "auth.login.attempt", operation_type="login")
+    try:
+        await assert_login_allowed(tax_id)
+    except HTTPException as exc:
+        if exc.status_code == status.HTTP_429_TOO_MANY_REQUESTS:
+            login_results.add(1, {"outcome": "rate_limited"})
+            log_event(logger, "auth.login.rate_limited", level=logging.WARNING, status=exc.status_code)
+        raise
     query = select(User).where(User.tax_id == tax_id)
     result = await db.execute(query)
     user = result.scalars().first()
 
     if not user or not verify_password(payload.password, user.hashed_password):
+        login_results.add(1, {"outcome": "invalid_credentials"})
+        log_event(logger, "auth.login.failed", level=logging.WARNING, status=status.HTTP_401_UNAUTHORIZED)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="CPF ou senha inválidos.")
 
     if not user.is_active:
+        login_results.add(1, {"outcome": "inactive"})
+        log_event(logger, "auth.login.failed", level=logging.WARNING, status=status.HTTP_403_FORBIDDEN)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Conta bancária inativa.")
 
     await clear_login_failures(tax_id)
+    login_results.add(1, {"outcome": "success"})
     token = create_access_token(data={"sub": str(user.id), "tax_id": user.tax_id, "name": user.full_name})
+    log_event(logger, "auth.login.succeeded", status=status.HTTP_200_OK)
     return TokenResponse(
         access_token=token,
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,

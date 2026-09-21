@@ -12,6 +12,8 @@ MARKERS_BY_FILE = {
     "test_p2f_risk_gate.py": ("integration", "postgres"),
     "test_p2g_resilience.py": ("unit", "security"),
     "test_p3c_transactional_outbox.py": ("integration", "postgres"),
+    "test_observability.py": ("unit",),
+    "test_tracing.py": ("unit", "security"),
 }
 
 

@@ -58,8 +58,11 @@ public static partial class RiskAuthenticationExtensions
                             .GetRequiredService<ILoggerFactory>()
                             .CreateLogger("BankCore.Risk.Authentication");
                         logger.LogWarning(
-                            "Risk JWT authentication failed: {FailureType}",
-                            context.Exception.GetType().Name);
+                            "{Event} {FailureType} {RequestId} {CorrelationId}",
+                            "risk.authentication.failed",
+                            context.Exception.GetType().Name,
+                            context.HttpContext.Items["BankCore.RequestId"],
+                            context.HttpContext.Items["BankCore.CorrelationId"]);
                         return Task.CompletedTask;
                     },
                     OnTokenValidated = context =>

@@ -17,6 +17,7 @@ COPY services/transactions-service/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
 COPY --chown=bankcore:bankcore services/transactions-service/app ./app
+COPY --chown=bankcore:bankcore common ./common
 COPY --chown=bankcore:bankcore infra/postgres/alembic/transactions ./alembic/transactions
 COPY --chown=bankcore:bankcore infra/postgres/preflight.py ./preflight.py
 COPY --chown=bankcore:bankcore infra/postgres/migrate.py ./migrate.py

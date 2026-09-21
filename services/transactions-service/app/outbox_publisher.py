@@ -3,20 +3,29 @@
 import argparse
 import asyncio
 import json
+import logging
 import re
 import socket
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 from uuid import UUID
 
 from aiokafka import AIOKafkaProducer
-from sqlalchemy import or_, select, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import settings
 from app.database import AsyncSessionLocal, engine
 from app.models import OutboxEvent
+from common.metrics import configure_metrics
+from common.observability import log_event, set_correlation_id
+from common.tracing import configure_tracing, inject_trace_headers, tracer
+from app.metrics import outbox_publish_duration, outbox_published, set_outbox_state
+
+logger = logging.getLogger("bankcore.outbox-publisher")
+_tracer = tracer("bankcore.outbox-publisher")
 
 
 SENSITIVE_ERROR = re.compile(
@@ -83,6 +92,16 @@ class OutboxPublisher:
                 .with_for_update(skip_locked=True)
             )
             rows = (await session.execute(statement)).scalars().all()
+            pending_count = await session.scalar(
+                select(func.count(OutboxEvent.id)).where(OutboxEvent.published_at.is_(None))
+            )
+            oldest = await session.scalar(
+                select(func.min(OutboxEvent.occurred_at)).where(OutboxEvent.published_at.is_(None))
+            )
+            set_outbox_state(
+                int(pending_count or 0),
+                (now - oldest).total_seconds() if oldest else 0.0,
+            )
             if not rows:
                 return []
 
@@ -98,6 +117,17 @@ class OutboxPublisher:
                 row.locked_by = self.publisher_id
                 row.locked_until = lease_until
             await session.commit()
+            for event in claimed:
+                correlation_id = event.payload.get("correlation_id")
+                if correlation_id:
+                    set_correlation_id(str(correlation_id))
+                log_event(
+                    logger,
+                    "outbox.event.claimed",
+                    event_id=str(event.id),
+                    transaction_id=str(event.payload.get("data", {}).get("transaction_id", "")),
+                    attempt=int(next((row.attempts for row in rows if row.id == event.id), 0)),
+                )
             return claimed
 
     async def mark_published(self, event_id: UUID) -> bool:
@@ -147,11 +177,20 @@ class OutboxPublisher:
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
-        await producer.send_and_wait(
-            settings.KAFKA_TOPIC,
-            key=event.message_key.encode("utf-8"),
-            value=payload,
-        )
+        kafka_headers = {
+            "x-event-id": str(event.payload.get("event_id", event.id)),
+            "x-correlation-id": str(event.payload.get("correlation_id", "")),
+        }
+        with _tracer.start_as_current_span("kafka.produce transaction.completed.v1") as span:
+            span.set_attribute("messaging.destination.name", settings.KAFKA_TOPIC)
+            span.set_attribute("messaging.operation", "publish")
+            inject_trace_headers(kafka_headers)
+            await producer.send_and_wait(
+                settings.KAFKA_TOPIC,
+                key=event.message_key.encode("utf-8"),
+                value=payload,
+                headers=[(key, value.encode("ascii")) for key, value in kafka_headers.items()],
+            )
 
     async def run_once(self, producer: AIOKafkaProducer | None = None) -> tuple[int, int]:
         events = await self.claim_pending()
@@ -171,18 +210,47 @@ class OutboxPublisher:
                 except Exception as error:
                     for event in events:
                         await self.mark_failed(event.id, error)
+                        outbox_published.add(1, {"outcome": "failure"})
                     return 0, len(events)
 
             for event in events:
+                started_at = time.perf_counter()
+                outcome = "failure"
                 try:
                     await self._publish_one(active_producer, event)
+                    set_correlation_id(str(event.payload.get("correlation_id", "")))
+                    log_event(
+                        logger,
+                        "outbox.event.publish.succeeded",
+                        event_id=str(event.id),
+                        transaction_id=str(event.payload.get("data", {}).get("transaction_id", "")),
+                        topic=settings.KAFKA_TOPIC,
+                    )
                     if settings.OUTBOX_CRASH_AFTER_KAFKA_ACK:
                         raise SystemExit(97)
                     if await self.mark_published(event.id):
                         published += 1
+                        outcome = "success"
+                        outbox_published.add(1, {"outcome": outcome})
                 except Exception as error:
                     failed += 1
+                    set_correlation_id(str(event.payload.get("correlation_id", "")))
+                    log_event(
+                        logger,
+                        "outbox.event.publish.failed",
+                        level=logging.WARNING,
+                        event_id=str(event.id),
+                        transaction_id=str(event.payload.get("data", {}).get("transaction_id", "")),
+                        topic=settings.KAFKA_TOPIC,
+                        error_type=type(error).__name__,
+                    )
                     await self.mark_failed(event.id, error)
+                    outbox_published.add(1, {"outcome": outcome})
+                finally:
+                    outbox_publish_duration.record(
+                        time.perf_counter() - started_at,
+                        {"outcome": outcome},
+                    )
         finally:
             if owns_producer and producer_started:
                 await active_producer.stop()
@@ -198,6 +266,11 @@ async def main() -> int:
     parser = argparse.ArgumentParser(description="BankCore transactional outbox publisher")
     parser.add_argument("--once", action="store_true", help="claim and publish one batch")
     args = parser.parse_args()
+    from common.observability import configure_logging
+
+    configure_logging("outbox-publisher")
+    configure_metrics("outbox-publisher")
+    configure_tracing("outbox-publisher")
     publisher = OutboxPublisher()
     if args.once:
         await publisher.run_once()

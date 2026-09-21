@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -15,8 +16,16 @@ from app.schemas import DepositRequest, PixTransferRequest, TransactionResponse
 from app.seed import SETTLEMENT_ACCOUNT_ID, is_settlement
 from app.services.ledger import deposit_funds, transfer_funds
 from app.risk_client import assess_transaction_risk
+from app.metrics import ledger_commits, operation_results, outbox_events_created
+from common.observability import (
+    current_correlation_id,
+    current_request_id,
+    log_event,
+    set_correlation_id,
+)
 
 router = APIRouter(prefix="/transactions", tags=["Transações Financeiras"])
+logger = logging.getLogger("bankcore.transactions")
 PIX_DESTINATION_NOT_FOUND = "Destinatário não encontrado."
 
 
@@ -81,7 +90,19 @@ async def _resolve_pix_destination(
         async with httpx.AsyncClient(timeout=10.0) as client:
             res = await client.post(
                 f"{settings.AUTH_SERVICE_URL}/auth/internal/pix/resolve",
-                headers={"Authorization": f"Bearer {service_token}"},
+                headers={
+                    "Authorization": f"Bearer {service_token}",
+                    **(
+                        {"X-Request-ID": current_request_id()}
+                        if current_request_id()
+                        else {}
+                    ),
+                    **(
+                        {"X-Correlation-ID": current_correlation_id()}
+                        if current_correlation_id()
+                        else {}
+                    ),
+                },
                 json={"pix_key": tax_id},
             )
     except httpx.HTTPError as exc:
@@ -124,6 +145,16 @@ async def deposit(
         amount_cents=reais_to_cents(payload.amount_reais),
         idempotency_key=payload.idempotency_key,
     )
+    set_correlation_id(str(tx.id))
+    log_event(
+        logger,
+        "transactions.ledger.committed",
+        transaction_id=str(tx.id),
+        operation_type="DEPOSIT",
+        status=200,
+    )
+    ledger_commits.add(1, {"operation": "deposit"})
+    operation_results.add(1, {"operation": "deposit", "outcome": "success"})
     return _tx_response(tx, "CREDIT")
 
 
@@ -136,6 +167,14 @@ async def pix_transfer(
     user_id = UUID(current_user["sub"])
     await _require_own_account(db, payload.source_account_id, user_id)
 
+    transaction_id = build_transaction_id(
+        user_id=user_id,
+        account_id=payload.source_account_id,
+        operation_type="TRANSFER",
+        idempotency_key=payload.idempotency_key,
+    )
+    set_correlation_id(str(transaction_id))
+
     dest_account_id = await _resolve_pix_destination(
         db,
         payload.destination_key,
@@ -145,13 +184,12 @@ async def pix_transfer(
         raise HTTPException(status_code=400, detail="Não é permitido fazer Pix para a própria conta.")
 
     amount_cents = reais_to_cents(payload.amount_reais)
-    transaction_id = build_transaction_id(
-        user_id=user_id,
-        account_id=payload.source_account_id,
-        operation_type="TRANSFER",
-        idempotency_key=payload.idempotency_key,
+    log_event(
+        logger,
+        "transactions.operation.started",
+        transaction_id=str(transaction_id),
+        operation_type="PIX",
     )
-
     # End the pre-flight session transaction before any network call to Risk.
     await db.rollback()
     risk = await assess_transaction_risk(
@@ -180,6 +218,25 @@ async def pix_transfer(
         risk_assessment_id=risk.assessment_id,
         risk_decision=risk.decision,
         risk_rules_version=risk.rules_version,
+    )
+    ledger_commits.add(1, {"operation": "pix"})
+    operation_results.add(1, {"operation": "pix", "outcome": "success"})
+    log_event(
+        logger,
+        "transactions.ledger.committed",
+        transaction_id=str(tx.id),
+        risk_assessment_id=str(risk.assessment_id),
+        operation_type="PIX",
+        status=200,
+    )
+    outbox_events_created.add(1, {"event_type": "transaction.completed.v1"})
+    log_event(
+        logger,
+        "transactions.outbox.created",
+        transaction_id=str(tx.id),
+        risk_assessment_id=str(risk.assessment_id),
+        operation_type="PIX",
+        status=200,
     )
     return _tx_response(tx, "DEBIT")
 

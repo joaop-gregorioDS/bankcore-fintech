@@ -346,3 +346,118 @@ jobs:
 
       - name: Run Transactions without Redis financial smoke test
         run: python scripts/p4d-transactions-no-redis.py
+
+  observability-quality:
+    name: Observability configuration quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      POSTGRES_PASSWORD: ci-observability-validation-only
+      JWT_ACTIVE_KID: ci-validation
+      AUTH_SERVICE_TOKEN: ci-observability-service-token
+      RATE_LIMIT_KEY_SECRET: ci-observability-rate-limit-key
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install disposable runner dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir cryptography==50.0.1
+
+      - name: Compile observability runners
+        run: python -m py_compile scripts/p5-alerts.py scripts/p5-grafana.py scripts/p5-metrics.py scripts/p5-tracing.py scripts/p5-observability-e2e.py scripts/p5-observability-dependency-failure.py
+
+      - name: Validate redaction and cardinality guards
+        run: python scripts/p5-observability-e2e.py --static-only
+
+      - name: Validate observability Compose overlays
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.e2e.yml -f docker-compose.p3-e2e.yml \
+            -f docker-compose.p5-tracing.yml -f docker-compose.p5-metrics.yml \
+            -f docker-compose.p5-grafana.yml -f docker-compose.p5-alerts.yml config --quiet
+
+      - name: Validate Prometheus rules
+        run: |
+          docker run --rm \
+            --mount "type=bind,source=$GITHUB_WORKSPACE,target=/work,readonly" \
+            --entrypoint promtool prom/prometheus:v2.55.1 \
+            check rules /work/infra/prometheus/rules/bankcore-alerts.yml
+
+  observability-tracing-metrics:
+    name: Observability tracing and metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install disposable runner dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir cryptography==50.0.1
+
+      - name: Run P5-C tracing and redaction validation
+        run: python scripts/p5-tracing.py
+
+      - name: Run P5-D metrics and failure-mode validation
+        run: python scripts/p5-metrics.py
+
+  observability-ui-alerts:
+    name: Observability dashboards and alerts
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install disposable runner dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir cryptography==50.0.1
+
+      - name: Run P5-E Grafana provisioning validation
+        run: python scripts/p5-grafana.py
+
+      - name: Run P5-F alert lifecycle validation
+        run: python scripts/p5-alerts.py
+
+  observability-e2e:
+    name: P5 consolidated observability E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install disposable runner dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir cryptography==50.0.1
+
+      - name: Run P5-G consolidated disposable validation
+        run: python scripts/p5-observability-e2e.py

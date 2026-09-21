@@ -11,3 +11,7 @@ bcrypt==4.0.1
 PyJWT[crypto]==2.14.0
 redis==5.0.8
 alembic==1.13.3
+opentelemetry-api==1.44.0
+opentelemetry-sdk==1.44.0
+opentelemetry-exporter-otlp-proto-grpc==1.44.0
+opentelemetry-instrumentation-fastapi==0.65b0

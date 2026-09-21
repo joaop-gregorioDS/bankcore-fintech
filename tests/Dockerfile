@@ -19,6 +19,7 @@ RUN pip install --no-cache-dir --disable-pip-version-check \
     pytest==8.3.3
 
 COPY --chown=bankcore:bankcore services ./services
+COPY --chown=bankcore:bankcore common ./common
 COPY --chown=bankcore:bankcore infra ./infra
 COPY --chown=bankcore:bankcore docs ./docs
 COPY --chown=bankcore:bankcore tests ./tests
