@@ -1,0 +1,7 @@
+---
+- name: Prepare a disposable or staging BankCore host contract
+  hosts: bankcore_staging
+  become: true
+  gather_facts: true
+  roles:
+    - bankcore_host
