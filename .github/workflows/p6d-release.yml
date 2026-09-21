@@ -1,0 +1,225 @@
+name: BankCore P6-D Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Human-readable GHCR release tag"
+        required: true
+        default: p6d-test
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bankcore-p6d-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-publish:
+    name: Build, publish and attest ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: auth
+            dockerfile: services/auth-service/Dockerfile
+          - name: transactions
+            dockerfile: services/transactions-service/Dockerfile
+          - name: risk
+            dockerfile: services/risk-service/Dockerfile
+          - name: audit
+            dockerfile: services/audit-service/Dockerfile
+    env:
+      IMAGE: ghcr.io/joaop-gregoriods/bankcore-${{ matrix.name }}
+      RELEASE_VERSION: ${{ inputs.release_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ env.RELEASE_VERSION }}
+            ${{ env.IMAGE }}:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ env.RELEASE_VERSION }}
+          build-args: |
+            OCI_SOURCE=https://github.com/${{ github.repository }}
+            OCI_REVISION=${{ github.sha }}
+            OCI_VERSION=${{ env.RELEASE_VERSION }}
+          provenance: false
+          sbom: false
+
+      - name: Generate CycloneDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.IMAGE }}@${{ steps.push.outputs.digest }}
+          format: cyclonedx-json
+          output-file: release/sbom/${{ matrix.name }}.cdx.json
+          upload-artifact: false
+
+      - name: Attest image provenance
+        uses: actions/attest@v4
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+          create-storage-record: false
+
+      - name: Attest image SBOM
+        uses: actions/attest@v4
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          sbom-path: release/sbom/${{ matrix.name }}.cdx.json
+          push-to-registry: true
+          create-storage-record: false
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.8.1
+
+      - name: Sign image keylessly
+        run: cosign sign --yes "${IMAGE}@${{ steps.push.outputs.digest }}"
+
+      - name: Verify keyless signature
+        env:
+          EXPECTED_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/p6d-release.yml@${{ github.ref }}
+        run: |
+          cosign verify "${IMAGE}@${{ steps.push.outputs.digest }}" \
+            --certificate-identity "${EXPECTED_IDENTITY}" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com
+
+      - name: Write release fragment
+        run: |
+          mkdir -p release/fragments
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          name = os.environ["IMAGE"].rsplit("/", 1)[1].removeprefix("bankcore-")
+          image = os.environ["IMAGE"]
+          digest = os.environ["IMAGE_DIGEST"]
+          release = os.environ["RELEASE_VERSION"]
+          Path(f"release/fragments/{name}.json").write_text(
+              json.dumps({
+                  "name": name,
+                  "image": image,
+                  "tag": release,
+                  "digest": digest,
+                  "sbom": f"sbom/{name}.cdx.json",
+              }, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+        env:
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+
+      - name: Upload signed release inputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: p6d-${{ matrix.name }}
+          path: release
+          if-no-files-found: error
+
+  verify:
+    name: Verify GHCR release and production-like E2E
+    needs: build-publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download release fragments and SBOMs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: p6d-*
+          path: release-input
+          merge-multiple: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare verified release directory
+        run: |
+          mkdir -p release
+          cp -R release-input/sbom release/sbom
+
+      - name: Assemble release manifest
+        run: |
+          python scripts/p6d-release-manifest.py \
+            --input-dir release-input \
+            --output release/manifest.json \
+            --release "${{ inputs.release_version }}" \
+            --commit "${{ github.sha }}" \
+            --repository "${{ github.repository }}" \
+            --workflow p6d-release.yml
+          sha256sum release/manifest.json release/sbom/*.json > release/checksums.sha256
+
+      - name: Log in to GHCR for verification
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.8.1
+
+      - name: Verify digest, signature, provenance and SBOM
+        run: |
+          python scripts/p6d-verify-release.py \
+            --manifest release/manifest.json \
+            --repository "${{ github.repository }}" \
+            --workflow p6d-release.yml \
+            --ref "${{ github.ref }}"
+
+      - name: Run digest-pinned production-like E2E
+        run: python scripts/p6d-ghcr-e2e.py --manifest release/manifest.json
+
+      - name: Upload verified release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: p6d-verified-release
+          path: release
+          if-no-files-found: error

@@ -1,3 +1,7 @@
+ARG OCI_SOURCE="https://github.com/joaop-gregorioDS/bankcore-fintech"
+ARG OCI_REVISION="unknown"
+ARG OCI_VERSION="dev"
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine@sha256:3111b113abec80b4a8a3d4b5cebebf61a4cdab019b7e56ca3e6389e6ac4e1c8d AS build
 WORKDIR /src
 
@@ -15,6 +19,14 @@ RUN dotnet publish services/risk-service/src/BankCore.Risk.Migrator/BankCore.Ris
     /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine@sha256:628ffa789119d231880f32653b75aca3f528968058fdc3cdfb6969e583f8243a AS runtime
+ARG OCI_SOURCE
+ARG OCI_REVISION
+ARG OCI_VERSION
+
+LABEL org.opencontainers.image.source="${OCI_SOURCE}" \
+      org.opencontainers.image.revision="${OCI_REVISION}" \
+      org.opencontainers.image.version="${OCI_VERSION}" \
+      org.opencontainers.image.title="BankCore Risk Service"
 RUN addgroup -S -g 10001 bankcore \
     && adduser -S -D -u 10001 -G bankcore -h /nonexistent -s /sbin/nologin bankcore \
     && apk add --no-cache curl
