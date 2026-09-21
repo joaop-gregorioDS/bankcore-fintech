@@ -17,6 +17,7 @@ MARKERS = (
 
 
 def run(command: list[str], *, env: dict[str, str] | None = None) -> str:
+    """Run a command and return stdout; callers must treat the result as text."""
     result = subprocess.run(command, text=True, capture_output=True, env=env, check=False)
     if result.returncode:
         raise RuntimeError(
@@ -72,8 +73,7 @@ def main() -> int:
         repo_digests = inspected.get("RepoDigests") or []
         if immutable_ref not in repo_digests:
             raise SystemExit(f"Pulled image does not retain the manifest digest for {image['name']}.")
-        history = run(["docker", "history", "--no-trunc", "--format", "{{.CreatedBy}}", immutable_ref])
-        history_text = history.stdout + history.stderr
+        history_text = run(["docker", "history", "--no-trunc", "--format", "{{.CreatedBy}}", immutable_ref])
         if any(marker in history_text for marker in MARKERS):
             raise SystemExit(f"Sensitive marker found in image history for {image['name']}.")
 
