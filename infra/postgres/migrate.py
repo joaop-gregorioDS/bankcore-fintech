@@ -55,6 +55,8 @@ def main() -> None:
             command.stamp(config, expected)
         else:
             command.upgrade(config, "head")
+    elif result.state == SchemaState.ALEMBIC_MANAGED.value:
+        command.upgrade(config, "head")
     else:  # pragma: no cover
         raise SystemExit("Migration aborted.")
 
