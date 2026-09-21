@@ -48,16 +48,25 @@ Example, with two verified P6-D bundles already downloaded locally:
 python scripts/p6e-deploy-rollback.py \
   --release-a release-a/manifest.json \
   --release-b release-b/manifest.json \
-  --smoke-a "python scripts/p6e-smoke-adapter.py" \
-  --smoke-b "python scripts/p6e-smoke-adapter.py" \
-  --snapshot-command "python scripts/p6e-financial-snapshot.py" \
+  --smoke-a "python scripts/p6e-financial-acceptance.py smoke" \
+  --smoke-b "python scripts/p6e-financial-acceptance.py smoke" \
+  --snapshot-command "python scripts/p6e-financial-acceptance.py snapshot" \
   --failure-mode readiness
 ```
 
-The actual adapter is intentionally external to the deployment engine so that
-the deployment code cannot manufacture a passing financial result. In the
-BankCore disposable environment it should invoke the existing PIX → Risk →
-Ledger → Outbox → Kafka → Audit E2E and query the three PostgreSQL stores.
+The adapter is intentionally external to the deployment engine so that the
+deployment code cannot manufacture a passing financial result. The versioned
+`scripts/p6e-financial-acceptance.py` starts the disposable
+`scripts/p6e-probe.Dockerfile` image on the Compose network. The probe invokes
+the gateway for a controlled PIX and queries the internal Transactions,
+Risk and Audit PostgreSQL services without publishing any database port. It
+asserts the transaction, Risk assessment, double-entry ledger, balances,
+idempotency record, outbox publication and exactly one Audit event. Its
+snapshot mode emits only a SHA-256 digest of canonical, ordered state.
+
+For rollback assertions, the runner restores A and compares the snapshot before
+running the post-rollback smoke. That smoke intentionally creates a new
+controlled operation, so it is not confused with the preservation check.
 
 ## Migration safety
 

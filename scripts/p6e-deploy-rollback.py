@@ -25,6 +25,7 @@ from e2e import generate_keys
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPOSE_BASE = ROOT / "docker-compose.production.yml"
+PROBE_DOCKERFILE = ROOT / "scripts" / "p6e-probe.Dockerfile"
 CUSTOM_SERVICES = {
     "auth": ("migrate-auth", "auth-service"),
     "transactions": ("migrate-transactions", "transactions-service", "outbox-publisher"),
@@ -283,7 +284,9 @@ def snapshot(command: str | None, environment: dict[str, str], *, label: str) ->
     value = result.stdout.strip()
     if not value:
         raise RuntimeError(f"Financial snapshot command returned no data for {label}.")
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()
+    print(f"P6E SNAPSHOT PASS: {label}")
+    return digest
 
 
 def smoke(command: str | None, environment: dict[str, str], *, release: str, health_only: bool) -> None:
@@ -296,6 +299,7 @@ def smoke(command: str | None, environment: dict[str, str], *, release: str, hea
     result = subprocess.run(command, cwd=ROOT, env=smoke_env, shell=True, text=True, capture_output=True, check=False)
     if result.returncode:
         raise RuntimeError(f"Smoke test failed for {release} ({result.returncode}): {redact(result.stderr, environment)}")
+    print(f"P6E FINANCIAL SMOKE PASS: {release}")
 
 
 @dataclass
@@ -339,6 +343,21 @@ def deployment_environment(key_dir: Path, release: str, revision: str) -> dict[s
         }
     )
     return environment
+
+
+def prepare_probe_image(project: str, environment: dict[str, str]) -> str:
+    image = f"bankcore-p6e-probe:{project}"
+    require_command(
+        ["docker", "build", "--file", str(PROBE_DOCKERFILE), "--tag", image, "."],
+        environment,
+    )
+    return image
+
+
+def remove_probe_image(image: str, environment: dict[str, str]) -> None:
+    result = run_command(["docker", "image", "rm", image], environment)
+    if result.returncode:
+        raise RuntimeError(f"P6-E probe image cleanup failed: {redact(result.stderr or result.stdout, environment)}")
 
 
 def deploy(
@@ -387,6 +406,9 @@ def run_scenario(args: argparse.Namespace) -> int:
         release_a_identity = {"release": str(manifest_a["release"]), "git_commit": str(manifest_a["git_commit"])}
         release_b_identity = {"release": str(manifest_b["release"]), "git_commit": str(manifest_b["git_commit"])}
         environment = deployment_environment(key_dir, str(manifest_a["release"]), str(manifest_a["git_commit"]))
+        environment["P6E_COMPOSE_PROJECT"] = project
+        probe_image = prepare_probe_image(project, environment)
+        environment["P6E_PROBE_IMAGE"] = probe_image
         override_a = temporary / "release-a.yml"
         override_b = temporary / "release-b.yml"
         write_override(override_a, manifest_a)
@@ -408,23 +430,37 @@ def run_scenario(args: argparse.Namespace) -> int:
                 deploy(project, environment, manifest_b, override_b, smoke_command=b_smoke, health_only=args.health_only)
                 write_state(state_path, release_b_identity, state.current)
                 state = ReleaseState(release_b_identity, state.current)
+                current_state = read_state(state_path)
+                if current_state.current != release_b_identity or current_state.previous != release_a_identity:
+                    raise RuntimeError("Release pointers do not identify B as current and A as previous.")
                 print(f"P6E RELEASE B PASS: {manifest_b['release']}")
             except Exception as failure:
                 print(f"P6E EXPECTED FAILURE: {type(failure).__name__}")
                 environment.update({"BANKCORE_RELEASE_VERSION": str(manifest_a["release"]), "BANKCORE_GIT_COMMIT": str(manifest_a["git_commit"])})
-                deploy(project, environment, manifest_a, override_a, smoke_command=args.smoke_a, health_only=args.health_only)
+                # Restore A and compare the pre-failure snapshot before running
+                # the post-rollback smoke. The smoke intentionally creates a
+                # new controlled operation, so it must not contaminate the
+                # preservation assertion.
+                deploy(project, environment, manifest_a, override_a, smoke_command=None, health_only=True)
                 after = snapshot(args.snapshot_command, environment, label="rollback")
                 if snapshot_before is not None and after != snapshot_before:
                     raise RuntimeError("Financial snapshot changed across rollback.") from failure
+                smoke(args.smoke_a, environment, release=str(manifest_a["release"]), health_only=args.health_only)
                 write_state(state_path, release_a_identity, None)
+                current_state = read_state(state_path)
+                if current_state.current != release_a_identity or current_state.previous is not None:
+                    raise RuntimeError("Release pointers do not identify A as the restored release.")
                 print(f"P6E ROLLBACK PASS: restored {manifest_a['release']}; financial snapshot preserved")
             exit_code = 0
         finally:
             teardown = compose(project, environment, override_a, "down", "-v", "--remove-orphans")
             if teardown.returncode and exit_code == 0:
                 exit_code = teardown.returncode
-            if teardown.returncode == 0:
-                verify_no_residue(project, environment, override_a)
+            try:
+                if teardown.returncode == 0:
+                    verify_no_residue(project, environment, override_a)
+            finally:
+                remove_probe_image(probe_image, environment)
     return exit_code
 
 
