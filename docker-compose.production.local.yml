@@ -1,0 +1,47 @@
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+
+  transactions-service:
+    build:
+      context: .
+      dockerfile: services/transactions-service/Dockerfile
+
+  risk-service:
+    build:
+      context: .
+      dockerfile: services/risk-service/Dockerfile
+
+  migrate-audit:
+    build:
+      context: .
+      dockerfile: services/audit-service/Dockerfile
+
+  p6b-e2e-runner:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    image: "${BANKCORE_IMAGE_REGISTRY:-bankcore.local}/bankcore-verifier:${BANKCORE_RELEASE_VERSION:?set BANKCORE_RELEASE_VERSION for the production bundle}"
+    profiles: ["verification"]
+    environment:
+      E2E_BASE_URL: http://nginx:8080
+      E2E_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_transactions
+      E2E_RISK_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@postgres:5432/bankcore_risk
+      E2E_AUDIT_DATABASE_URL: postgresql://${POSTGRES_USER:-bankadmin}:${POSTGRES_PASSWORD}@audit-postgres:5432/bankcore_audit
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: bankcore.transaction.completed.v1
+      KAFKA_RETRY_TOPIC: bankcore.transaction.completed.v1.retry
+      KAFKA_DLQ_TOPIC: bankcore.transaction.completed.v1.dlq
+    depends_on:
+      nginx:
+        condition: service_healthy
+      risk-service:
+        condition: service_healthy
+      outbox-publisher:
+        condition: service_started
+      audit-consumer:
+        condition: service_started
+    networks:
+      - bankcore_net
