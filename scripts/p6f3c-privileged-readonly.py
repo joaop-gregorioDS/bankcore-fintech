@@ -41,6 +41,7 @@ READ_ONLY_PROGRAMS = {
     "openssl",
     "ss",
     "systemctl",
+    "true",
     "ufw",
 }
 FORBIDDEN_TOKENS = {
@@ -100,6 +101,9 @@ SENSITIVE_LINE = re.compile(
 ENV_ASSIGNMENT = re.compile(r"^\s*[A-Za-z_][A-Za-z0-9_]*\s*=\s*.*$")
 URI_CREDENTIALS = re.compile(r"(://[^:/\s]+:)[^@\s]+(@)")
 PEM_BLOCK = re.compile(r"-----BEGIN [^-]+-----.*?-----END [^-]+-----", re.DOTALL)
+NGINX_SAFE_DIRECTIVE = re.compile(
+    r"^\s*(listen|server_name|proxy_pass|include|ssl_certificate)\b"
+)
 
 
 @dataclass
@@ -128,6 +132,16 @@ def sanitize(text: str, *, limit: int = 3500) -> str:
     return cleaned if len(cleaned) <= limit else cleaned[:limit] + "\n<truncated>"
 
 
+def sanitize_nginx_config(text: str, *, limit: int = 3500) -> str:
+    """Keep only routing/certificate references from ``nginx -T`` output."""
+
+    safe_lines: list[str] = []
+    for line in text.splitlines():
+        if NGINX_SAFE_DIRECTIVE.match(line):
+            safe_lines.append(line)
+    return sanitize("\n".join(safe_lines), limit=limit)
+
+
 def _under_allowed_root(path: str, roots: set[str] = ALLOWED_METADATA_ROOTS) -> bool:
     candidate = PurePosixPath(path)
     return any(candidate == PurePosixPath(root) or PurePosixPath(root) in candidate.parents for root in roots)
@@ -149,6 +163,8 @@ def validate_privileged_command(argv: list[str]) -> None:
     if command[0] not in READ_ONLY_PROGRAMS:
         raise ValueError(f"program is not allowlisted: {command[0]}")
 
+    if command == ["true"]:
+        return
     if command == ["ss", "-lntup"]:
         return
     if command in (
@@ -208,8 +224,31 @@ def probe(name: str, argv: list[str], *, timeout: int = 20) -> Probe:
         return Probe(name, " ".join(argv), "unavailable", None, "program not installed")
     except subprocess.TimeoutExpired:
         return Probe(name, " ".join(argv), "timeout", None, "probe timed out")
-    output = sanitize((result.stdout or "") + (result.stderr or ""))
+    raw_output = (result.stdout or "") + (result.stderr or "")
+    output = sanitize_nginx_config(raw_output) if name == "nginx_effective_config" else sanitize(raw_output)
     return Probe(name, " ".join(argv), "ok" if result.returncode == 0 else "unavailable", result.returncode, output)
+
+
+def preflight_sudo_ticket(*, timeout: int = 10) -> tuple[bool, str]:
+    """Accept only an already-authorized sudo ticket; never request a password."""
+
+    argv = ["sudo", "-n", "true"]
+    validate_privileged_command(argv)
+    try:
+        result = subprocess.run(
+            argv,
+            shell=False,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except FileNotFoundError:
+        return False, "sudo is not installed"
+    except subprocess.TimeoutExpired:
+        return False, "sudo ticket preflight timed out"
+    detail = sanitize((result.stdout or "") + (result.stderr or ""), limit=500)
+    return result.returncode == 0, detail or ("authorized" if result.returncode == 0 else "sudo ticket unavailable")
 
 
 def _find_command(*roots: str) -> list[str]:
@@ -335,6 +374,46 @@ def build_report(observed: dict, probes: list[Probe]) -> dict:
     }
 
 
+def build_preflight_failure_report(detail: str) -> dict:
+    """Produce a safe report without executing any privileged collection probe."""
+
+    return {
+        "schema": "bankcore.p6f3c.privileged-readonly-gap-closure.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "mode": "privileged read-only; sudo -n allowlist only",
+        "observed": {
+            "sudo_ticket": "unavailable",
+            "privileged_collection": "not started",
+            "detail": detail,
+            "secret_values": "never queried",
+            "private_keys": "never queried",
+            "database_dumps": "never opened",
+        },
+        "expected": EXPECTED,
+        "drift": ["No valid pre-authorized sudo ticket; privileged gaps remain unverified"],
+        "proposed_change": [
+            "An operator may authorize a temporary sudo ticket interactively, then rerun this collector immediately"
+        ],
+        "risk": ["Firewall, listener ownership, Nginx, TLS, Docker and backup state remain unverified"],
+        "rollback": ["No rollback action; privileged collection did not start and the host was not changed"],
+        "unverified_probes": ["privileged_collection_not_started"],
+        "probes": [],
+        "safety": {
+            "shell": False,
+            "interactive_sudo": False,
+            "sudo_only_for_exact_reads": True,
+            "filesystem_writes": False,
+            "docker_lifecycle": False,
+            "firewall_changes": False,
+            "systemd_changes": False,
+            "nginx_tls_changes": False,
+            "secret_values_read": False,
+            "private_keys_read": False,
+            "database_dumps_opened": False,
+        },
+    }
+
+
 def markdown(report: dict) -> str:
     lines = [
         "# P6-F3C — Privileged Read-only Gap Closure Report",
@@ -374,6 +453,7 @@ def markdown(report: dict) -> str:
 def self_test() -> int:
     allowed = ["sudo", "-n", "ss", "-lntup"]
     validate_privileged_command(allowed)
+    validate_privileged_command(["sudo", "-n", "true"])
     for rejected in (
         ["sudo", "-n", "rm", "-rf", "/"],
         ["sudo", "-n", "systemctl", "restart", "nginx"],
@@ -391,6 +471,16 @@ def self_test() -> int:
     if "<redacted>" not in sanitize("Authorization: Bearer abc\nPASSWORD=xyz"):
         print("P6F3C SELF-TEST FAILED: redaction", file=sys.stderr)
         return 1
+    nginx = sanitize_nginx_config(
+        "listen 443 ssl;\n"
+        "server_name bankcore.example;\n"
+        "proxy_pass http://internal:8080;\n"
+        "add_header Authorization secret;\n"
+        "ssl_certificate_key /etc/letsencrypt/live/example/privkey.pem;\n"
+    )
+    if "listen 443 ssl;" not in nginx or "Authorization" in nginx or "privkey.pem" in nginx:
+        print("P6F3C SELF-TEST FAILED: nginx redaction", file=sys.stderr)
+        return 1
     print("P6F3C SELF-TEST PASS: privileged read-only guardrails enforced")
     return 0
 
@@ -399,9 +489,21 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument(
+        "--privileged-readonly",
+        action="store_true",
+        help="require an already-authorized sudo ticket and run the allowlisted probes",
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
     if args.self_test:
         return self_test()
+    if not args.privileged_readonly:
+        parser.error("collection requires explicit --privileged-readonly mode")
+    ticket_ok, detail = preflight_sudo_ticket()
+    if not ticket_ok:
+        report = build_preflight_failure_report(detail)
+        print(json.dumps(report, indent=2, ensure_ascii=False) if args.json else markdown(report), end="")
+        return 2
     observed, probes = collect()
     report = build_report(observed, probes)
     print(json.dumps(report, indent=2, ensure_ascii=False) if args.json else markdown(report), end="")

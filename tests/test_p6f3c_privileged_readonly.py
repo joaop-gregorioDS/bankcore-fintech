@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
@@ -19,6 +20,7 @@ def test_exact_read_only_commands_are_allowed() -> None:
     MODULE.validate_privileged_command(["sudo", "-n", "ss", "-lntup"])
     MODULE.validate_privileged_command(["sudo", "-n", "nft", "list", "ruleset"])
     MODULE.validate_privileged_command(["sudo", "-n", "nginx", "-T"])
+    MODULE.validate_privileged_command(["sudo", "-n", "true"])
 
 
 @pytest.mark.security
@@ -65,3 +67,41 @@ def test_redaction_never_preserves_secret_values() -> None:
     assert "abc" not in sanitized
     assert "xyz" not in sanitized
     assert "public=<present>" in sanitized
+
+
+def test_nginx_output_is_limited_to_safe_directives() -> None:
+    sanitized = MODULE.sanitize_nginx_config(
+        "listen 443 ssl;\n"
+        "server_name bankcore.example;\n"
+        "proxy_pass http://internal:8080;\n"
+        "add_header Authorization secret;\n"
+        "ssl_certificate_key /etc/letsencrypt/live/example/privkey.pem;\n"
+    )
+    assert "listen 443 ssl;" in sanitized
+    assert "server_name bankcore.example;" in sanitized
+    assert "proxy_pass http://internal:8080;" in sanitized
+    assert "Authorization" not in sanitized
+    assert "privkey.pem" not in sanitized
+
+
+def test_missing_sudo_ticket_aborts_before_collection(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(MODULE, "preflight_sudo_ticket", lambda: (False, "sudo ticket unavailable"))
+    monkeypatch.setattr(MODULE, "collect", lambda: (_ for _ in ()).throw(AssertionError("collection started")))
+
+    assert MODULE.main(["--privileged-readonly", "--json"]) == 2
+    output = capsys.readouterr().out
+    assert '"privileged_collection": "not started"' in output
+    assert "sudo ticket unavailable" in output
+
+
+def test_preflight_uses_noninteractive_sudo(monkeypatch) -> None:
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        calls.append((argv, kwargs))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(MODULE.subprocess, "run", fake_run)
+    assert MODULE.preflight_sudo_ticket() == (True, "authorized")
+    assert calls[0][0] == ["sudo", "-n", "true"]
+    assert calls[0][1]["shell"] is False

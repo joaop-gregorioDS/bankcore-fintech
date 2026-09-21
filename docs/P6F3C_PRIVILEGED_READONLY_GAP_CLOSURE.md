@@ -36,9 +36,16 @@ not collect:
 - `shell=False`, bounded timeouts and sanitized output are used for every
   probe.
 
-If passwordless `sudo` is unavailable, the probe records the gap as
-unverified and stops; it does not ask for a password or fall back to a broader
-command.
+The collector requires the explicit `--privileged-readonly` mode. Before any
+collection probe it executes only `sudo -n true`, accepting an already-valid
+operator ticket. If that preflight fails, it emits a fail-closed report and
+starts no privileged collection. It never asks for, receives, stores or
+transmits a password, and never falls back to a broader command.
+
+The intended operator sequence is outside this program: authorize a temporary
+ticket interactively with `sudo -v`, run the collector immediately, and then
+invalidate the ticket with `sudo -k`. The collector itself always uses
+non-interactive `sudo -n`.
 
 ## Report contract
 
@@ -57,5 +64,8 @@ python3 -m py_compile scripts/p6f3c-privileged-readonly.py tests/test_p6f3c_priv
 ```
 
 Remote execution, when separately authorized, must stream this exact program
-to the approved host and capture only its sanitized report. It must not copy
-files to the host or execute any command outside the program's allowlist.
+to the approved host and invoke it with
+`--privileged-readonly --json`, after the operator has authorized the temporary
+ticket in the same session. It must capture only its sanitized report, must not
+copy files to the host, and must not execute any command outside the program's
+allowlist.
