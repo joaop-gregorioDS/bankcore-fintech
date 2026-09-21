@@ -38,8 +38,26 @@
     group: "{{ bankcore_deploy_group }}"
     home: "{{ bankcore_deploy_home }}"
     create_home: true
-    shell: /bin/bash
+    shell: "{{ bankcore_deploy_shell }}"
     state: present
+
+- name: Configure subordinate UID range for rootless Docker when requested
+  ansible.builtin.lineinfile:
+    path: /etc/subuid
+    regexp: "^{{ bankcore_deploy_user | regex_escape }}:"
+    line: "{{ bankcore_deploy_user }}:{{ bankcore_subuid_start }}:{{ bankcore_subuid_count }}"
+    create: true
+    mode: "0644"
+  when: bankcore_manage_subids | bool
+
+- name: Configure subordinate GID range for rootless Docker when requested
+  ansible.builtin.lineinfile:
+    path: /etc/subgid
+    regexp: "^{{ bankcore_deploy_user | regex_escape }}:"
+    line: "{{ bankcore_deploy_user }}:{{ bankcore_subuid_start }}:{{ bankcore_subuid_count }}"
+    create: true
+    mode: "0644"
+  when: bankcore_manage_subids | bool
 
 - name: Ensure host layout exists with explicit permissions
   ansible.builtin.file:
@@ -50,13 +68,29 @@
     mode: "{{ item.mode }}"
   loop: "{{ bankcore_host_directories }}"
 
+- name: Resolve deploy user UID for the rootless Docker socket
+  ansible.builtin.command: id -u "{{ bankcore_deploy_user }}"
+  register: bankcore_deploy_uid
+  changed_when: false
+
+- name: Ensure runtime directory exists for rootless Docker
+  ansible.builtin.file:
+    path: "/run/user/{{ bankcore_deploy_uid.stdout | trim }}"
+    state: directory
+    owner: "{{ bankcore_deploy_user }}"
+    group: "{{ bankcore_deploy_group }}"
+    # rootlesskit owns this runtime directory and recreates it as 0755;
+    # sensitive material remains under /opt/bankcore/secrets (0700).
+    mode: "0755"
+
 - name: Check Docker client for the deploy user when explicitly requested
-  ansible.builtin.command: docker version --format '{{.Server.Version}}'
+  ansible.builtin.command: docker version --format '{{ "{{.Server.Version}}" }}'
   become_user: "{{ bankcore_deploy_user }}"
   register: bankcore_docker_version
   changed_when: false
   environment:
-    DOCKER_HOST: "unix:///run/user/{{ bankcore_deploy_user }}/docker.sock"
+    DOCKER_HOST: "unix:///run/user/{{ bankcore_deploy_uid.stdout | trim }}/docker.sock"
+    XDG_RUNTIME_DIR: "/run/user/{{ bankcore_deploy_uid.stdout | trim }}"
   when: bankcore_verify_docker_contract | bool
 
 - name: Check Docker Compose plugin for the deploy user when explicitly requested
@@ -65,7 +99,8 @@
   register: bankcore_compose_version
   changed_when: false
   environment:
-    DOCKER_HOST: "unix:///run/user/{{ bankcore_deploy_user }}/docker.sock"
+    DOCKER_HOST: "unix:///run/user/{{ bankcore_deploy_uid.stdout | trim }}/docker.sock"
+    XDG_RUNTIME_DIR: "/run/user/{{ bankcore_deploy_uid.stdout | trim }}"
   when: bankcore_verify_docker_contract | bool
 
 - name: Enable user lingering only when explicitly requested
