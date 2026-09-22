@@ -61,10 +61,16 @@ def _columns(inspector, table: str) -> set[str]:
 
 
 def _has_legacy_unique(inspector) -> bool:
-    return any(
+    unique_constraint = any(
         set(constraint.get("column_names") or []) == {"idempotency_key"}
         for constraint in inspector.get_unique_constraints("ledger_transactions")
     )
+    unique_index = any(
+        index.get("unique") is True
+        and set(index.get("column_names") or []) == {"idempotency_key"}
+        for index in inspector.get_indexes("ledger_transactions")
+    )
+    return unique_constraint or unique_index
 
 
 def _has_auth_unique_indexes(inspector) -> bool:

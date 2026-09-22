@@ -94,6 +94,15 @@ def fake_transactions_schema(revision, *, include_alembic_version=False):
     return FakeInspector(columns, indexes, unique_constraints, include_alembic_version)
 
 
+def classify_transactions(inspector, versions=()):
+    original_inspect = PREFLIGHT.inspect
+    try:
+        PREFLIGHT.inspect = lambda connection: inspector
+        return PREFLIGHT._inspect_sync(FakeConnection(versions), "transactions")
+    finally:
+        PREFLIGHT.inspect = original_inspect
+
+
 class MigrationContractTests(unittest.TestCase):
     def test_application_and_postgres_tests_do_not_create_schema(self):
         sources = [
@@ -153,6 +162,49 @@ class MigrationContractTests(unittest.TestCase):
             self.assertEqual(result.state, PREFLIGHT.SchemaState.CURRENT_P0.value)
         finally:
             PREFLIGHT.inspect = original_inspect
+
+    def test_legacy_unique_constraint_is_accepted(self):
+        inspector = fake_transactions_schema("tx_001_initial_schema")
+        result = classify_transactions(inspector)
+        self.assertEqual(result.state, PREFLIGHT.SchemaState.LEGACY_PRE_P0.value)
+
+    def test_legacy_unique_index_is_accepted(self):
+        inspector = fake_transactions_schema("tx_001_initial_schema")
+        inspector.unique_constraints["ledger_transactions"] = []
+        inspector.indexes["ledger_transactions"] = [{
+            "name": "ix_ledger_transactions_idempotency_key",
+            "column_names": ["idempotency_key"],
+            "unique": True,
+        }]
+        result = classify_transactions(inspector)
+        self.assertEqual(result.state, PREFLIGHT.SchemaState.LEGACY_PRE_P0.value)
+
+    def test_legacy_non_unique_index_is_rejected(self):
+        inspector = fake_transactions_schema("tx_001_initial_schema")
+        inspector.unique_constraints["ledger_transactions"] = []
+        inspector.indexes["ledger_transactions"] = [{
+            "name": "ix_ledger_transactions_idempotency_key",
+            "column_names": ["idempotency_key"],
+            "unique": False,
+        }]
+        result = classify_transactions(inspector)
+        self.assertEqual(result.state, PREFLIGHT.SchemaState.UNKNOWN.value)
+
+    def test_legacy_schema_without_unique_protection_is_rejected(self):
+        inspector = fake_transactions_schema("tx_001_initial_schema")
+        inspector.unique_constraints["ledger_transactions"] = []
+        result = classify_transactions(inspector)
+        self.assertEqual(result.state, PREFLIGHT.SchemaState.UNKNOWN.value)
+
+    def test_inconsistent_current_schema_with_legacy_unique_index_is_unknown(self):
+        inspector = fake_transactions_schema("tx_002_idempotency_ownership")
+        inspector.indexes["ledger_transactions"] = [{
+            "name": "ix_ledger_transactions_idempotency_key",
+            "column_names": ["idempotency_key"],
+            "unique": True,
+        }]
+        result = classify_transactions(inspector)
+        self.assertEqual(result.state, PREFLIGHT.SchemaState.UNKNOWN.value)
 
     def test_transactions_preflight_rejects_unknown_revision(self):
         inspector = fake_transactions_schema("tx_005_outbox_leases", include_alembic_version=True)

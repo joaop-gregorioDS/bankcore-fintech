@@ -16,6 +16,44 @@ branch_labels = None
 depends_on = None
 
 
+def _legacy_operation_type(transaction_type):
+    # Older PIX rows represent the same transfer operation that the current
+    # ledger persists as TRANSFER and uses for its idempotency scope.
+    return "TRANSFER" if transaction_type == "PIX" else transaction_type
+
+
+def _validate_legacy_row(row, seen):
+    transaction_type = row["transaction_type"]
+    normalized_type = _legacy_operation_type(transaction_type)
+    valid_type = normalized_type in {"DEPOSIT", "TRANSFER", "WITHDRAWAL"}
+    valid_pix_accounts = (
+        transaction_type != "PIX"
+        or (
+            row["source_account_id"] is not None
+            and row["destination_account_id"] is not None
+            and row["source_account_id"] != row["destination_account_id"]
+        )
+    )
+    scope = (
+        row["user_id"],
+        row["account_id"],
+        normalized_type,
+        row["idempotency_key"],
+    )
+    if (
+        not valid_type
+        or not valid_pix_accounts
+        or row["status"] != "COMPLETED"
+        or row["user_id"] is None
+        or row["account_id"] is None
+        or scope in seen
+    ):
+        raise RuntimeError(
+            "Ambiguous legacy idempotency context; migration aborted without changes."
+        )
+    seen.add(scope)
+
+
 def _legacy_transactions(bind):
     rows = bind.execute(
         sa.text(
@@ -45,24 +83,7 @@ def _legacy_transactions(bind):
 
     seen = set()
     for row in rows:
-        scope = (
-            row["user_id"],
-            row["account_id"],
-            row["transaction_type"],
-            row["idempotency_key"],
-        )
-        valid_type = row["transaction_type"] in {"DEPOSIT", "TRANSFER", "WITHDRAWAL"}
-        if (
-            not valid_type
-            or row["status"] != "COMPLETED"
-            or row["user_id"] is None
-            or row["account_id"] is None
-            or scope in seen
-        ):
-            raise RuntimeError(
-                "Ambiguous legacy idempotency context; migration aborted without changes."
-            )
-        seen.add(scope)
+        _validate_legacy_row(row, seen)
     return rows
 
 
@@ -146,7 +167,7 @@ def upgrade() -> None:
                 "idempotency_key": row["idempotency_key"],
                 "user_id": row["user_id"],
                 "account_id": row["account_id"],
-                "operation_type": row["transaction_type"],
+                "operation_type": _legacy_operation_type(row["transaction_type"]),
                 "request_fingerprint": marker,
                 "transaction_id": row["id"],
             },
