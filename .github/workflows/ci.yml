@@ -50,6 +50,9 @@ jobs:
           python -m pip install --disable-pip-version-check --no-cache-dir ruff==0.6.9
           ruff check --select E9,F63,F7,F82 services infra scripts tests conftest.py
 
+      - name: Validate P6-F4 review-only VPS change plan
+        run: python scripts/p6f4-change-plan-validate.py
+
       - name: Python dependency audit
         run: |
           python -m pip install --disable-pip-version-check --no-cache-dir pip-audit==2.7.3
