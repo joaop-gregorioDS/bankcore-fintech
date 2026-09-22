@@ -1,0 +1,42 @@
+{
+  "schema": "bankcore-p6f5c-f5c2-summary-v1",
+  "source": "P6-F5C-2 authorized read-only VPS sample series",
+  "successful_samples": 13,
+  "observation_span_minutes": 60.0,
+  "representative_peak_period": false,
+  "host": {
+    "cpu_logical_cores": 4,
+    "memory_total_bytes": 16763637760,
+    "memory_available_bytes_min": 14892781568,
+    "memory_used_bytes_max": 1870856192,
+    "swap_total_bytes": 0,
+    "swap_io_pages_delta_sum": {"pswpin": 0, "pswpout": 0},
+    "process_count_max": 183,
+    "pid_max": 4194304,
+    "filesystems": {
+      "docker_root": {
+        "total_bytes": 207071854592,
+        "available_bytes_min": 196179619840,
+        "total_inodes": 24962560,
+        "available_inodes_min": 24826504
+      }
+    },
+    "docker": {
+      "container_count_running": 5,
+      "image_count": 5,
+      "volume_count": 2,
+      "images_size_bytes": 1519000000,
+      "local_volumes_size_bytes": 72700000,
+      "containers_size_bytes": 2011000,
+      "build_cache_size_bytes": 0,
+      "running_memory_used_bytes_peak": 234002315,
+      "running_pids_sum_peak": 37,
+      "running_cpu_percent_sum_peak": 0.99
+    }
+  },
+  "limitations": [
+    "The observed window was not confirmed to contain representative production peak load.",
+    "The candidate /opt/bankcore filesystem path was absent during read-only observation.",
+    "Docker storage was reported as aggregate types, not per-volume quotas."
+  ]
+}

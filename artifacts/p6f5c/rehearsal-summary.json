@@ -1,0 +1,58 @@
+{
+  "schema": "bankcore-p6f5c-rehearsal-aggregate-v1",
+  "run_at_utc": "2026-09-22T16:09:51Z",
+  "classification": "FAIL",
+  "profile_complete": false,
+  "vps_baseline": {
+    "observation_minutes": 60,
+    "samples": 13,
+    "representative_peak_period": false,
+    "logical_cpus": 4,
+    "memory_total_bytes": 16763637760,
+    "memory_available_min_bytes": 14892781568,
+    "swap_io_pages": 0,
+    "docker_root_total_bytes": 207071854592,
+    "docker_root_available_min_bytes": 196179619840,
+    "docker_root_total_inodes": 24962560,
+    "docker_root_available_min_inodes": 24826504
+  },
+  "disposable_profile": {
+    "cpu_quota_cores": 4,
+    "memory_limit_bytes": 16106127360,
+    "all_release_images_retained_by_digest": true,
+    "scenario_results": {
+      "healthy_a_to_b": "PASS",
+      "readiness_rollback": "PASS",
+      "smoke_rollback": "PASS"
+    },
+    "cpu_busy_p95_ratio_observed": 1.000235164421396,
+    "cpu_busy_interpreted_as": "approximately 100%; exceeds unchanged 85% hard limit",
+    "cgroup_memory_peak_bytes": 7724122112,
+    "cgroup_pids_peak": 2519,
+    "swap_io_pages": 0,
+    "additional_processes_projected": 2464,
+    "projected_vps_memory_available_bytes": 7235690496,
+    "projected_docker_root_available_bytes": 192014879840,
+    "projected_docker_root_available_inodes": 24732304,
+    "a_b_docker_storage_peak_bytes": 4284000000
+  },
+  "evidence_gaps": [
+    "Per-container Docker stats were inconsistent with target cgroup totals and are excluded from reliable conclusions.",
+    "Migration work was observed within the startup/readiness window but the initial sampler did not isolate a migration-only time series.",
+    "Load-average projection is unavailable across the non-equivalent host environments.",
+    "VPS baseline did not establish a representative production peak.",
+    "Docker storage is aggregate and does not prove per-volume quota or growth behavior."
+  ],
+  "limitations": [
+    "The disposable target was a 4-vCPU, 15-GiB container running rootless Docker-in-Docker on a 12-vCPU host, not the VPS host/kernel/CPU/storage stack.",
+    "The capacity FAIL applies to the measured disposable profile; it is not a definitive verdict on VPS A+B capacity.",
+    "No VPS was accessed during F5C-3; no live financial data, dumps, backups, or secrets were used."
+  ],
+  "privacy": {
+    "hostnames_or_ips_included": false,
+    "container_names_or_ids_included": false,
+    "image_names_or_tags_included": false,
+    "secrets_or_financial_rows_included": false,
+    "raw_time_series_retained": false
+  }
+}
