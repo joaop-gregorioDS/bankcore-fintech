@@ -1,6 +1,6 @@
 # P6-F5C-1 — Capacity Gate Design
 
-Status: F5C-1 design and synthetic validation ✅; F5C-2 read-only VPS baseline **CONDITIONAL**; F5C-3 disposable A+B rehearsal executed with **FAIL for the measured profile**. Overall capacity gate remains **🟡 NOT APPROVED**. No VPS mutation or cutover is authorized by these results.
+Status: F5C-1 design and synthetic validation ✅; F5C-2 read-only VPS baseline **CONDITIONAL**; F5C-3 disposable A+B rehearsal executed with **FAIL for the measured profile**; F5C-4a native-host design/preflight ✅; F5C-4b **NOT REPRESENTATIVE**. F5C-5 closes the portfolio demonstration. Production capacity for representative-host A+B coexistence remains **NOT PROVEN**; no production-capacity `PASS` is claimed.
 
 ## Purpose and stages
 
@@ -9,7 +9,8 @@ The gate decides whether the current BankCore stack (A) and the candidate P6 rel
 1. **F5C-1 ✅:** define the read-only sampler, evidence contract, conservative thresholds, and synthetic tests.
 2. **F5C-2 ✅ / CONDITIONAL:** collect repeated read-only measurements from the VPS. The observed 60-minute window was not confirmed to include a representative production peak, so it cannot establish a capacity `PASS`.
 3. **F5C-3 ✅ / FAIL for the measured disposable profile:** combine the VPS baseline with a measured P6 staging profile. The fixed CPU hard limit was exceeded; host non-equivalence and evidence gaps mean this is not a definitive verdict on the VPS itself.
-4. **F5C-4 ⏳ NOT STARTED:** if separately approved, repeat the capacity rehearsal on a disposable Linux host closer to the VPS hardware/kernel/storage profile, keeping the existing thresholds unchanged.
+4. **F5C-4a ✅ / F5C-4b NOT REPRESENTATIVE:** native-host admission design was prepared, but the available environment was Windows and failed admission before Docker activity. No representative rehearsal was performed.
+5. **F5C-5 ✅ Portfolio closure:** methodology and its stop decisions are complete for the portfolio. F5C-4c representative-host acquisition is not required; production capacity remains not proven and out of portfolio scope.
 
 Even a `PASS` only clears the capacity gate for planning. It does not authorize any VPS mutation or cutover; other F5 blockers remain independent.
 
@@ -37,6 +38,8 @@ F5C-2 gathered **60 minutes and 13 successful samples** at a cadence no slower t
 
 F5C-3 ran the healthy A→B, readiness rollback, and smoke rollback scenarios using the verified digest-pinned release images in disposable Linux. All three deployment scenarios passed, but the capacity classification for that measured profile was **FAIL**: observed cgroup CPU busy p95 was approximately 100%, exceeding the unchanged 85% hard threshold. The disposable environment used rootless Docker-in-Docker and did not share the VPS CPU model, kernel, storage implementation, or workload; therefore the result must be preserved as-is, must not be generalized into a claim that the VPS itself fails, and still withholds capacity approval. The sanitized aggregate is in [`artifacts/p6f5c/rehearsal-summary.json`](../artifacts/p6f5c/rehearsal-summary.json); methodology and limitations are in [`P6F5C_AB_CAPACITY_REHEARSAL.md`](P6F5C_AB_CAPACITY_REHEARSAL.md).
 
+F5C-4a prepared the native host design and fail-closed preflight. F5C-4b ran only the preflight in the available Windows environment; it returned `NOT REPRESENTATIVE` before any Docker query or lifecycle. Under F5C-5, acquisition of a second paid representative host is not required for portfolio completion. Production blue/green capacity remains **NOT PROVEN**. See [`P6F5C_PORTFOLIO_CLOSURE.md`](P6F5C_PORTFOLIO_CLOSURE.md) for the portfolio decision and proposed sequential lab deployment direction.
+
 ## Decision thresholds
 
 The classification is deliberately conservative and uses the worst observed/projection relevant to A+B. Thresholds are initial engineering guardrails, not production SLOs.
@@ -62,4 +65,4 @@ Memory headroom uses Linux `MemAvailable`, not merely free pages. Swap capacity 
 - `docker system df` is aggregate; it cannot alone prove per-volume growth limits. Unaccounted storage is an open gate.
 - The F5C result cannot override backup/restore, live-state migration, security, or rollback gates.
 - No limits, swap, pruning, image pulls, package changes, service actions, or filesystem changes are permitted as part of measurement.
-- No mutation, cutover, or deployment to the VPS has occurred as part of F5C. F5C-4 is not started; the existing thresholds and both measured outcomes must remain unchanged unless a separately reviewed evidence-based policy revision is approved.
+- No mutation, cutover, or deployment to the VPS has occurred as part of F5C. The thresholds and measured outcomes remain unchanged. A representative-host production-capacity certification is outside this portfolio closure.
