@@ -186,6 +186,53 @@
             border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
             background: color-mix(in srgb, var(--gold) 10%, transparent);
         }
+        
+        /* Mobile BB-Style Bottom Navigation */
+        .bottom-nav-item {
+            color: var(--mute);
+            transition: color 0.15s ease, transform 0.15s ease;
+        }
+        .bottom-nav-item.active {
+            color: var(--gold) !important;
+        }
+        .bottom-nav-item:active {
+            transform: scale(0.94);
+        }
+
+        /* Mobile Timeline Connectors (Atividades Recentes) */
+        .timeline-step {
+            position: relative;
+        }
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: 1.15rem;
+            top: 2.5rem;
+            bottom: -0.5rem;
+            width: 2px;
+            background-color: var(--border-subtle);
+        }
+        .timeline-step:last-child::before {
+            display: none;
+        }
+
+        /* Safe Area Padding for iOS/Android */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .safe-pb-bottom-nav {
+                padding-bottom: calc(env(safe-area-inset-bottom) + 5rem) !important;
+            }
+        }
+
+        .bottom-nav-item {
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bottom-nav-item:active {
+            transform: scale(0.92);
+        }
+
         .pdf-no-print { display: block; }
         @media print {
             @page { size: A4; margin: 12mm; }
@@ -304,13 +351,16 @@
     </div>
 
     <!-- ================= MAIN WEB BANKING INTERFACE ================= -->
-    <div id="appView" class="hidden h-full flex flex-row overflow-hidden">
+    <div id="appView" class="hidden h-full flex flex-row overflow-hidden relative">
         
-        <!-- SIDEBAR -->
-        <aside id="mainSidebar" class="w-68 flex-shrink-0 carbon-sidebar flex flex-col justify-between z-30 select-none">
+        <!-- BACKDROP DO MENU MOBILE -->
+        <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden transition-opacity duration-300 opacity-0 lg:hidden"></div>
+
+        <!-- SIDEBAR (DRAWER DESLIZANTE NO MOBILE, FIXA NO DESKTOP) -->
+        <aside id="mainSidebar" class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:static lg:w-68 flex-shrink-0 carbon-sidebar flex flex-col justify-between select-none">
             <div>
                 <!-- Brand Header -->
-                <div class="h-18 px-6 flex items-center justify-between border-b border-inherit">
+                <div class="h-18 px-5 lg:px-6 flex items-center justify-between border-b border-inherit">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="border: 1px solid var(--gold);">
                             <i data-lucide="shield" class="w-4.5 h-4.5 text-gold"></i>
@@ -320,8 +370,13 @@
                             <div class="text-[10px] font-medium tracking-widest truncate" style="color: var(--mute);">VORTEX SOFTWARE</div>
                         </div>
                     </div>
-                    <button onclick="toggleSidebarCollapse()" class="opacity-60 hover:opacity-100 p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition" title="Recolher Menu">
+                    <!-- Desktop Collapse Toggle -->
+                    <button onclick="toggleSidebarCollapse()" class="hidden lg:block opacity-60 hover:opacity-100 p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition" title="Recolher Menu">
                         <i data-lucide="chevrons-left" class="w-5 h-5" id="sidebarToggleIcon"></i>
+                    </button>
+                    <!-- Mobile Close Button -->
+                    <button onclick="toggleMobileSidebar(false)" class="lg:hidden p-1.5 rounded-lg opacity-70 hover:opacity-100 transition" title="Fechar Menu">
+                        <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
 
@@ -398,165 +453,382 @@
         <!-- MAIN AREA -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             
-            <!-- TOPBAR -->
-            <header class="h-18 carbon-header backdrop-blur-md px-6 flex items-center justify-between flex-shrink-0 z-20">
-                <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebarCollapse()" class="p-2 rounded-lg carbon-card transition" title="Menu">
-                        <i data-lucide="menu" class="w-4.5 h-4.5"></i>
-                    </button>
+            <!-- TOPBAR (ADAPTÁVEL: ESTILO APP BB NO CELULAR + COMPLETO NO DESKTOP) -->
+            <header class="h-16 lg:h-18 carbon-header backdrop-blur-md px-4 sm:px-6 flex items-center justify-between flex-shrink-0 z-20">
+                
+                <!-- MOBILE HEADER (REFERÊNCIA APP BB FOTO 1 E 2) -->
+                <div class="flex lg:hidden items-center justify-between w-full">
+                    <div class="flex items-center gap-2.5">
+                        <!-- Avatar com Badge Notificação (Foto 1) -->
+                        <div onclick="toggleProfileQuickMenu()" class="relative cursor-pointer group">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs" style="background: var(--input-bg); border: 2px solid var(--gold); color: var(--gold);" id="topUserAvatarMobile">LM</div>
+                            <span class="absolute -top-1 -right-1 bg-amber-500 text-black text-[9px] font-black px-1 py-0.2 rounded-full leading-tight shadow-xs">99+</span>
+                        </div>
+                        <!-- Saudação Olá, Nome + Agência e Conta -->
+                        <div class="text-left cursor-pointer" onclick="toggleProfileQuickMenu()">
+                            <div class="text-xs font-bold leading-tight flex items-center gap-1">
+                                <span>Olá, <span id="topGreetingNameMobile">Lucas</span></span>
+                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60"></i>
+                            </div>
+                            <div class="text-[10px] font-mono leading-none mt-0.5" style="color: var(--mute);" id="topAccountSubtitleMobile">Ag. 0001-9 · Cc. 77412-7</div>
+                        </div>
+                    </div>
 
-                    <div class="flex items-center gap-2 text-xs font-medium" style="color: var(--mute);">
-                        <span class="hover:opacity-100 cursor-pointer" onclick="navigateTo('inicio')">Início</span>
-                        <span>/</span>
-                        <span class="text-gold font-semibold capitalize" id="topBreadcrumb">Visão Geral</span>
+                    <!-- Botões de Ação Topo Direita (Foto 1) -->
+                    <div class="flex items-center gap-2">
+                        <!-- Olho (Mostrar/Ocultar Saldo) -->
+                        <button onclick="toggleBalanceVisibility()" class="p-2 rounded-full carbon-card transition" title="Ocultar/Mostrar Saldo">
+                            <i id="topEyeIconMobile" data-lucide="eye" class="w-4.5 h-4.5"></i>
+                        </button>
+                        <!-- Trocar de Conta Demo Rápido -->
+                        <button onclick="quickSwitchDemoUser()" class="p-2 rounded-full carbon-card text-gold transition" title="Alternar entre Lucas e Maria">
+                            <i data-lucide="users" class="w-4.5 h-4.5"></i>
+                        </button>
+                        <!-- Alternar Tema -->
+                        <button onclick="toggleTheme()" class="p-2 rounded-full carbon-card transition" title="Alternar tema">
+                            <i data-lucide="moon" class="w-4.5 h-4.5" id="iconThemeMobile"></i>
+                        </button>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 sm:gap-4 text-xs">
-                    
-                    <!-- BOTÃO ALTERNAR TEMA CLARO / ESCURO -->
-                    <button onclick="toggleTheme()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 text-gold" title="Alternar tema" id="btnThemeToggle">
-                        <i data-lucide="moon" class="w-4.5 h-4.5" id="iconTheme"></i>
-                        <span class="hidden md:inline font-medium text-[11px]" id="textThemeLabel">Escuro</span>
-                    </button>
+                <!-- DESKTOP HEADER (PRESERVADO PARA TELAS LARGAS) -->
+                <div class="hidden lg:flex items-center justify-between w-full">
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleSidebarCollapse()" class="p-2 rounded-lg carbon-card transition" title="Menu">
+                            <i data-lucide="menu" class="w-4.5 h-4.5"></i>
+                        </button>
 
-                    <button onclick="toggleFontScale()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 font-medium text-xs" title="Tamanho da fonte">
-                        <span class="font-semibold font-mono text-gold text-sm">A<sup class="text-[10px]">+</sup></span>
-                        <span class="hidden md:inline text-[11px] opacity-80" id="textScaleLabel">Fonte</span>
-                    </button>
-
-                    <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg carbon-card text-xs font-mono" style="color: var(--mute);">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 text-gold"></i>
-                        <span>Sessão <strong class="text-inherit" id="sessionTimer">14:59</strong></span>
+                        <div class="flex items-center gap-2 text-xs font-medium" style="color: var(--mute);">
+                            <span class="hover:opacity-100 cursor-pointer" onclick="navigateTo('inicio')">Início</span>
+                            <span>/</span>
+                            <span class="text-gold font-semibold capitalize" id="topBreadcrumb">Visão Geral</span>
+                        </div>
                     </div>
 
-                    <a href="/transactions/docs" target="_blank" class="hidden sm:flex text-xs font-medium opacity-80 hover:opacity-100 px-3 py-1.5 rounded-lg carbon-card transition items-center gap-1.5">
-                        <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Swagger
-                    </a>
+                    <div class="flex items-center gap-3 sm:gap-4 text-xs">
+                        <!-- BOTÃO ALTERNAR TEMA CLARO / ESCURO -->
+                        <button onclick="toggleTheme()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 text-gold" title="Alternar tema" id="btnThemeToggle">
+                            <i data-lucide="moon" class="w-4.5 h-4.5" id="iconTheme"></i>
+                            <span class="hidden md:inline font-medium text-[11px]" id="textThemeLabel">Escuro</span>
+                        </button>
 
-                    <button onclick="navigateTo('perfil')" class="flex items-center gap-3 pl-3 border-l border-inherit hover:opacity-80 transition cursor-pointer text-left group">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-gold text-xs" style="border: 1px solid var(--gold);" id="topUserAvatar">LM</div>
-                        <div class="hidden xl:block">
-                            <div class="text-xs font-semibold leading-tight group-hover:text-gold transition" id="topUserName">Lucas Mendes</div>
-                            <div class="text-[11px] font-mono" style="color: var(--mute);" id="topUserCpf">987.654.321-00</div>
+                        <button onclick="toggleFontScale()" class="p-2 rounded-lg carbon-card transition flex items-center gap-1.5 font-medium text-xs" title="Tamanho da fonte">
+                            <span class="font-semibold font-mono text-gold text-sm">A<sup class="text-[10px]">+</sup></span>
+                            <span class="hidden md:inline text-[11px] opacity-80" id="textScaleLabel">Fonte</span>
+                        </button>
+
+                        <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg carbon-card text-xs font-mono" style="color: var(--mute);">
+                            <i data-lucide="clock" class="w-3.5 h-3.5 text-gold"></i>
+                            <span>Sessão <strong class="text-inherit" id="sessionTimer">14:59</strong></span>
                         </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 opacity-50 group-hover:text-gold transition"></i>
-                    </button>
+
+                        <a href="/transactions/docs" target="_blank" class="hidden sm:flex text-xs font-medium opacity-80 hover:opacity-100 px-3 py-1.5 rounded-lg carbon-card transition items-center gap-1.5">
+                            <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Swagger
+                        </a>
+
+                        <button onclick="navigateTo('perfil')" class="flex items-center gap-3 pl-3 border-l border-inherit hover:opacity-80 transition cursor-pointer text-left group">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-gold text-xs" style="border: 1px solid var(--gold);" id="topUserAvatar">LM</div>
+                            <div class="hidden xl:block">
+                                <div class="text-xs font-semibold leading-tight group-hover:text-gold transition" id="topUserName">Lucas Mendes</div>
+                                <div class="text-[11px] font-mono" style="color: var(--mute);" id="topUserCpf">987.654.321-00</div>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 opacity-50 group-hover:text-gold transition"></i>
+                        </button>
+                    </div>
                 </div>
             </header>
 
             <!-- SCROLLABLE VIEWS -->
-            <main class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
+            <main class="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 pb-28 lg:pb-8 space-y-4 sm:space-y-6 safe-pb-bottom-nav">
 
-                <!-- 1. VIEW: INÍCIO -->
-                <section id="view-inicio" class="view-panel space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <div class="lg:col-span-8 carbon-card p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden">
-                            <div>
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="text-xs font-medium tracking-wide" style="color: var(--mute);">Saldo em conta corrente</div>
-                                    <span class="badge-status text-xs font-medium px-3 py-1 rounded-md flex items-center gap-1.5">
-                                        <span class="w-1.5 h-1.5 rounded-full" style="background: var(--status);"></span> Conta ativa
-                                    </span>
+                <!-- 1. VIEW: INÍCIO (ORGANIZADO NO MODELO DO APP BANCO DO BRASIL) -->
+                <section id="view-inicio" class="view-panel space-y-4 sm:space-y-6 max-w-5xl mx-auto">
+                    
+                    <!-- SESSÃO 1: HERO DE SALDO & AÇÕES DIRETAS (REFERÊNCIA BB FOTO 1) -->
+                    <div class="carbon-card p-5 sm:p-7 relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg icon-gold flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="wallet" class="w-4 h-4"></i>
                                 </div>
-                                <div class="flex items-baseline gap-2 mb-2">
-                                    <span class="text-2xl font-medium opacity-40">R$</span>
-                                    <h2 id="mainBalanceDisplay" class="text-5xl sm:text-6xl font-semibold font-amount tracking-tight">18.450,80</h2>
-                                </div>
-                                <div class="text-sm flex items-center gap-2 mb-6" style="color: var(--mute);">
-                                    <span>Limite Carbon disponível</span>
-                                    <strong class="text-gold font-mono text-base font-semibold" id="mainLimitDisplay">R$ 50.000,00</strong>
-                                </div>
+                                <span class="text-xs font-medium" style="color: var(--mute);">Saldo disponível</span>
                             </div>
-
-                            <div class="pt-6 border-t border-inherit flex flex-wrap items-center gap-3">
-                                <button onclick="navigateTo('pix')" class="btn-primary px-5 py-3 flex items-center gap-2">
-                                    <i data-lucide="qr-code" class="w-4 h-4"></i> Pix
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleBalanceVisibility()" class="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-gold transition" title="Ocultar/Mostrar Saldo">
+                                    <i id="heroEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
                                 </button>
-                                <button onclick="openModal('depositModal')" class="btn-secondary px-5 py-3 flex items-center gap-2">
-                                    <i data-lucide="plus-circle" class="w-4 h-4 text-gold"></i> Depositar
-                                </button>
-                                <button onclick="navigateTo('extrato')" class="btn-secondary px-5 py-3 flex items-center gap-2">
-                                    <i data-lucide="file-text" class="w-4 h-4"></i> Extrato
-                                </button>
-                                <button onclick="refreshDashboard()" class="btn-secondary p-3" title="Atualizar">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                                </button>
+                                <span class="badge-status text-[11px] font-medium px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full" style="background: var(--status);"></span> Ativa
+                                </span>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-4 carbon-card p-7 flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center justify-between mb-4">
-                                    <span class="text-xs font-medium" style="color: var(--mute);">Cartão virtual</span>
-                                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-md" style="color: var(--gold); border: 1px solid var(--gold);" id="cardBadgeType">Carbon Black</span>
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span class="text-xl sm:text-2xl font-medium opacity-40">R$</span>
+                            <h2 id="mainBalanceDisplay" class="text-4xl sm:text-6xl font-semibold font-amount tracking-tight">18.450,80</h2>
+                        </div>
+
+                        <!-- Pílulas de Ação Imediata (estilo BB: Fazer Pix / Trazer dinheiro) -->
+                        <div class="pt-4 border-t border-inherit flex flex-wrap items-center gap-2.5 sm:gap-3">
+                            <button onclick="navigateTo('pix')" class="btn-primary px-5 py-2.5 sm:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-xs">
+                                <i data-lucide="qr-code" class="w-4 h-4"></i> Fazer Pix
+                            </button>
+                            <button onclick="openModal('depositModal')" class="btn-secondary px-5 py-2.5 sm:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm font-medium">
+                                <i data-lucide="plus-circle" class="w-4 h-4 text-gold"></i> Trazer dinheiro / Depositar
+                            </button>
+                            <button onclick="navigateTo('extrato')" class="btn-secondary px-4 py-2.5 sm:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm font-medium">
+                                <i data-lucide="file-text" class="w-4 h-4"></i> Extrato
+                            </button>
+                            <button onclick="refreshDashboard()" class="btn-secondary p-2.5 sm:p-3 rounded-full" title="Atualizar saldo">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Indicador de Carrossel de Pontos (Dots - estilo BB) -->
+                        <div class="flex justify-center items-center gap-1.5 mt-4 pt-1">
+                            <span class="w-4 h-1.5 rounded-full" style="background: var(--gold);"></span>
+                            <span class="w-1.5 h-1.5 rounded-full opacity-30 bg-current"></span>
+                            <span class="w-1.5 h-1.5 rounded-full opacity-30 bg-current"></span>
+                        </div>
+                    </div>
+
+                    <!-- SESSÃO 2: GRADE 2x4 DE ATALHOS / AÇÕES RÁPIDAS (8 Botões - Referência BB Fotos 1 e 2) -->
+                    <div class="carbon-card p-4 sm:p-5">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider mb-3 px-1" style="color: var(--mute);">Acesso Rápido</div>
+                        <div class="grid grid-cols-4 gap-2 sm:gap-3">
+                            <!-- 1. Extrato -->
+                            <button onclick="navigateTo('extrato')" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl icon-gold flex items-center justify-center transition group-hover:scale-105">
+                                    <i data-lucide="file-text" class="w-5 h-5"></i>
                                 </div>
-                                <div class="h-36 rounded-xl card-theme-carbon p-5 flex flex-col justify-between relative overflow-hidden text-white" id="miniCardTheme">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm font-semibold">Bank<span style="color:#C4A35A;">Core</span></span>
-                                        <i data-lucide="wifi" class="w-4 h-4 rotate-90 text-zinc-400"></i>
-                                    </div>
-                                    <div class="text-sm font-mono text-zinc-300 font-medium" id="miniCardNumber">•••• 4289</div>
-                                    <div class="flex items-center justify-between text-[11px] font-mono text-zinc-300 uppercase">
-                                        <span id="miniCardHolder">LUCAS MENDES ROCHA</span>
-                                        <span>12/29</span>
-                                    </div>
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight">Extrato</span>
+                            </button>
+                            <!-- 2. Pagar -->
+                            <button onclick="navigateTo('pagar')" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl icon-gold flex items-center justify-center transition group-hover:scale-105">
+                                    <i data-lucide="barcode" class="w-5 h-5"></i>
                                 </div>
-                            </div>
-                            <button onclick="navigateTo('cartoes')" class="btn-secondary mt-4 w-full py-2.5 text-xs">
-                                Central de cartões →
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight">Pagar</span>
+                            </button>
+                            <!-- 3. Pix (Destaque) -->
+                            <button onclick="navigateTo('pix')" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group relative" style="border-color: var(--gold);">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition group-hover:scale-105" style="background: var(--gold); color: #0B0B0C;">
+                                    <i data-lucide="qr-code" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight text-gold">Pix</span>
+                            </button>
+                            <!-- 4. Transferência -->
+                            <button onclick="openModal('modalPixTransfer')" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl icon-gold flex items-center justify-center transition group-hover:scale-105">
+                                    <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight">Transferir</span>
+                            </button>
+                            <!-- 5. Investimentos -->
+                            <button onclick="navigateTo('invest')" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl icon-gold flex items-center justify-center transition group-hover:scale-105">
+                                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight">Investir</span>
+                            </button>
+                            <!-- 6. Cartões -->
+                            <button onclick="navigateTo('cartoes')" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl icon-gold flex items-center justify-center transition group-hover:scale-105">
+                                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight">Cartões</span>
+                            </button>
+                            <!-- 7. Empréstimo -->
+                            <button onclick="navigateTo('credito')" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl icon-gold flex items-center justify-center transition group-hover:scale-105">
+                                    <i data-lucide="coins" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight">Crédito</span>
+                            </button>
+                            <!-- 8. Ver Mais -->
+                            <button onclick="toggleMobileSidebar(true)" class="p-2.5 sm:p-3.5 rounded-xl carbon-card hover:border-[var(--gold)] flex flex-col items-center justify-center text-center gap-2 transition group">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl icon-gold flex items-center justify-center transition group-hover:scale-105">
+                                    <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-semibold leading-tight">Ver mais</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="carbon-card p-6 flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-lg icon-gold flex items-center justify-center">
-                                <i data-lucide="qr-code" class="w-5 h-5"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-[11px] font-medium" style="color: var(--mute);">Chave Pix (CPF)</div>
-                                <div class="text-base font-semibold font-mono text-gold truncate mt-0.5" id="mainPixCpf">987.654.321-00</div>
-                            </div>
-                            <button onclick="copyPixKey()" class="p-2 rounded-lg text-gold transition" title="Copiar chave">
-                                <i data-lucide="copy" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-
-                        <div class="carbon-card rounded-3xl p-6 flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-lg tx-icon-credit flex items-center justify-center">
-                                <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <div class="text-[11px] font-medium" style="color: var(--mute);">Entradas no extrato</div>
-                                <div class="text-base font-semibold font-mono amount-credit mt-0.5" id="mainTotalIncome">+ R$ 0,00</div>
+                    <!-- SESSÃO 3: BANNER DE BENEFÍCIOS VORTEX (Estilo BB Foto 1) -->
+                    <div class="carbon-card p-4 sm:p-5 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-xs sm:text-sm font-semibold">Vortex Carbon Corporate</div>
+                            <div class="text-[11px] sm:text-xs mt-0.5 leading-snug" style="color: var(--mute);">
+                                Acesso a benefícios empresariais exclusivos e limites corporativos ampliados.
                             </div>
                         </div>
-
-                        <div class="carbon-card rounded-3xl p-6 flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-lg tx-icon-debit flex items-center justify-center">
-                                <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <div class="text-[11px] font-medium" style="color: var(--mute);">Saídas no extrato</div>
-                                <div class="text-base font-semibold font-mono amount-debit mt-0.5" id="mainTotalExpense">- R$ 0,00</div>
-                            </div>
-                        </div>
+                        <button onclick="navigateTo('credito')" class="btn-secondary px-3.5 py-1.5 rounded-full text-xs font-semibold flex-shrink-0">
+                            Saiba mais
+                        </button>
                     </div>
 
-                    <div class="carbon-card p-6">
-                        <div class="flex items-center justify-between mb-5">
-                            <h3 class="text-lg font-semibold flex items-center gap-2.5">
-                                <span>Últimas movimentações</span>
-                                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md" style="border: 1px solid var(--gold); color: var(--gold);">Comprovante PDF</span>
+                    <!-- SESSÃO 4: AGENDA DE BOLETOS / DDA (Referência BB Foto 3) -->
+                    <div class="carbon-card p-5 sm:p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base sm:text-lg font-semibold flex items-center gap-2">
+                                <span>Agenda de boletos</span>
+                                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md" style="color: var(--mute); border: 1px solid var(--line);">DDA Automático</span>
                             </h3>
-                            <button onclick="navigateTo('extrato')" class="text-xs font-medium text-gold hover:underline transition">
+                            <button onclick="navigateTo('pagar')" class="text-xs text-gold hover:underline font-medium">
+                                Ver todos →
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-black/5 dark:bg-white/5 border border-inherit">
+                            <div>
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">A vencer Hoje</div>
+                                <div class="text-base sm:text-lg font-semibold font-mono mt-0.5">R$ 0,00</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">Próximos 30 dias</div>
+                                <div class="text-base sm:text-lg font-semibold font-mono text-gold mt-0.5" id="homeDdaTotal">R$ 1.280,80</div>
+                            </div>
+                        </div>
+                        <button onclick="navigateTo('pagar')" class="btn-secondary w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2">
+                            <span>Ver todos os boletos no DDA</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- SESSÃO 5: CARTÕES & FATURA (Referência BB Fotos 3 e 5) -->
+                    <div class="carbon-card p-5 sm:p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <button onclick="navigateTo('cartoes')" class="text-base sm:text-lg font-semibold flex items-center gap-1.5 hover:text-gold transition">
+                                <span>Cartões</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gold"></i>
+                            </button>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded-md" style="color: var(--gold); border: 1px solid var(--gold);" id="homeCardBadge">Carbon Black</span>
+                        </div>
+
+                        <!-- Indicador de Limite Utilizado vs Disponível com Barra de Progresso -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-baseline text-xs sm:text-sm">
+                                <div>
+                                    <span class="font-medium" style="color: var(--mute);">Limite utilizado:</span>
+                                    <strong class="font-mono ml-1 font-semibold" id="homeCardUsed">R$ 8.371,00</strong>
+                                </div>
+                                <div>
+                                    <span class="font-medium" style="color: var(--mute);">Disponível:</span>
+                                    <strong class="font-mono text-gold ml-1 font-semibold" id="homeCardAvailable">R$ 12.260,00</strong>
+                                </div>
+                            </div>
+                            <div class="w-full h-2 rounded-full overflow-hidden p-0.5" style="background: var(--line);">
+                                <div class="h-full rounded-full transition-all duration-500" style="background: var(--gold); width: 40%;" id="homeCardProgress"></div>
+                            </div>
+                        </div>
+
+                        <!-- Card Visual da Fatura Estilizado Carbon -->
+                        <div class="p-4 sm:p-5 rounded-2xl border border-inherit bg-black/5 dark:bg-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="space-y-1 w-full sm:w-auto">
+                                <div class="text-xs font-semibold" style="color: var(--mute);" id="homeCardName">Final 4289 • Carbon Black</div>
+                                <div class="text-2xl sm:text-3xl font-bold font-mono tracking-tight" id="homeCardInvoice">R$ 2.296,07</div>
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">
+                                    Melhor dia: <strong class="text-inherit">29/Set</strong> · Vence em: <strong class="text-inherit">10/Out</strong>
+                                </div>
+                            </div>
+
+                            <!-- Mini Cartão Ilustrado -->
+                            <div class="w-44 h-26 rounded-xl card-theme-carbon p-3.5 flex flex-col justify-between shadow-lg flex-shrink-0 text-white relative overflow-hidden" id="homeCardVisual">
+                                <div class="flex justify-between items-center text-xs font-bold">
+                                    <span>Bank<span style="color: #C4A35A;">Core</span></span>
+                                    <i data-lucide="wifi" class="w-3.5 h-3.5 rotate-90 text-zinc-400"></i>
+                                </div>
+                                <div class="text-xs font-mono text-zinc-300 font-bold" id="homeCardNumber">•••• 4289</div>
+                                <div class="flex justify-between items-center text-[9px] font-mono text-zinc-300 uppercase">
+                                    <span id="homeCardHolder">LUCAS MENDES</span>
+                                    <span class="font-bold text-amber-400">VISA</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="navigateTo('cartoes')" class="btn-secondary w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2">
+                            <span>Gerenciar cartões e faturas</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- SESSÃO 6: ATIVIDADES RECENTES (Extrato em Linha do Tempo - Referência BB Fotos 1 e 4) -->
+                    <div class="carbon-card p-5 sm:p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-base sm:text-lg font-semibold flex items-center gap-2">
+                                    <span>Atividades recentes</span>
+                                </h3>
+                                <p class="text-[11px] mt-0.5" style="color: var(--mute);">Movimentações reais no ledger interno · Toque para emitir PDF</p>
+                            </div>
+                            <button onclick="navigateTo('extrato')" class="text-xs text-gold hover:underline font-medium">
                                 Ver extrato completo →
                             </button>
                         </div>
-                        <div id="mainRecentTransactions" class="divide-y divide-inherit"></div>
+
+                        <!-- Chave Pix CPF Rápida -->
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-inherit text-xs">
+                            <div class="flex items-center gap-2.5">
+                                <i data-lucide="qr-code" class="w-4 h-4 text-gold"></i>
+                                <span>Chave Pix (CPF): <strong class="font-mono text-gold ml-1" id="mainPixCpf">987.654.321-00</strong></span>
+                            </div>
+                            <button onclick="copyPixKey()" class="text-gold font-medium hover:underline flex items-center gap-1">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+                            </button>
+                        </div>
+
+                        <!-- Totais ocultos de apoio para compatibilidade com scripts existentes -->
+                        <div class="hidden">
+                            <span id="mainTotalIncome">+ R$ 0,00</span>
+                            <span id="mainTotalExpense">- R$ 0,00</span>
+                            <span id="mainLimitDisplay">R$ 50.000,00</span>
+                            <span id="miniCardNumber">•••• 4289</span>
+                            <span id="miniCardHolder">LUCAS MENDES ROCHA</span>
+                            <span id="cardBadgeType">Carbon Black</span>
+                        </div>
+
+                        <!-- Lista do Extrato Dinâmico -->
+                        <div id="mainRecentTransactions" class="divide-y divide-inherit">
+                            <div class="py-4 text-center text-xs opacity-60">Carregando atividades recentes...</div>
+                        </div>
                     </div>
+
+                    <!-- SESSÃO 7: INVESTIMENTOS & PATRIMÔNIO (Referência BB Foto 5) -->
+                    <div class="carbon-card p-5 sm:p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <button onclick="navigateTo('invest')" class="text-base sm:text-lg font-semibold flex items-center gap-1.5 hover:text-gold transition">
+                                <span>Investimentos & Patrimônio</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gold"></i>
+                            </button>
+                            <span class="text-[10px] font-medium px-2 py-0.5 rounded-md" style="color: var(--status); border: 1px solid var(--status);">Protegido</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="p-3.5 rounded-xl border border-inherit bg-black/5 dark:bg-white/5 space-y-1">
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">CDB Liquidez Diária</div>
+                                <div class="text-base font-semibold font-mono text-gold">102% CDI</div>
+                                <div class="text-[10px] opacity-70">Resgate 24/7 garantido</div>
+                            </div>
+                            <div class="p-3.5 rounded-xl border border-inherit bg-black/5 dark:bg-white/5 space-y-1">
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">Tesouro Selic 2029</div>
+                                <div class="text-base font-semibold font-mono">Selic + 0,15%</div>
+                                <div class="text-[10px] opacity-70">Risco soberano zero</div>
+                            </div>
+                            <div class="p-3.5 rounded-xl border border-inherit bg-black/5 dark:bg-white/5 space-y-1">
+                                <div class="text-[11px] font-medium" style="color: var(--mute);">Limite Pré-Aprovado</div>
+                                <div class="text-base font-semibold font-mono" id="homeCreditApproved">R$ 50.000,00</div>
+                                <div class="text-[10px] opacity-70">Crédito imediato em conta</div>
+                            </div>
+                        </div>
+
+                        <button onclick="navigateTo('invest')" class="btn-secondary w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2">
+                            <span>Acessar BankCore Invest</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
                 </section>
+
 
                 <!-- 2. VIEW: EXTRATO -->
                 <section id="view-extrato" class="view-panel hidden space-y-6">
@@ -1696,6 +1968,155 @@
         </div>
     </div>
 
+    <!-- ================= BOTTOM NAVIGATION BAR (ESTILO APP BANCO DO BRASIL - MOBILE) ================= -->
+    <nav id="bottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-30 carbon-header backdrop-blur-xl border-t border-inherit px-3 py-1 flex items-center justify-around select-none">
+        <!-- 1. Início -->
+        <button onclick="navigateTo('inicio')" id="bottom-nav-inicio" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition text-gold font-bold" title="Início">
+            <i data-lucide="home" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px]">Início</span>
+        </button>
+
+        <!-- 2. Invest -->
+        <button onclick="navigateTo('invest')" id="bottom-nav-invest" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Investimentos">
+            <i data-lucide="trending-up" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px]">Invest</span>
+        </button>
+
+        <!-- 3. Pix (Botão Central Elevado Dourado - Estilo BB) -->
+        <button onclick="navigateTo('pix')" id="bottom-nav-pix" class="bottom-nav-item flex flex-col items-center justify-center relative -top-3.5 transition group" title="Área Pix">
+            <div class="w-13 h-13 rounded-full flex items-center justify-center shadow-lg transition-transform group-active:scale-95" style="background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%); color: #0B0B0C; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);">
+                <i data-lucide="qr-code" class="w-6 h-6 stroke-[2.4]"></i>
+            </div>
+            <span class="text-[10px] font-bold text-gold mt-0.5">Pix</span>
+        </button>
+
+        <!-- 4. Cartões -->
+        <button onclick="navigateTo('cartoes')" id="bottom-nav-cartoes" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Cartões">
+            <i data-lucide="credit-card" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px]">Cartões</span>
+        </button>
+
+        <!-- 5. Menu / Extrato -->
+        <button onclick="toggleMobileSidebar(true)" id="bottom-nav-menu" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Menu Completo">
+            <i data-lucide="menu" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px]">Menu</span>
+        </button>
+    </nav>
+
+    <!-- ================= MODAL / BOTTOM SHEET DE PERFIL & CONFIGURAÇÕES (REFERÊNCIA BB FOTO 2) ================= -->
+    <div id="profileQuickMenuModal" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div onclick="toggleProfileQuickMenu(false)" class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"></div>
+        
+        <!-- Sheet container -->
+        <div class="fixed inset-x-0 bottom-0 sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 w-full sm:max-w-md max-h-[88vh] overflow-y-auto carbon-card rounded-t-3xl sm:rounded-2xl p-5 sm:p-6 shadow-2xl border border-inherit z-10 space-y-4 animate-in slide-in-from-bottom duration-300">
+            <!-- Sheet handle mobile -->
+            <div class="w-12 h-1 rounded-full bg-zinc-500/40 mx-auto -mt-1 sm:hidden cursor-pointer" onclick="toggleProfileQuickMenu(false)"></div>
+            
+            <!-- User Header -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style="background: var(--input-bg); border: 2px solid var(--gold); color: var(--gold);" id="quickMenuAvatar">LM</div>
+                    <div class="min-w-0">
+                        <div class="text-sm font-bold leading-tight truncate" id="quickMenuName">Lucas Mendes Rocha</div>
+                        <div class="text-xs font-mono mt-0.5" style="color: var(--mute);" id="quickMenuAcc">Ag. 0001-9 · Cc. 77412-7</div>
+                        <div class="text-[10px] font-semibold text-gold truncate" id="quickMenuSegment">Vortex Carbon Corporate</div>
+                    </div>
+                </div>
+                <button onclick="toggleProfileQuickMenu(false)" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 opacity-70 hover:opacity-100 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="h-px bg-inherit opacity-20"></div>
+
+            <!-- Demo User Fast Switcher -->
+            <div class="p-3 rounded-xl border border-inherit bg-black/5 dark:bg-white/5 space-y-2">
+                <div class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--mute);">Alternar Conta de Demonstração</div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button type="button" onclick="selectDemoUser('98765432100'); toggleProfileQuickMenu(false);" id="quickBtnLucas" class="py-2 px-3 rounded-lg border text-left flex items-center justify-between transition hover:border-[var(--gold)]">
+                        <div>
+                            <div class="font-bold">Lucas Mendes</div>
+                            <div class="text-[10px] opacity-70">Corporate PJ</div>
+                        </div>
+                        <i data-lucide="check" class="w-4 h-4 text-gold" id="checkLucas"></i>
+                    </button>
+                    <button type="button" onclick="selectDemoUser('12345678900'); toggleProfileQuickMenu(false);" id="quickBtnMaria" class="py-2 px-3 rounded-lg border text-left flex items-center justify-between transition hover:border-[var(--gold)]">
+                        <div>
+                            <div class="font-bold">Maria Silva</div>
+                            <div class="text-[10px] opacity-70">Platinum PF</div>
+                        </div>
+                        <i data-lucide="check" class="w-4 h-4 text-gold hidden" id="checkMaria"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Menu Items -->
+            <div class="space-y-1 text-xs">
+                <!-- Notificações -->
+                <button onclick="showToastNotification('Você tem 3 notificações de segurança e ledger pendentes.', 'info'); toggleProfileQuickMenu(false);" class="w-full p-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg icon-gold flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="bell" class="w-4 h-4"></i>
+                        </div>
+                        <span class="font-semibold">Notificações</span>
+                    </div>
+                    <span class="bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 rounded-full">99+</span>
+                </button>
+
+                <!-- Suporte / Atendimento 24/7 -->
+                <button onclick="showToastNotification('Atendimento BankCore Concierge 24/7 ativo.', 'info'); toggleProfileQuickMenu(false);" class="w-full p-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg icon-gold flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="message-square" class="w-4 h-4"></i>
+                        </div>
+                        <span class="font-semibold">Atendimento & Concierge</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 opacity-40 group-hover:text-gold transition"></i>
+                </button>
+
+                <!-- Meu Perfil Completo -->
+                <button onclick="navigateTo('perfil'); toggleProfileQuickMenu(false);" class="w-full p-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg icon-gold flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                        </div>
+                        <span class="font-semibold">Dados Cadastrais & Perfil</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 opacity-40 group-hover:text-gold transition"></i>
+                </button>
+
+                <!-- Alternar Tema -->
+                <button onclick="toggleTheme()" class="w-full p-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg icon-gold flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="sun-moon" class="w-4 h-4"></i>
+                        </div>
+                        <span class="font-semibold">Alternar Tema (Claro / Escuro)</span>
+                    </div>
+                    <span class="text-[11px] font-mono opacity-60">Toque</span>
+                </button>
+
+                <!-- Segurança & Chaves Pix -->
+                <button onclick="navigateTo('pix'); toggleProfileQuickMenu(false);" class="w-full p-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg icon-gold flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        </div>
+                        <span class="font-semibold">Segurança & Chaves Pix</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 opacity-40 group-hover:text-gold transition"></i>
+                </button>
+            </div>
+
+            <div class="pt-1">
+                <button onclick="toggleProfileQuickMenu(false); logout();" class="w-full py-2.5 rounded-xl font-bold text-xs amount-debit border border-red-500/30 hover:bg-red-500/10 flex items-center justify-center gap-2 transition">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Sair do Aplicativo
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- SPA LOGIC -->
     <script>
         let currentAuthUser = JSON.parse(localStorage.getItem('bankcore_user') || 'null');
@@ -1739,15 +2160,18 @@
             localStorage.setItem('bankcore_theme', theme);
             const html = document.documentElement;
             const icon = document.getElementById('iconTheme');
+            const iconMobile = document.getElementById('iconThemeMobile');
             const label = document.getElementById('textThemeLabel');
 
             if (theme === 'light') {
                 html.classList.add('light-theme');
                 if (icon) icon.setAttribute('data-lucide', 'moon');
+                if (iconMobile) iconMobile.setAttribute('data-lucide', 'moon');
                 if (label) label.innerText = 'Escuro';
             } else {
                 html.classList.remove('light-theme');
                 if (icon) icon.setAttribute('data-lucide', 'sun');
+                if (iconMobile) iconMobile.setAttribute('data-lucide', 'sun');
                 if (label) label.innerText = 'Claro';
             }
             lucide.createIcons();
@@ -1774,6 +2198,57 @@
                 if (label) label.innerText = 'Fonte';
                 showToastNotification('Tamanho de fonte restaurado ao padrão.', 'info');
             }
+        }
+
+        function toggleMobileSidebar(force) {
+            const sidebar = document.getElementById('mainSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (!sidebar || !backdrop) return;
+            
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            const shouldOpen = typeof force === 'boolean' ? force : isClosed;
+            
+            if (shouldOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        function toggleProfileQuickMenu(force) {
+            const modal = document.getElementById('profileQuickMenuModal');
+            if (!modal) return;
+            const isHidden = modal.classList.contains('hidden');
+            const shouldOpen = typeof force === 'boolean' ? force : isHidden;
+            if (shouldOpen) {
+                modal.classList.remove('hidden');
+                lucide.createIcons();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function selectDemoUser(taxId) {
+            const isLucas = taxId === '98765432100';
+            currentAuthUser = {
+                tax_id: taxId,
+                full_name: isLucas ? 'Lucas Mendes Rocha' : 'Maria Silva Santos',
+                token: 'demo-token-' + taxId,
+                id: isLucas ? 1 : 2
+            };
+            localStorage.setItem('bankcore_user', JSON.stringify(currentAuthUser));
+            showApp();
+            showToastNotification(`Conta alternada para ${currentAuthUser.full_name}`, 'success');
+        }
+
+        function quickSwitchDemoUser() {
+            const currentTaxId = taxIdDigits(currentAuthUser && currentAuthUser.tax_id);
+            const nextTaxId = currentTaxId === '98765432100' ? '12345678900' : '98765432100';
+            selectDemoUser(nextTaxId);
         }
 
         function formatCPF(v) {
@@ -1939,6 +2414,7 @@
             const nameParts = fullName.split(/\s+/).filter(Boolean);
             const initials = (nameParts.slice(0, 2).map(function (p) { return p[0]; }).join('') || 'BC').toUpperCase();
             const accNumber = isLucas ? '77412-7' : isMaria ? '88921-3' : '—';
+            const firstName = nameParts[0] || 'Cliente';
 
             document.getElementById('sideUserName').innerText = fullName;
             document.getElementById('topUserName').innerText = fullName;
@@ -1946,6 +2422,30 @@
             document.getElementById('topUserAvatar').innerText = initials;
             document.getElementById('mainPixCpf').innerText = cpfFormatted;
 
+            // Mobile Topbar Elements (Banco do Brasil style)
+            const topGreeting = document.getElementById('topGreetingNameMobile');
+            if (topGreeting) topGreeting.innerText = firstName;
+            const topAccMobile = document.getElementById('topAccountSubtitleMobile');
+            if (topAccMobile) topAccMobile.innerText = `Ag. 0001-9 · Cc. ${accNumber}`;
+            const topAvatarMobile = document.getElementById('topUserAvatarMobile');
+            if (topAvatarMobile) topAvatarMobile.innerText = initials;
+
+            // Profile Quick Menu Popover / Bottom Sheet (Foto 2)
+            const qmAvatar = document.getElementById('quickMenuAvatar');
+            if (qmAvatar) qmAvatar.innerText = initials;
+            const qmName = document.getElementById('quickMenuName');
+            if (qmName) qmName.innerText = fullName;
+            const qmAcc = document.getElementById('quickMenuAcc');
+            if (qmAcc) qmAcc.innerText = `Ag. 0001-9 · Cc. ${accNumber}`;
+            const qmSegment = document.getElementById('quickMenuSegment');
+            if (qmSegment) qmSegment.innerText = isLucas ? 'Vortex Carbon Corporate' : isMaria ? 'Vortex Carbon Platinum' : 'BankCore Demo';
+
+            const checkLucas = document.getElementById('checkLucas');
+            const checkMaria = document.getElementById('checkMaria');
+            if (checkLucas) checkLucas.classList.toggle('hidden', !isLucas);
+            if (checkMaria) checkMaria.classList.toggle('hidden', !isMaria);
+
+            // Perfil View
             document.getElementById('perfilHeroAvatar').innerText = initials;
             document.getElementById('perfilHeroName').innerText = fullName;
             document.getElementById('perfilHeroCpf').innerText = 'CPF: ' + cpfFormatted;
@@ -1954,6 +2454,18 @@
             document.getElementById('perfilInputName').value = fullName;
             document.getElementById('perfilInputCpf').value = cpfFormatted;
             document.getElementById('perfilInputEmail').value = isLucas ? 'contato@vortexsoftware.tech' : isMaria ? 'maria.silva@vortexsoftware.tech' : '';
+
+            // Feed Home & Dados do Usuário
+            const homeDdaTotal = document.getElementById('homeDdaTotal');
+            const homeCardBadge = document.getElementById('homeCardBadge');
+            const homeCardUsed = document.getElementById('homeCardUsed');
+            const homeCardAvailable = document.getElementById('homeCardAvailable');
+            const homeCardProgress = document.getElementById('homeCardProgress');
+            const homeCardName = document.getElementById('homeCardName');
+            const homeCardInvoice = document.getElementById('homeCardInvoice');
+            const homeCardNumber = document.getElementById('homeCardNumber');
+            const homeCardHolder = document.getElementById('homeCardHolder');
+            const homeCreditApproved = document.getElementById('homeCreditApproved');
 
             if (isLucas) {
                 document.getElementById('sideLimitDisplay').innerText = 'R$ 50.000,00';
@@ -1969,6 +2481,19 @@
                 document.getElementById('cardLimitUsed').innerText = 'R$ 8.371,00';
                 document.getElementById('cardLimitAvailable').innerText = 'R$ 12.260,00';
                 document.getElementById('cardLimitTotalText').innerText = 'R$ 20.631,00';
+
+                // Home Feed Cards & DDA
+                if (homeDdaTotal) homeDdaTotal.innerText = 'R$ 1.280,80';
+                if (homeCardBadge) homeCardBadge.innerText = 'Carbon Black';
+                if (homeCardUsed) homeCardUsed.innerText = 'R$ 8.371,00';
+                if (homeCardAvailable) homeCardAvailable.innerText = 'R$ 12.260,00';
+                if (homeCardProgress) homeCardProgress.style.width = '40%';
+                if (homeCardName) homeCardName.innerText = 'Final 4289 • Carbon Black';
+                if (homeCardInvoice) homeCardInvoice.innerText = 'R$ 2.296,07';
+                if (homeCardNumber) homeCardNumber.innerText = '•••• 4289';
+                if (homeCardHolder) homeCardHolder.innerText = 'LUCAS MENDES';
+                if (homeCreditApproved) homeCreditApproved.innerText = 'R$ 50.000,00';
+
                 document.getElementById('cardTransactionsList').innerHTML =
                     mockCardRow('AWS Amazon Web Services', 'Crédito · 6x · 01/Set', '1.240,00') +
                     mockCardRow('Figma Inc.', 'Assinatura anual · 30/Ago', '184,90') +
@@ -2004,6 +2529,19 @@
                 document.getElementById('cardLimitUsed').innerText = 'R$ 4.210,00';
                 document.getElementById('cardLimitAvailable').innerText = 'R$ 15.790,00';
                 document.getElementById('cardLimitTotalText').innerText = 'R$ 20.000,00';
+
+                // Home Feed Cards & DDA
+                if (homeDdaTotal) homeDdaTotal.innerText = 'R$ 1.982,35';
+                if (homeCardBadge) homeCardBadge.innerText = 'Carbon Platinum';
+                if (homeCardUsed) homeCardUsed.innerText = 'R$ 4.210,00';
+                if (homeCardAvailable) homeCardAvailable.innerText = 'R$ 15.790,00';
+                if (homeCardProgress) homeCardProgress.style.width = '21%';
+                if (homeCardName) homeCardName.innerText = 'Final 8821 • Carbon Platinum';
+                if (homeCardInvoice) homeCardInvoice.innerText = 'R$ 1.480,30';
+                if (homeCardNumber) homeCardNumber.innerText = '•••• 8821';
+                if (homeCardHolder) homeCardHolder.innerText = 'MARIA SILVA';
+                if (homeCreditApproved) homeCreditApproved.innerText = 'R$ 35.000,00';
+
                 document.getElementById('cardTransactionsList').innerHTML =
                     mockCardRow('Latam Airlines Brasil', 'SP–RJ · 5x · 29/Ago', '890,00') +
                     mockCardRow('Farmácia Droga Raia', 'Crédito · 28/Ago', '186,40') +
@@ -2038,6 +2576,19 @@
                 document.getElementById('cardLimitUsed').innerText = 'R$ 0,00';
                 document.getElementById('cardLimitAvailable').innerText = 'R$ 10.000,00';
                 document.getElementById('cardLimitTotalText').innerText = 'R$ 10.000,00';
+
+                // Home Feed Cards & DDA
+                if (homeDdaTotal) homeDdaTotal.innerText = 'R$ 309,90';
+                if (homeCardBadge) homeCardBadge.innerText = 'Carbon Demo';
+                if (homeCardUsed) homeCardUsed.innerText = 'R$ 0,00';
+                if (homeCardAvailable) homeCardAvailable.innerText = 'R$ 10.000,00';
+                if (homeCardProgress) homeCardProgress.style.width = '0%';
+                if (homeCardName) homeCardName.innerText = 'Cartão Virtual Demo';
+                if (homeCardInvoice) homeCardInvoice.innerText = 'R$ 0,00';
+                if (homeCardNumber) homeCardNumber.innerText = '•••• ••••';
+                if (homeCardHolder) homeCardHolder.innerText = (nameParts[0] || 'CLIENTE').toUpperCase();
+                if (homeCreditApproved) homeCreditApproved.innerText = 'R$ 10.000,00';
+
                 document.getElementById('cardTransactionsList').innerHTML =
                     mockCardRow('Mercado Livre', 'Crédito · 01/Set', '219,90') +
                     mockCardRow('Posto Ipiranga', 'Débito · 30/Ago', '180,00') +
@@ -2056,6 +2607,8 @@
             await loadOrCreateAccount();
             if (currentAccount && currentAccount.account_number) {
                 document.getElementById('perfilHeroAcc').innerText = `Ag. 0001-9 • Cc. ${currentAccount.account_number}`;
+                if (topAccMobile) topAccMobile.innerText = `Ag. 0001-9 · Cc. ${currentAccount.account_number}`;
+                if (qmAcc) qmAcc.innerText = `Ag. 0001-9 · Cc. ${currentAccount.account_number}`;
             }
             await loadStatement();
             recalcLoan();
@@ -2168,26 +2721,28 @@
                             const d = new Date(tx.created_at.endsWith('Z') ? tx.created_at : tx.created_at + 'Z');
                             const formatted = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
                             return `
-                                <div onclick="openReceiptByIndex(${idx})" class="py-3.5 px-2 cursor-pointer transition flex items-center justify-between group" style="border-bottom: 1px solid var(--border-subtle);">
-                                    <div class="flex items-center gap-3.5">
-                                        <div class="w-9 h-9 rounded-lg ${isCredit ? 'tx-icon-credit' : 'tx-icon-debit'} flex items-center justify-center">
-                                            <i data-lucide="${isCredit ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4"></i>
+                                <div onclick="openReceiptByIndex(${idx})" class="py-3 px-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition flex items-center justify-between group" style="border-bottom: 1px solid var(--border-subtle);">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-10 h-10 rounded-full ${isCredit ? 'tx-icon-credit' : 'tx-icon-debit'} flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="${isCredit ? 'arrow-down-left' : 'arrow-up-right'}" class="w-5 h-5"></i>
                                         </div>
-                                        <div>
-                                            <div class="text-xs font-semibold group-hover:text-gold transition flex items-center gap-1.5">
-                                                <span>${tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado')}</span>
-                                                <i data-lucide="file-text" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition"></i>
+                                        <div class="min-w-0">
+                                            <div class="text-xs sm:text-sm font-semibold truncate group-hover:text-gold transition flex items-center gap-1.5">
+                                                <span class="truncate">${tx.description || (isCredit ? 'Pix recebido' : 'Pix enviado')}</span>
                                             </div>
-                                            <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">${formatted} · ${tx.idempotency_key.substring(0, 12)}…</div>
+                                            <div class="text-[11px] font-mono mt-0.5 truncate" style="color: var(--mute);">${formatted} · ${tx.idempotency_key.substring(0, 10)}…</div>
                                         </div>
                                     </div>
-                                    <div class="text-right font-mono font-semibold text-xs font-amount ${isCredit ? 'amount-credit' : 'amount-debit'}">
-                                        ${isCredit ? '+' : '−'} R$ ${tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    <div class="flex items-center gap-2 flex-shrink-0 ml-2">
+                                        <div class="text-right font-mono font-semibold text-xs sm:text-sm font-amount ${isCredit ? 'amount-credit' : 'amount-debit'}">
+                                            ${isCredit ? '+' : '−'} R$ ${tx.amount_reais.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        </div>
+                                        <i data-lucide="chevron-right" class="w-4 h-4 opacity-30 group-hover:opacity-100 group-hover:text-gold transition"></i>
                                     </div>
                                 </div>
                             `;
                         };
-                        mainContainer.innerHTML = txs.slice(0, 4).map((tx, idx) => renderItem(tx, idx)).join('');
+                        mainContainer.innerHTML = txs.slice(0, 5).map((tx, idx) => renderItem(tx, idx)).join('');
                         fullContainer.innerHTML = txs.map((tx, idx) => renderItem(tx, idx)).join('');
                         document.getElementById('mainTotalIncome').innerText = '+ R$ ' + totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                         document.getElementById('mainTotalExpense').innerText = '- R$ ' + totalExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -2452,6 +3007,24 @@
             if (target) target.classList.remove('hidden');
             if (navBtn) navBtn.classList.add('active');
 
+            // Atualiza barra de navegação inferior mobile (Bottom Navigation Bar)
+            document.querySelectorAll('.bottom-nav-item').forEach(el => {
+                el.classList.remove('text-gold', 'font-bold');
+                el.classList.add('opacity-70', 'font-medium');
+            });
+            const bottomNavBtn = document.getElementById('bottom-nav-' + viewName);
+            if (bottomNavBtn) {
+                bottomNavBtn.classList.add('text-gold', 'font-bold');
+                bottomNavBtn.classList.remove('opacity-70', 'font-medium');
+            }
+
+            // Fecha a barra lateral mobile se estiver aberta
+            toggleMobileSidebar(false);
+
+            // Rola a visualização principal para o topo
+            const mainContainer = document.querySelector('main');
+            if (mainContainer) mainContainer.scrollTop = 0;
+
             const breadcrumbMap = {
                 'inicio': 'Visão Geral',
                 'extrato': 'Extrato & Recibos',
@@ -2463,7 +3036,8 @@
                 'credito': 'Empréstimos & Crédito',
                 'perfil': 'Meu Perfil & Ajustes'
             };
-            document.getElementById('topBreadcrumb').innerText = breadcrumbMap[viewName] || viewName;
+            const bc = document.getElementById('topBreadcrumb');
+            if (bc) bc.innerText = breadcrumbMap[viewName] || viewName;
             lucide.createIcons();
         }
 
@@ -2480,7 +3054,14 @@
         function toggleBalanceVisibility() {
             isBalanceHidden = !isBalanceHidden;
             const iconName = isBalanceHidden ? 'eye-off' : 'eye';
-            document.getElementById('sideEyeIcon').setAttribute('data-lucide', iconName);
+            const sideEye = document.getElementById('sideEyeIcon');
+            const topEyeMobile = document.getElementById('topEyeIconMobile');
+            const heroEye = document.getElementById('heroEyeIcon');
+
+            if (sideEye) sideEye.setAttribute('data-lucide', iconName);
+            if (topEyeMobile) topEyeMobile.setAttribute('data-lucide', iconName);
+            if (heroEye) heroEye.setAttribute('data-lucide', iconName);
+
             updateAccountUI();
             lucide.createIcons();
             showToastNotification(isBalanceHidden ? 'Saldo ocultado.' : 'Saldo visível.', 'info');
