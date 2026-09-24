@@ -8,16 +8,16 @@ O backend (`services/`) e a SPA (`frontend/`) já existem. Três clientes do **m
 | :--- | :--- | :--- | :--- | :--- |
 | iOS | `apps/ios` | SwiftUI, iOS 17+ | Mac M1 Air + Xcode | **Feito** `version 1.10.25` |
 | Desktop | `apps/desktop` | Tauri 2 + HTML/JS Carbon Ledger | Windows | **Feito** `version 1.10.25` |
-| Android | `apps/android` | Kotlin + Jetpack Compose | Windows (Android Studio) | A fazer |
+| Android | `apps/android` | Kotlin + Jetpack Compose | Windows (Android Studio) | **Feito** `version 1.10.25` |
 
-## Ordem
+## Ecossistema Multiplataforma
 
-1. Docs neste diretório (já no GitHub).
-2. iOS no Mac — **concluído**.
-3. Desktop Tauri no Windows (prova a API fora do browser).
-4. Android nativo no Windows.
+1. **Backend e Web SPA:** API em produção (`https://bankcore.vortexsoftware.tech`) e web banking ativo.
+2. **iOS no Mac:** Concluído nativo em SwiftUI.
+3. **Desktop Tauri no Windows:** Concluído com empacotador NSIS (`-setup.exe`).
+4. **Android nativo no Windows:** Concluído com Jetpack Compose nativo.
 
-Um chat = um app até o happy path: **login → Pix → extrato → comprovante**, depois a home viva (grade, cartões simulados, versão).
+Todos os três clientes compartilham o mesmo fluxo happy path: **login → Pix → extrato → comprovante**, com home viva e `version 1.10.25`.
 
 ## v1 (obrigatório em todos)
 
