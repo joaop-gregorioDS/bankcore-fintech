@@ -273,79 +273,105 @@
         </div>
     </div>
 
-    <!-- ================= AUTH SCREEN ================= -->
-    <div id="authView" class="min-h-full flex items-center justify-center p-4 sm:p-6" style="background: var(--ink);">
-        <div class="max-w-md w-full space-y-6">
-            <div class="text-center space-y-3">
-                <div class="inline-flex w-12 h-12 rounded-lg items-center justify-center" style="border: 1px solid var(--gold);">
-                    <i data-lucide="shield" class="w-6 h-6 text-gold"></i>
+    <!-- ================= AUTH SCREEN (DESIGN UNIFICADO INSPIRADO NO APP TAURI PC) ================= -->
+    <div id="authView" class="min-h-full flex items-center justify-center p-4 sm:p-6 py-8" style="background: var(--ink);">
+        <div class="max-w-md w-full carbon-card rounded-3xl p-6 sm:p-8 shadow-2xl border border-inherit space-y-4 my-auto">
+            <!-- Header: Escudo Dourado + Título + Subtítulo + Badge -->
+            <div class="text-center space-y-2.5">
+                <div class="w-13 h-13 rounded-2xl flex items-center justify-center mx-auto shadow-xs" style="background: var(--input-bg); border: 1.5px solid var(--gold);">
+                    <i data-lucide="shield" class="w-7 h-7 text-gold"></i>
                 </div>
-                <h1 class="text-3xl font-semibold tracking-tight">Bank<span class="text-gold">Core</span></h1>
-                <p class="text-sm font-medium" style="color: var(--mute);">Web banking de demonstração · Vortex Software</p>
-                <p class="text-[11px] font-medium tracking-wide" style="color: var(--gold);">Ambiente de portfólio — login, Pix, extrato e PDF no ledger interno</p>
-            </div>
-
-            <div class="carbon-card p-5">
-                <div class="text-[11px] font-semibold tracking-wide mb-3" style="color: var(--mute);">Contas de demonstração</div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="fillDemo('98765432100', 'teste123456')" class="p-3 btn-secondary text-left transition group">
-                        <div class="text-xs font-semibold group-hover:text-gold">Lucas Mendes</div>
-                        <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">987.654.321-00</div>
-                        <div class="text-xs font-mono font-amount mt-1.5">R$ 18.450,80</div>
-                    </button>
-                    <button onclick="fillDemo('12345678900', 'teste123456')" class="p-3 btn-secondary text-left transition group">
-                        <div class="text-xs font-semibold group-hover:text-gold">Maria Silva</div>
-                        <div class="text-[11px] font-mono mt-0.5" style="color: var(--mute);">123.456.789-00</div>
-                        <div class="text-xs font-mono font-amount mt-1.5">R$ 12.870,40</div>
-                    </button>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">Bank<span class="text-gold">Core</span></h1>
+                    <p class="text-[11px] sm:text-xs font-medium opacity-70 mt-0.5">Web Banking Corporativo &amp; Ledger de Partidas Dobradas</p>
+                </div>
+                <div class="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold tracking-wider uppercase border border-[var(--gold)]/30 text-gold bg-amber-500/5">
+                    PORTFÓLIO / LABORATÓRIO DE DEMONSTRAÇÃO
                 </div>
             </div>
 
-            <div class="carbon-card p-6 space-y-5">
-                <div class="flex p-1" style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px;">
-                    <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-xs font-semibold rounded-md transition btn-primary">Acessar conta</button>
-                    <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-xs font-semibold rounded-md transition" style="color: var(--mute);">Abrir conta</button>
+            <!-- Contas de um clique (Referência App Tauri) -->
+            <div class="space-y-2 pt-1">
+                <div class="text-[11px] font-semibold opacity-70 px-1">Contas de um clique:</div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <!-- Lucas Mendes -->
+                    <button type="button" onclick="quickLoginDemo('98765432100', 'teste123456')" class="p-2.5 rounded-xl border border-inherit bg-black/5 dark:bg-white/5 hover:border-[var(--gold)] hover:bg-black/10 dark:hover:bg-white/10 transition flex items-center gap-2.5 text-left group">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0" style="background: var(--input-bg); border: 1.5px solid var(--gold); color: var(--gold);">LM</div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold leading-tight truncate group-hover:text-gold transition">Lucas Mendes</div>
+                            <div class="text-[10px] font-medium opacity-60 leading-tight">PJ · Carbon Black</div>
+                        </div>
+                    </button>
+
+                    <!-- Maria Silva -->
+                    <button type="button" onclick="quickLoginDemo('12345678900', 'teste123456')" class="p-2.5 rounded-xl border border-inherit bg-black/5 dark:bg-white/5 hover:border-[var(--gold)] hover:bg-black/10 dark:hover:bg-white/10 transition flex items-center gap-2.5 text-left group">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0" style="background: var(--input-bg); border: 1.5px solid var(--gold); color: var(--gold);">MS</div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold leading-tight truncate group-hover:text-gold transition">Maria Silva</div>
+                            <div class="text-[10px] font-medium opacity-60 leading-tight">PF · Platinum</div>
+                        </div>
+                    </button>
                 </div>
+            </div>
 
-                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">CPF do correntista</label>
-                        <input type="text" id="loginTaxId" required placeholder="00000000000" class="field-input w-full px-4 py-3 text-sm font-mono">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Senha de acesso</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••" class="field-input w-full px-4 py-3 text-sm">
-                    </div>
-                    <button type="submit" id="btnLoginSubmit" class="btn-primary w-full py-3 flex items-center justify-center gap-2">
-                        <span>Entrar</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </form>
+            <!-- Divisor: OU CREDENCIAIS MANUAIS -->
+            <div class="relative flex items-center justify-center py-1">
+                <div class="grow border-t border-inherit opacity-25"></div>
+                <span class="shrink-0 px-3 text-[10px] font-mono uppercase tracking-widest opacity-50">OU CREDENCIAIS MANUAIS</span>
+                <div class="grow border-t border-inherit opacity-25"></div>
+            </div>
 
-                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                    <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Nome completo / razão social</label>
-                        <input type="text" id="regName" required placeholder="Nome e sobrenome" class="field-input w-full px-4 py-3 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">CPF / CNPJ (apenas números)</label>
-                        <input type="text" id="regTaxId" required placeholder="00000000000" class="field-input w-full px-4 py-3 text-sm font-mono">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">E-mail corporativo</label>
-                        <input type="email" id="regEmail" required placeholder="contato@empresa.com" class="field-input w-full px-4 py-3 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--mute);">Senha</label>
-                        <input type="password" id="regPassword" required minlength="8" placeholder="••••••••" class="field-input w-full px-4 py-3 text-sm">
-                    </div>
-                    <button type="submit" class="btn-primary w-full py-3 flex items-center justify-center gap-2">
-                        <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>Criar conta</span>
-                    </button>
-                </form>
+            <!-- Alternador Acessar / Abrir Conta -->
+            <div class="flex p-1 rounded-xl bg-black/5 dark:bg-white/5 border border-inherit text-xs font-semibold">
+                <button type="button" id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg transition btn-primary text-xs font-semibold">Acessar conta</button>
+                <button type="button" id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg transition opacity-60 hover:opacity-100 text-xs font-semibold" style="color: var(--mute);">Abrir conta</button>
+            </div>
 
-                <div id="authAlert" class="mt-4 text-xs p-3 rounded-lg hidden text-center font-medium"></div>
+            <!-- Formulário de Login -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3 text-left">
+                <div>
+                    <label class="block text-xs font-medium mb-1 opacity-70">CPF do Titular</label>
+                    <input type="text" id="loginTaxId" required placeholder="000.000.000-00" class="field-input w-full px-3.5 py-2.5 text-sm font-mono rounded-xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1 opacity-70">Senha de Acesso</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="field-input w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <button type="submit" id="btnLoginSubmit" class="btn-primary w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition">
+                    <span>Acessar Conta Segura</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+
+            <!-- Formulário de Cadastro -->
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3 text-left hidden">
+                <div>
+                    <label class="block text-xs font-medium mb-1 opacity-70">Nome completo / Razão social</label>
+                    <input type="text" id="regName" required placeholder="Nome e sobrenome" class="field-input w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1 opacity-70">CPF / CNPJ (apenas números)</label>
+                    <input type="text" id="regTaxId" required placeholder="00000000000" class="field-input w-full px-3.5 py-2.5 text-sm font-mono rounded-xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1 opacity-70">E-mail corporativo</label>
+                    <input type="email" id="regEmail" required placeholder="contato@empresa.com" class="field-input w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1 opacity-70">Senha</label>
+                    <input type="password" id="regPassword" required minlength="8" placeholder="••••••••" class="field-input w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/5 dark:bg-zinc-900 border border-inherit">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Criar Conta</span>
+                </button>
+            </form>
+
+            <div id="authAlert" class="text-xs p-3 rounded-xl hidden text-center font-bold"></div>
+
+            <!-- Rodapé estilo Tauri PC -->
+            <div class="text-center text-[10px] font-mono opacity-40 pt-1 tracking-wider">
+                versão 1.10.25 · vortex software
             </div>
         </div>
     </div>
@@ -1727,6 +1753,41 @@
                     </div>
                 </section>
             </main>
+
+            <!-- ================= BOTTOM NAVIGATION BAR (ESTILO APP BANCO DO BRASIL - MOBILE - DENTRO DE APPVIEW) ================= -->
+            <nav id="bottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-30 carbon-header backdrop-blur-xl border-t border-inherit px-3 py-1 flex items-center justify-around select-none">
+                <!-- 1. Início -->
+                <button onclick="navigateTo('inicio')" id="bottom-nav-inicio" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition text-gold font-bold" title="Início">
+                    <i data-lucide="home" class="w-5 h-5 mb-0.5"></i>
+                    <span class="text-[10px]">Início</span>
+                </button>
+
+                <!-- 2. Invest -->
+                <button onclick="navigateTo('invest')" id="bottom-nav-invest" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Investimentos">
+                    <i data-lucide="trending-up" class="w-5 h-5 mb-0.5"></i>
+                    <span class="text-[10px]">Invest</span>
+                </button>
+
+                <!-- 3. Pix (Botão Central Elevado Dourado - Estilo BB) -->
+                <button onclick="navigateTo('pix')" id="bottom-nav-pix" class="bottom-nav-item flex flex-col items-center justify-center relative -top-3.5 transition group" title="Área Pix">
+                    <div class="w-13 h-13 rounded-full flex items-center justify-center shadow-lg transition-transform group-active:scale-95" style="background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%); color: #0B0B0C; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);">
+                        <i data-lucide="qr-code" class="w-6 h-6 stroke-[2.4]"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-gold mt-0.5">Pix</span>
+                </button>
+
+                <!-- 4. Cartões -->
+                <button onclick="navigateTo('cartoes')" id="bottom-nav-cartoes" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Cartões">
+                    <i data-lucide="credit-card" class="w-5 h-5 mb-0.5"></i>
+                    <span class="text-[10px]">Cartões</span>
+                </button>
+
+                <!-- 5. Menu / Extrato -->
+                <button onclick="toggleMobileSidebar(true)" id="bottom-nav-menu" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Menu Completo">
+                    <i data-lucide="menu" class="w-5 h-5 mb-0.5"></i>
+                    <span class="text-[10px]">Menu</span>
+                </button>
+            </nav>
         </div>
     </div>
 
@@ -1967,41 +2028,6 @@
             </form>
         </div>
     </div>
-
-    <!-- ================= BOTTOM NAVIGATION BAR (ESTILO APP BANCO DO BRASIL - MOBILE) ================= -->
-    <nav id="bottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-30 carbon-header backdrop-blur-xl border-t border-inherit px-3 py-1 flex items-center justify-around select-none">
-        <!-- 1. Início -->
-        <button onclick="navigateTo('inicio')" id="bottom-nav-inicio" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition text-gold font-bold" title="Início">
-            <i data-lucide="home" class="w-5 h-5 mb-0.5"></i>
-            <span class="text-[10px]">Início</span>
-        </button>
-
-        <!-- 2. Invest -->
-        <button onclick="navigateTo('invest')" id="bottom-nav-invest" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Investimentos">
-            <i data-lucide="trending-up" class="w-5 h-5 mb-0.5"></i>
-            <span class="text-[10px]">Invest</span>
-        </button>
-
-        <!-- 3. Pix (Botão Central Elevado Dourado - Estilo BB) -->
-        <button onclick="navigateTo('pix')" id="bottom-nav-pix" class="bottom-nav-item flex flex-col items-center justify-center relative -top-3.5 transition group" title="Área Pix">
-            <div class="w-13 h-13 rounded-full flex items-center justify-center shadow-lg transition-transform group-active:scale-95" style="background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%); color: #0B0B0C; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);">
-                <i data-lucide="qr-code" class="w-6 h-6 stroke-[2.4]"></i>
-            </div>
-            <span class="text-[10px] font-bold text-gold mt-0.5">Pix</span>
-        </button>
-
-        <!-- 4. Cartões -->
-        <button onclick="navigateTo('cartoes')" id="bottom-nav-cartoes" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Cartões">
-            <i data-lucide="credit-card" class="w-5 h-5 mb-0.5"></i>
-            <span class="text-[10px]">Cartões</span>
-        </button>
-
-        <!-- 5. Menu / Extrato -->
-        <button onclick="toggleMobileSidebar(true)" id="bottom-nav-menu" class="bottom-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-xl transition opacity-70 font-medium" title="Menu Completo">
-            <i data-lucide="menu" class="w-5 h-5 mb-0.5"></i>
-            <span class="text-[10px]">Menu</span>
-        </button>
-    </nav>
 
     <!-- ================= MODAL / BOTTOM SHEET DE PERFIL & CONFIGURAÇÕES (REFERÊNCIA BB FOTO 2) ================= -->
     <div id="profileQuickMenuModal" class="fixed inset-0 z-50 hidden">
@@ -2333,8 +2359,8 @@
             document.getElementById('registerForm').classList.toggle('hidden', isLogin);
             const loginBtn = document.getElementById('tabLogin');
             const regBtn = document.getElementById('tabRegister');
-            loginBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-md transition' + (isLogin ? ' btn-primary' : '');
-            regBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-md transition' + (!isLogin ? ' btn-primary' : '');
+            loginBtn.className = 'flex-1 py-2 rounded-lg transition text-xs font-semibold' + (isLogin ? ' btn-primary' : ' opacity-60 hover:opacity-100');
+            regBtn.className = 'flex-1 py-2 rounded-lg transition text-xs font-semibold' + (!isLogin ? ' btn-primary' : ' opacity-60 hover:opacity-100');
             loginBtn.style.color = isLogin ? '' : 'var(--mute)';
             regBtn.style.color = !isLogin ? '' : 'var(--mute)';
             hideAlert('authAlert');
@@ -2344,6 +2370,11 @@
             document.getElementById('loginTaxId').value = taxId;
             document.getElementById('loginPassword').value = password;
             switchAuthTab('login');
+        }
+
+        async function quickLoginDemo(taxId, password) {
+            fillDemo(taxId, password);
+            await handleLogin({ preventDefault: function () {} });
         }
 
         async function handleRegister(e) {
@@ -2374,6 +2405,11 @@
         function showAuth() {
             document.getElementById('authView').classList.remove('hidden');
             document.getElementById('appView').classList.add('hidden');
+            const bottomNav = document.getElementById('bottomNav');
+            if (bottomNav) bottomNav.classList.add('hidden');
+            const quickMenu = document.getElementById('profileQuickMenuModal');
+            if (quickMenu) quickMenu.classList.add('hidden');
+            lucide.createIcons();
         }
 
         function mockCardRow(name, meta, amount) {
@@ -2405,6 +2441,8 @@
         async function showApp() {
             document.getElementById('authView').classList.add('hidden');
             document.getElementById('appView').classList.remove('hidden');
+            const bottomNav = document.getElementById('bottomNav');
+            if (bottomNav) bottomNav.classList.remove('hidden');
 
             const taxId = taxIdDigits(currentAuthUser.tax_id);
             const isLucas = taxId === '98765432100';
