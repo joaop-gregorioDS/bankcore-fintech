@@ -1,6 +1,6 @@
 # BankCore — Fintech Platform & Multiplatform Banking Ecosystem
 
-Plataforma fintech corporativa de demonstração — Backend de alta confiabilidade em microserviços com **FastAPI**, **PostgreSQL 16**, **Redis 7** e um **Ledger Financeiro de Partidas Dobradas (ACID)**, integrado a um ecossistema omni-channel completo: **Web Banking SPA**, **Desktop Windows (Tauri 2)**, **Android Nativo (Jetpack Compose)** e **iOS Nativo (SwiftUI)**.
+Plataforma fintech de demonstração com serviços em **FastAPI**, **PostgreSQL 16** e **Redis 7**, um ledger interno de partidas dobradas e clientes web, desktop, Android e iOS.
 
 Feito para portfólio de engenharia de software de ponta: o avaliador entra em um clique, transfere via Pix, consulta o razão contábil e exporta comprovantes e extratos em PDF e CSV.
 
@@ -45,7 +45,7 @@ O sistema possui duas contas pré-configuradas no banco para teste imediato de t
 1. Acesse o Web Banking e clique no botão demo de **Lucas Mendes**;
 2. Envie um Pix de qualquer valor para o CPF de **Maria Silva** (`12345678900`);
 3. Veja o saldo debitar instantaneamente e abra o **Extrato**;
-4. Clique no lançamento para gerar o **Comprovante oficial em PDF** (estilo papel ivory de segurança);
+4. Clique no lançamento para gerar um **comprovante demonstrativo em PDF** (estilo papel ivory);
 5. Alterne para a conta da Maria e verifique o crédito instantâneo correspondente.
 
 ---
