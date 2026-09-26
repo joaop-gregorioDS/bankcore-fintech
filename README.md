@@ -24,6 +24,8 @@ Feito para portfólio de engenharia de software de ponta: o avaliador entra em u
 
 ## 🌐 Demonstração & Ambientes Oficiais
 
+O web banking e as APIs estão hospedados na VPS própria, atrás do gateway Nginx.
+
 * **Web Banking em Produção:** [https://bankcore.vortexsoftware.tech](https://bankcore.vortexsoftware.tech)
 * **Auth API (Swagger Docs):** [https://bankcore.vortexsoftware.tech/auth/docs](https://bankcore.vortexsoftware.tech/auth/docs)
 * **Transactions & Ledger API (Swagger Docs):** [https://bankcore.vortexsoftware.tech/transactions/docs](https://bankcore.vortexsoftware.tech/transactions/docs)
